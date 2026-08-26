@@ -1,0 +1,64 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+# Environment & Secrets
+.env
+.env.*
+.env.local
+.env.*.local
+!.env.example
+# OS & Editor
+Thumbs.db
+ehthumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo
+# Large Binaries, Archives & Build Outputs
+*.rar
+*.zip
+*.7z
+*.tar.gz
+*.pkg
+*.exe
+*.dll
+*.dmg
+*.app
+*.pak
+*.dat
+*.bin
+*.pdb
+build/
+dist/
+release/
+out/
+dist-electron/
+deploy/
+.netlify/
+# Node Dependencies & Logs
+node_modules/
+.pnp
+.pnp.js
+.vite/
+.next/

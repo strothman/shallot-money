@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="/capy_track_cap.png" />
+  <!-- iOS Home Screen Icons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png" />
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png" />
+  <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png" />
+  <!-- Web App Manifest -->
+  <link rel="manifest" href="/manifest.json" />
+  <!-- Mobile-first viewport optimized for iPhone 12 Pro Max and standalone look -->
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Capy-Track" />
+  <title>Capy-Track</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+  <!-- App Container matching mobile viewport -->
+  <div class="app-container">
+
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="header-logo">
+        <img src="/capy_track_cap.png" alt="Capy-Track Logo" class="logo-img" />
+        <span class="logo-text">Capy-Track</span>
+      </div>
+      <div class="header-actions">
+        <button id="theme-toggle" class="icon-btn" aria-label="Cycle Themes">
+          <i data-lucide="palette"></i>
+        </button>
+        <button id="settings-btn" class="icon-btn" aria-label="Settings">
+          <i data-lucide="settings"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN SCROLLABLE CONTENT AREA -->
+    <main class="app-content">
+
+      <!-- VIEW 1: DASHBOARD (Active by default) -->
+      <section id="view-dashboard" class="app-view active">
+        <!-- Pool Card -->
+        <div class="pool-card">
+          <div class="pool-header">
+            <span class="pool-title">Monthly Pool Remaining</span>
+            <button id="edit-income-quick" class="income-badge">
+              Income: <span id="pool-income-val">$0.00</span> <i data-lucide="edit-3"></i>
+            </button>
+          </div>
+          <div class="pool-amount" id="pool-remaining-val">$0.00</div>
+          <div class="pool-progress-container">
+            <div class="pool-progress-bar" id="pool-progress-fill"></div>
+          </div>
+          <div class="pool-footer">
+            <div class="pool-stat">
+              <span class="stat-label">Spent This Month</span>
+              <span class="stat-value" id="pool-spent-val">$0.00</span>
+            </div>
+            <div class="pool-stat">
+              <span class="stat-label">Spent This Week</span>
+              <span class="stat-value warning" id="week-spent-val">$0.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Monthly Breakdown Chart Section -->
+        <div class="card monthly-card">
+          <div class="card-header monthly-header-controls">
+            <h2 class="card-title">Monthly Breakdown</h2>
+            <div class="month-nav-controls">
+              <button id="toggle-monthly-bills" class="toggle-bills-btn" title="Toggle Bills">
+                <i data-lucide="eye"></i> <span>Bills</span>
+              </button>
+              <button id="prev-month-btn" class="icon-btn-sm" aria-label="Previous Month">
+                <i data-lucide="chevron-left"></i>
+              </button>
+              <span class="card-subtitle" id="monthly-date-label">June 2026</span>
+              <button id="next-month-btn" class="icon-btn-sm" aria-label="Next Month">
+                <i data-lucide="chevron-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Custom CSS Bar Chart for weeks -->
+          <div class="monthly-chart" id="monthly-chart-bars">
+            <!-- Dynamically populated bars -->
+          </div>
+
+          <!-- Category Breakdown Grid for month -->
+          <div class="category-breakdown" id="monthly-category-breakdown-list">
+            <!-- Dynamically populated list -->
+          </div>
+        </div>
+
+        <!-- Weekly Breakdown Chart Section -->
+        <div class="card weekly-card">
+          <div class="card-header weekly-header-controls">
+            <h2 class="card-title">Weekly Breakdown</h2>
+            <div class="week-nav-controls">
+              <button id="toggle-weekly-bills" class="toggle-bills-btn" title="Toggle Bills">
+                <i data-lucide="eye"></i> <span>Bills</span>
+              </button>
+              <button id="prev-week-btn" class="icon-btn-sm" aria-label="Previous Week">
+                <i data-lucide="chevron-left"></i>
+              </button>
+              <span class="card-subtitle" id="weekly-date-range">Mon - Sun</span>
+              <button id="next-week-btn" class="icon-btn-sm" aria-label="Next Week">
+                <i data-lucide="chevron-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Custom CSS Bar Chart -->
+          <div class="weekly-chart" id="weekly-chart-bars">
+            <!-- Dynamically populated bars -->
+          </div>
+
+          <!-- Category Breakdown Grid -->
+          <div class="category-breakdown" id="category-breakdown-list">
+            <!-- Dynamically populated list -->
+          </div>
+        </div>
+
+        <!-- Recent Activity Mini List -->
+        <div class="card recent-card">
+          <div class="card-header">
+            <h2 class="card-title">Recent Spending</h2>
+            <button id="view-all-recent" class="text-btn">View All</button>
+          </div>
+          <div class="recent-list" id="recent-spending-list">
+            <!-- Dynamically populated standard elements -->
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: LOG SPENDING -->
+      <section id="view-log" class="app-view">
+        <div class="log-form-container">
+          <h2 class="view-title">Log Expense</h2>
+
+          <!-- Segmented Toggle -->
+          <div class="transaction-type-toggle" id="log-type-toggle">
+            <button type="button" class="type-btn active" data-type="expense">Expense</button>
+            <button type="button" class="type-btn" data-type="refund">Refund</button>
+          </div>
+
+          <!-- Large Amount Display -->
+          <div class="amount-input-wrapper">
+            <span class="currency-symbol">$</span>
+            <input type="text" id="expense-amount" placeholder="0.00" inputmode="decimal" required />
+          </div>
+
+          <!-- Description -->
+          <div class="form-group">
+            <label for="expense-desc">What was this for?</label>
+            <div class="input-with-icon">
+              <i data-lucide="tag"></i>
+              <input type="text" id="expense-desc" placeholder="e.g. Grocery, Taxi, Coffee" required />
+            </div>
+          </div>
+
+          <!-- Category Selection (Grid of Quick Tap Pills) -->
+          <div class="form-group">
+            <label>Category</label>
+            <div class="category-grid" id="category-picker">
+              <!-- Dynamically filled categories -->
+            </div>
+          </div>
+
+          <!-- Date Selector -->
+          <div class="form-group">
+            <label for="expense-date">Date</label>
+            <div class="input-with-icon">
+              <i data-lucide="calendar"></i>
+              <input type="date" id="expense-date" />
+            </div>
+          </div>
+
+          <!-- Submit CTA -->
+          <button id="submit-expense-btn" class="primary-btn">
+            <i data-lucide="plus-circle"></i> Log Expense
+          </button>
+        </div>
+      </section>
+
+      <!-- VIEW 3: HISTORY -->
+      <section id="view-history" class="app-view">
+        <div class="history-container">
+          <div class="history-header">
+            <h2 class="view-title">Spending History</h2>
+          </div>
+
+          <!-- Search and Filter Bar -->
+          <div class="filter-bar">
+            <div class="search-wrapper">
+              <i data-lucide="search"></i>
+              <input type="text" id="history-search" placeholder="Search description..." />
+            </div>
+            <div class="filter-select-wrapper">
+              <select id="history-filter-category">
+                <option value="all">All Categories</option>
+                <!-- Populate dynamically -->
+              </select>
+            </div>
+          </div>
+
+          <!-- History Feed grouped by dates -->
+          <div class="history-feed" id="history-feed-list">
+            <!-- Dynamically populated grouped entries -->
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- NAVIGATION TAB BAR -->
+    <nav class="app-tab-bar">
+      <button class="tab-item active" data-view="view-dashboard">
+        <i data-lucide="layout-grid"></i>
+        <span>Dashboard</span>
+      </button>
+      <button class="tab-item add-tab" data-view="view-log">
+        <div class="add-tab-inner">
+          <i data-lucide="plus"></i>
+        </div>
+      </button>
+      <button class="tab-item" data-view="view-history">
+        <i data-lucide="history"></i>
+        <span>History</span>
+      </button>
+    </nav>
+
+    <!-- MODAL: SETTINGS & BUDGET CONFIG -->
+    <div id="settings-modal" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Settings & Budget</h3>
+          <button id="close-settings" class="icon-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body">
+
+          <div class="form-group">
+            <label for="monthly-income-input">Monthly Income Pool ($)</label>
+            <div class="input-with-icon">
+              <i data-lucide="dollar-sign"></i>
+              <input type="number" id="monthly-income-input" placeholder="Enter monthly income" min="0" step="1" />
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="settings-actions">
+            <h4>Theme Color Scheme</h4>
+            <p class="settings-info-text">Choose a visual aesthetic for your budget workspace.</p>
+            <div class="theme-selector-grid">
+              <button class="theme-option" data-theme="christmas"
+                style="background-color: #122218; border-color: #ef4444;" title="Christmas Red & Green"></button>
+              <button class="theme-option" data-theme="antigravity"
+                style="background-color: #0a2c33; border-color: #06b6d4;" title="Antigravity IDE"></button>
+              <button class="theme-option" data-theme="halloween"
+                style="background-color: #140b22; border-color: #f97316;"
+                title="Halloween Orange & Spooky Purple"></button>
+              <button class="theme-option" data-theme="july4th"
+                style="background-color: #0d162d; border-color: #3b82f6;"
+                title="July 4th Patriotic Red, White, & Blue"></button>
+              <button class="theme-option" data-theme="glacier"
+                style="background-color: #081530; border-color: #00bfff;" title="Glacier Vibrant Blue"></button>
+              <button class="theme-option" data-theme="valentine"
+                style="background-color: #250a14; border-color: #e11d48;" title="Valentine's Cupid Rose"></button>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="settings-actions">
+            <h4>Excel Spreadsheet Integration</h4>
+            <p class="settings-info-text">Import expenses from a CSV/Excel file or export your data to a CSV file for
+              use in Excel.</p>
+            <div class="btn-row">
+              <button id="import-excel-btn" class="secondary-btn">
+                <i data-lucide="upload"></i> Import CSV
+              </button>
+              <button id="export-excel-btn" class="secondary-btn">
+                <i data-lucide="download"></i> Export CSV
+              </button>
+              <input type="file" id="import-excel-input" accept=".csv,.tsv,.txt" style="display: none;" />
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="settings-actions">
+            <h4>Backup & Restore</h4>
+            <p class="settings-info-text">Export your spending data to a file, or restore from a backup.</p>
+            <div class="btn-row">
+              <button id="import-data-btn" class="secondary-btn">
+                <i data-lucide="upload"></i> Import JSON
+              </button>
+              <button id="export-data-btn" class="secondary-btn">
+                <i data-lucide="download"></i> Export JSON
+              </button>
+              <input type="file" id="import-file-input" accept=".json" style="display: none;" />
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="settings-actions danger-zone">
+            <h4>Danger Zone</h4>
+            <button id="reset-all-btn" class="danger-btn">
+              <i data-lucide="trash-2"></i> Reset All Data
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: EDIT EXPENSE -->
+    <div id="edit-expense-modal" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Edit Expense</h3>
+          <button id="close-edit-expense" class="icon-btn" aria-label="Close Edit Modal"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="edit-expense-id" />
+          
+          <!-- Segmented Toggle -->
+          <div class="transaction-type-toggle" id="edit-type-toggle">
+            <button type="button" class="type-btn active" data-type="expense">Expense</button>
+            <button type="button" class="type-btn" data-type="refund">Refund</button>
+          </div>
+
+          <div class="amount-input-wrapper">
+            <span class="currency-symbol">$</span>
+            <input type="text" id="edit-expense-amount" placeholder="0.00" inputmode="decimal" required />
+          </div>
+
+          <div class="form-group">
+            <label for="edit-expense-desc">What was this for?</label>
+            <div class="input-with-icon">
+              <i data-lucide="tag"></i>
+              <input type="text" id="edit-expense-desc" placeholder="e.g. Grocery, Taxi, Coffee" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Category</label>
+            <div class="category-grid" id="edit-category-picker">
+              <!-- Dynamically filled categories -->
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-expense-date">Date</label>
+            <div class="input-with-icon">
+              <i data-lucide="calendar"></i>
+              <input type="date" id="edit-expense-date" />
+            </div>
+          </div>
+
+          <button id="save-expense-btn" class="primary-btn">
+            <i data-lucide="check"></i> Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: DELETE CONFIRMATION -->
+    <div id="delete-confirm-modal" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Delete Expense</h3>
+          <button id="close-delete-confirm" class="icon-btn" aria-label="Close Delete Modal"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body" style="align-items: center; text-align: center; gap: 16px; padding: 24px 20px;">
+          <p id="delete-confirm-text" style="font-size: 0.95rem; color: var(--text-primary); font-weight: 500; line-height: 1.5; margin-bottom: 8px;">
+            Are you sure you want to delete this expense?
+          </p>
+          <div class="btn-row" style="width: 100%; gap: 12px;">
+            <button id="cancel-delete-btn" class="secondary-btn" style="flex: 1; padding: 12px 14px;">
+              Cancel
+            </button>
+            <button id="confirm-delete-btn" class="danger-btn" style="flex: 1; padding: 12px 14px; background: var(--danger-color); color: white; border: none; border-radius: var(--border-radius-sm); font-weight: 700; cursor: pointer;">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Script loading -->
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>
