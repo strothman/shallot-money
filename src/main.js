@@ -112,11 +112,12 @@ const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
 // LOCALSTORAGE FUNCTIONS
 // ----------------------------------------------------
 function saveState() {
-  localStorage.setItem('capybudget_state', JSON.stringify(state));
+  localStorage.setItem('shallot_money_state', JSON.stringify(state));
+  localStorage.setItem('capybudget_state', JSON.stringify(state)); // dual-write for 100% backward safety
 }
 
 function loadState() {
-  const saved = localStorage.getItem('capybudget_state');
+  const saved = localStorage.getItem('shallot_money_state') || localStorage.getItem('capybudget_state');
   if (saved) {
     try {
       state = { ...state, ...JSON.parse(saved) };
@@ -1024,7 +1025,8 @@ function saveExpense() {
 // ----------------------------------------------------
 // CSV EXPORT / IMPORT
 // ----------------------------------------------------
-function exportToCSV() {
+async function exportToCSV() {
+  const filename = `shallot_money_expenses_${formatDateLocal(new Date())}.csv`;
   const headers = ['Date', 'Amount', 'Description', 'Category'];
   const rows = [...state.expenses]
     .sort((a, b) => a.date.localeCompare(b.date))
@@ -1037,15 +1039,83 @@ function exportToCSV() {
     });
 
   const csvContent = [headers.join(','), ...rows].join('\n');
+
+  // Try Web Share API (native iOS / Android Share Sheet)
+  if (navigator.share) {
+    try {
+      const file = new File([csvContent], filename, { type: 'text/csv' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: 'Shallot Money CSV Export',
+          text: `Shallot Money expenses CSV (${formatDateLocal(new Date())})`,
+        });
+        return;
+      }
+    } catch (err) {
+      if (err.name === 'AbortError') return; // User cancelled
+      console.warn('Web Share failed, falling back to Blob download:', err);
+    }
+  }
+
+  // Fallback: Blob URL download
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.setAttribute('href', url);
-  link.setAttribute('download', `capybudget_expenses_${formatDateLocal(new Date())}.csv`);
+  link.setAttribute('download', filename);
   document.body.appendChild(link);
   link.click();
   link.remove();
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+async function exportToJSON() {
+  const filename = `shallot_money_backup_${formatDateLocal(new Date())}.json`;
+  const jsonStr = JSON.stringify(state, null, 2);
+
+  // Try Web Share API (native iOS / Android Share Sheet)
+  if (navigator.share) {
+    try {
+      const file = new File([jsonStr], filename, { type: 'application/json' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: 'Shallot Money Backup',
+          text: `Shallot Money spending backup (${formatDateLocal(new Date())})`,
+        });
+        return;
+      }
+    } catch (err) {
+      if (err.name === 'AbortError') return; // User cancelled
+      console.warn('Web Share failed, falling back to Blob download:', err);
+    }
+  }
+
+  // Fallback: Blob URL download
+  const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const downloadAnchor = document.createElement('a');
+  downloadAnchor.setAttribute("href", url);
+  downloadAnchor.setAttribute("download", filename);
+  document.body.appendChild(downloadAnchor);
+  downloadAnchor.click();
+  downloadAnchor.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+async function copyJSONBackup() {
+  const jsonStr = JSON.stringify(state, null, 2);
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(jsonStr);
+      alert('Backup JSON copied to clipboard! You can paste it into Notes or an email to save it.');
+    } else {
+      prompt('Copy your backup JSON data below:', jsonStr);
+    }
+  } catch (err) {
+    prompt('Copy your backup JSON data below:', jsonStr);
+  }
 }
 
 function parseCSVLine(line) {
@@ -1345,14 +1415,15 @@ function setupEventListeners() {
 
   // Export JSON
   exportDataBtn.addEventListener('click', () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `capybudget_backup_${formatDateLocal(new Date())}.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
+    exportToJSON();
   });
+
+  const copyDataBtn = document.getElementById('copy-data-btn');
+  if (copyDataBtn) {
+    copyDataBtn.addEventListener('click', () => {
+      copyJSONBackup();
+    });
+  }
 
   // Import JSON
   importDataBtn.addEventListener('click', () => {
