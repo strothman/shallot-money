@@ -1,0 +1,12 @@
+[
+  {
+    "orderDate": "2026-08-14",
+    "total": 43.12,
+    "items": [
+      { "name": "Organic Milk 1gal" },
+      { "name": "Whole Wheat Bread" },
+      { "name": "Fresh Bananas" },
+      { "name": "Dozen Large Eggs" }
+    ]
+  }
+]

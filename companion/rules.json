@@ -1,0 +1,41 @@
+{
+  "merchant_rules": {
+    "groceries": [
+      "kroger", "walmart", "aldi", "publix", "trader joe", "whole foods", 
+      "food lion", "wegmans", "heb", "safeway", "sprouts", "harris teeter",
+      "market basket", "shoprite", "giant eagle", "meijer", "supermarket", "grocery"
+    ],
+    "fastfood": [
+      "mcdonald", "wendy", "taco bell", "chick-fil-a", "burger king", "subway",
+      "chipotle", "starbucks", "dunkin", "panera", "domino", "pizza hut",
+      "popeyes", "kfc", "panda express", "sonic drive", "five guys", "dairy queen",
+      "jack in the box", "jimmy john", "innout", "in-n-out", "arby", "restaurant", "cafe"
+    ],
+    "transport": [
+      "shell", "exxon", "mobil", "wawa", "chevron", "sunoco", "speedway",
+      "bp ", "marathon", "circle k", "racetrac", "sheetz", "loves travel",
+      "autozone", "advance auto", "o'reilly", "pep boys", "jiffy lube", "valvoline",
+      "uber", "lyft", "gas", "fuel", "parking", "toll", "ezpass", "sunpass"
+    ],
+    "bills": [
+      "electric", "power", "duke energy", "dominion", "fpl", "comed",
+      "water", "utility", "sewer", "waste", "trash",
+      "verizon", "at&t", "t-mobile", "sprint", "xfinity", "comcast", "spectrum", "charter",
+      "netflix", "spotify", "hulu", "disney", "apple.com/bill", "prime video", "hbo", "max",
+      "geico", "state farm", "progressive", "allstate", "insurance", "loan", "mortgage"
+    ],
+    "shopping": [
+      "amazon", "amzn", "target", "best buy", "ebay", "walmart.com", "dollar tree",
+      "dollar general", "family dollar", "tj maxx", "marshalls", "ross", "kohls",
+      "macy", "nordstrom", "home depot", "lowe's", "ikea", "costco", "sam's club"
+    ],
+    "entertainment": [
+      "cinema", "amc", "regal", "cinemark", "theatre", "theater", "steam",
+      "playstation", "xbox", "nintendo", "twitch", "patreon", "ticketmaster", "stubhub", "bowling"
+    ],
+    "gym": [
+      "cvs", "walgreens", "rite aid", "pharmacy", "planet fitness", "anytime fitness",
+      "la fitness", "crunch", "gold's gym", "ymca", "doctor", "dental", "hospital", "urgent care"
+    ]
+  }
+}
