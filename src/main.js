@@ -1560,6 +1560,32 @@ function setupEventListeners() {
   // Theme Toggle (Quick cycle in header)
   themeToggle.addEventListener('click', toggleTheme);
 
+  // Check for Updates / Force Refresh
+  const forceUpdateBtn = document.getElementById('force-update-btn');
+  if (forceUpdateBtn) {
+    forceUpdateBtn.addEventListener('click', async () => {
+      forceUpdateBtn.innerHTML = `<i data-lucide="refresh-cw" class="spin-icon"></i> Checking & Updating...`;
+      if (window.lucide) window.lucide.createIcons();
+      saveState();
+
+      // Clear any CacheStorage caches if present
+      if ('caches' in window) {
+        try {
+          const keys = await caches.keys();
+          await Promise.all(keys.map(k => caches.delete(k)));
+        } catch (e) {
+          console.warn('Cache clearing error:', e);
+        }
+      }
+
+      // Hard cache-busting reload
+      const cleanUrl = window.location.origin + window.location.pathname;
+      setTimeout(() => {
+        window.location.replace(`${cleanUrl}?_t=${Date.now()}`);
+      }, 400);
+    });
+  }
+
   // Reset Data
   resetAllBtn.addEventListener('click', () => {
     if (confirm('Are you absolutely sure you want to reset all budget and spending data? This cannot be undone.')) {

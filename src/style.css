@@ -1445,10 +1445,49 @@ body {
   font-weight: 700;
 }
 
+.update-app-btn {
+  margin-top: 6px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 8px 14px;
+  border-radius: var(--border-radius-md);
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.update-app-btn:hover,
+.update-app-btn:active {
+  color: var(--text-primary);
+  border-color: var(--accent-color);
+  background: rgba(61, 35, 74, 0.5);
+}
+
+.update-app-btn i {
+  width: 14px;
+  height: 14px;
+}
+
+.spin-icon {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .build-info {
   font-size: 0.72rem;
   color: var(--text-muted);
   text-align: center;
 }
+
 
 

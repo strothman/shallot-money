@@ -7,6 +7,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [1.0.3] - 2026-08-28
+
+### Added & Enhanced
+- **In-App "Check for Updates / Reload" Button**:
+  - Added a 1-tap **"Check for Updates / Reload"** button inside Settings.
+  - Automatically clears web CacheStorage and executes a hard, cache-busting network reload (`?_t=timestamp`), forcing Android and iOS devices to fetch the latest deployed code instantly without manual browser cache clearing.
+
+---
+
 ## [1.0.2] - 2026-08-28
 
 ### Added & Enhanced
