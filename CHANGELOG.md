@@ -7,6 +7,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [1.0.1] - 2026-08-28
+
+### Enhanced & Optimized
+- **Tight Icon Crop & Edge Transparency**:
+  - Tightly cropped the Shallot Money icon around the emblem badge to eliminate wasted edge padding.
+  - Added smooth antialiased alpha transparency to outer corners and borders for seamless rendering across dark and light surfaces.
+  - Maximized scale and visual clarity of the glowing golden shallot and currency coin symbol across all standard `.ico` and `.png` resolutions.
+
+---
+
 ## [1.0.0] - 2026-08-28
 
 ### Rebranded to "Shallot Money" & Design Overhaul
