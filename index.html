@@ -295,7 +295,7 @@
               <button id="export-excel-btn" class="secondary-btn">
                 <i data-lucide="download"></i> Export CSV
               </button>
-              <input type="file" id="import-excel-input" accept=".csv,.tsv,.txt,text/csv,text/plain,text/comma-separated-values,application/vnd.ms-excel,application/csv,text/*,*/*" style="display: none;" />
+              <input type="file" id="import-excel-input" style="display: none;" />
             </div>
           </div>
 
@@ -314,7 +314,10 @@
               <button id="copy-data-btn" class="secondary-btn">
                 <i data-lucide="copy"></i> Copy Backup
               </button>
-              <input type="file" id="import-file-input" accept=".json,application/json,text/plain,text/*,*/*" style="display: none;" />
+              <button id="paste-data-btn" class="secondary-btn">
+                <i data-lucide="clipboard"></i> Paste Data
+              </button>
+              <input type="file" id="import-file-input" style="display: none;" />
             </div>
           </div>
 
@@ -327,6 +330,23 @@
             </button>
           </div>
 
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: PASTE DATA IMPORT -->
+    <div id="paste-data-modal" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Paste CSV / Backup Data</h3>
+          <button id="close-paste-modal" class="icon-btn" aria-label="Close Paste Modal"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body">
+          <p class="settings-info-text">Paste your CSV text or JSON backup string below:</p>
+          <textarea id="paste-data-textarea" rows="8" placeholder="Paste CSV (Date, Amount, Description...) or JSON backup here..." style="width: 100%; border-radius: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: var(--text-primary); padding: 12px; font-family: monospace; font-size: 13px; resize: vertical; box-sizing: border-box;"></textarea>
+          <button id="submit-paste-btn" class="primary-btn" style="margin-top: 16px; width: 100%;">
+            <i data-lucide="check"></i> Import Pasted Data
+          </button>
         </div>
       </div>
     </div>

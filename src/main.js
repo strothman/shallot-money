@@ -1425,6 +1425,66 @@ function setupEventListeners() {
     });
   }
 
+  // Paste Data Modal (Universal Fallback for Android & iOS)
+  const pasteDataBtn = document.getElementById('paste-data-btn');
+  const pasteDataModal = document.getElementById('paste-data-modal');
+  const closePasteModal = document.getElementById('close-paste-modal');
+  const submitPasteBtn = document.getElementById('submit-paste-btn');
+  const pasteDataTextarea = document.getElementById('paste-data-textarea');
+
+  if (pasteDataBtn && pasteDataModal) {
+    pasteDataBtn.addEventListener('click', () => {
+      pasteDataTextarea.value = '';
+      pasteDataModal.classList.add('active');
+    });
+
+    const closePaste = () => pasteDataModal.classList.remove('active');
+    if (closePasteModal) closePasteModal.addEventListener('click', closePaste);
+    pasteDataModal.addEventListener('click', (e) => {
+      if (e.target === pasteDataModal) closePaste();
+    });
+
+    if (submitPasteBtn) {
+      submitPasteBtn.addEventListener('click', () => {
+        const text = pasteDataTextarea.value.trim();
+        if (!text) {
+          alert('Please paste some CSV or JSON text first.');
+          return;
+        }
+
+        // Auto-detect JSON vs CSV
+        if (text.startsWith('{') || text.startsWith('[')) {
+          try {
+            const parsed = JSON.parse(text);
+            if (parsed && typeof parsed === 'object') {
+              state = { ...state, ...parsed };
+              saveState();
+              applyTheme();
+              updateBillsToggleUI();
+              renderDashboard();
+              renderMonthlyBreakdown();
+              initCategorySelectors();
+              alert('JSON Backup successfully imported!');
+              closePaste();
+              closeModal();
+              return;
+            }
+          } catch (err) {
+            console.warn('Failed to parse as JSON, trying CSV:', err);
+          }
+        }
+
+        try {
+          importFromCSV(text);
+          closePaste();
+          closeModal();
+        } catch (err) {
+          alert('Could not parse pasted data: ' + err.message);
+        }
+      });
+    }
+  }
+
   // Import JSON
   importDataBtn.addEventListener('click', () => {
     importFileInput.click();
