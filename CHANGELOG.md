@@ -7,6 +7,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [1.0.2] - 2026-08-28
+
+### Added & Enhanced
+- **In-App Version Indicator**:
+  - Added an official Shallot Money version badge (`v1.0.2`) and build info inside the **Settings** modal.
+- **Universal Paste Import Modal**:
+  - Added dedicated **"Paste Data"** dialog allowing 1-tap import of raw CSV or JSON data across all Android and iOS devices.
+- **Android File Picker Universal Support**:
+  - Removed file input MIME restrictions so Android devices can select and import `.csv` and `.json` files without greyed-out limitations.
+
+---
+
 ## [1.0.1] - 2026-08-28
 
 ### Enhanced & Optimized

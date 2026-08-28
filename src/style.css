@@ -1410,3 +1410,45 @@ body {
   height: 12px;
 }
 
+/* Settings Version Footer */
+.settings-footer-info {
+  margin-top: 24px;
+  padding: 16px 0 8px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  border-top: 1px dashed var(--border-color);
+}
+
+.version-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(61, 35, 74, 0.5);
+  border: 1px solid var(--border-color);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.version-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+}
+
+.version-badge strong {
+  color: var(--accent-color, #d48244);
+  font-weight: 700;
+}
+
+.build-info {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+
