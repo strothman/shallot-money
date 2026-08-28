@@ -1,19 +1,19 @@
 {
   "merchant_rules": {
     "groceries": [
-      "kroger", "walmart", "aldi", "publix", "trader joe", "whole foods", 
-      "food lion", "wegmans", "heb", "safeway", "sprouts", "harris teeter",
-      "market basket", "shoprite", "giant eagle", "meijer", "supermarket", "grocery"
+      "kroger", "walmart", "wal-mart", "wal mart", "aldi", "publix", "trader joe", "whole foods", 
+      "food lion", "wegmans", "heb", "safeway", "sprouts", "harris teeter", "viet hoa",
+      "market basket", "shoprite", "giant eagle", "meijer", "supermarket", "grocery", "samsclub", "sam's club"
     ],
     "fastfood": [
-      "mcdonald", "wendy", "taco bell", "chick-fil-a", "burger king", "subway",
+      "mcdonald", "wendy", "taco bell", "chick-fil-a", "burger king", "subway", "roosters",
       "chipotle", "starbucks", "dunkin", "panera", "domino", "pizza hut",
       "popeyes", "kfc", "panda express", "sonic drive", "five guys", "dairy queen",
-      "jack in the box", "jimmy john", "innout", "in-n-out", "arby", "restaurant", "cafe"
+      "jack in the box", "jimmy john", "innout", "in-n-out", "arby", "restaurant", "cafe", "tst*"
     ],
     "transport": [
-      "shell", "exxon", "mobil", "wawa", "chevron", "sunoco", "speedway",
-      "bp ", "marathon", "circle k", "racetrac", "sheetz", "loves travel",
+      "shell", "exxon", "mobil", "wawa", "chevron", "sunoco", "speedway", "thorntons", "thornton",
+      "bp ", "marathon", "circle k", "circlek", "racetrac", "sheetz", "loves travel",
       "autozone", "advance auto", "o'reilly", "pep boys", "jiffy lube", "valvoline",
       "uber", "lyft", "gas", "fuel", "parking", "toll", "ezpass", "sunpass"
     ],

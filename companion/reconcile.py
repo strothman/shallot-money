@@ -65,6 +65,17 @@ def clean_amount(val):
     except ValueError:
         return 0.0
 
+def clean_merchant_name(raw):
+    if not raw:
+        return "Unknown Purchase"
+    s = raw
+    # Strip common bank prefixes
+    s = re.sub(r'^(DDA PURCHASE|VISA DDA PUR|POS PURCHASE|DEBIT CARD AUTH|DIRECTDEBIT|DEBIT)\s*(AP\s*\w+)?\s*', '', s, flags=re.IGNORECASE)
+    # Strip city state suffix like "LOUISVILLE * KY" or "Louisville KY"
+    s = re.sub(r'\s+(LOUISVILLE|LEXINGTON|NEW ALBANY|CLARKSVILLE)\s*\*?\s*(KY|IN)?\s*$', '', s, flags=re.IGNORECASE)
+    s = re.sub(r'\s+', ' ', s).strip()
+    return s.title() if (s.isupper() and len(s) > 3) else s
+
 # ---------------------------------------------------------------------------
 # STORE RECEIPT PARSERS (KROGER & WALMART)
 # ---------------------------------------------------------------------------
@@ -266,7 +277,18 @@ def parse_bank_file(fpath):
                 if date_idx == -1 or len(r) <= date_idx:
                     continue
                 d = parse_date(r[date_idx])
-                desc = r[desc_idx].strip() if desc_idx != -1 and len(r) > desc_idx else "Debit Purchase"
+                raw_desc = r[desc_idx].strip() if desc_idx != -1 and len(r) > desc_idx else "Debit Purchase"
+                
+                # Filter out internal transfers & card bill payments (since card purchases are tracked separately)
+                raw_lower = raw_desc.lower()
+                if any(kw in raw_lower for kw in [
+                    "online xfer", "transfer to", "transfer from", "xfer",
+                    "capital one mobile pmt", "card srvc bill pay", "mobile payment",
+                    "atm balance", "overdraft"
+                ]):
+                    continue
+
+                desc = clean_merchant_name(raw_desc)
                 
                 amt = 0.0
                 if out_idx != -1 and len(r) > out_idx and clean_amount(r[out_idx]) > 0:
@@ -276,10 +298,11 @@ def parse_bank_file(fpath):
                 
                 if d and amt > 0:
                     transactions.append({
-                        "source": "TD Bank" if "td" in fname else "Bank",
+                        "source": "TD Bank" if "td" in fname or "transaction" in fname else "Bank",
                         "date": d,
                         "amount": round(amt, 2),
-                        "description": desc
+                        "description": desc,
+                        "raw_desc": raw_desc
                     })
 
     return transactions
