@@ -15,6 +15,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Shallot Money" />
   <title>Shallot Money</title>
+  <!-- Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https:;" />
   <!-- Google Fonts: Outfit, Inter, Playfair Display -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -177,9 +180,16 @@
             </div>
           </div>
 
-          <!-- Date Selector -->
+          <!-- Date Selector with Quick Chips -->
           <div class="form-group">
-            <label for="expense-date">Date</label>
+            <div class="date-header-row">
+              <label for="expense-date">Date</label>
+              <div class="date-quick-chips">
+                <button type="button" class="date-chip active" data-offset="0">Today</button>
+                <button type="button" class="date-chip" data-offset="1">Yesterday</button>
+                <button type="button" class="date-chip" data-offset="2">2d Ago</button>
+              </div>
+            </div>
             <div class="input-with-icon">
               <i data-lucide="calendar"></i>
               <input type="date" id="expense-date" />
@@ -250,10 +260,28 @@
         <div class="modal-body">
 
           <div class="form-group">
-            <label for="monthly-income-input">Monthly Income Pool ($)</label>
+            <label for="monthly-income-input">Monthly Income Pool</label>
             <div class="input-with-icon">
-              <i data-lucide="dollar-sign"></i>
+              <i data-lucide="coins"></i>
               <input type="number" id="monthly-income-input" placeholder="Enter monthly income" min="0" step="1" />
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 12px;">
+            <label for="currency-select">Currency Symbol</label>
+            <div class="input-with-icon">
+              <i data-lucide="circle-dollar-sign"></i>
+              <select id="currency-select" class="currency-dropdown">
+                <option value="$">$ (USD / CAD / AUD)</option>
+                <option value="€">€ (EUR)</option>
+                <option value="£">£ (GBP)</option>
+                <option value="¥">¥ (JPY / CNY)</option>
+                <option value="₹">₹ (INR)</option>
+                <option value="CHF">CHF (Swiss Franc)</option>
+                <option value="kr">kr (SEK / NOK / DKK)</option>
+                <option value="R$">R$ (BRL)</option>
+                <option value="₱">₱ (PHP)</option>
+              </select>
             </div>
           </div>
 
@@ -323,6 +351,21 @@
 
           <div class="divider"></div>
 
+          <div class="settings-actions">
+            <h4>Automatic Recovery Snapshots</h4>
+            <p class="settings-info-text">Roll back to an automated rolling snapshot if you ever make a mistake.</p>
+            <div class="snapshot-row">
+              <select id="snapshot-select" class="currency-dropdown" style="flex: 1;">
+                <option value="">No snapshots recorded yet</option>
+              </select>
+              <button id="restore-snapshot-btn" class="secondary-btn" style="white-space: nowrap;">
+                <i data-lucide="rotate-ccw"></i> Restore
+              </button>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
           <div class="settings-actions danger-zone">
             <h4>Danger Zone</h4>
             <button id="reset-all-btn" class="danger-btn">
@@ -333,7 +376,7 @@
           <div class="settings-footer-info">
             <div class="version-badge">
               <img src="./icon.png" alt="Shallot Money" class="version-icon" />
-              <span>Shallot Money <strong>v1.0.3</strong></span>
+              <span>Shallot Money <strong>v1.1.0</strong></span>
             </div>
             <button id="force-update-btn" class="update-app-btn">
               <i data-lucide="refresh-cw"></i> Check for Updates / Reload
@@ -434,6 +477,12 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- FLOATING UNDO TOAST -->
+    <div id="undo-toast" class="toast-container">
+      <span id="toast-message" class="toast-message">Expense deleted</span>
+      <button id="toast-undo-btn" class="toast-undo-btn">Undo</button>
     </div>
 
   </div>

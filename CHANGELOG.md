@@ -7,6 +7,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [1.1.0] - 2026-08-28
+
+### Added & Enhanced
+- **Automatic Rolling Snapshots (Recovery System)**:
+  - Automatically records rotating state snapshots before deletions, imports, and data resets.
+  - Added a **"Restore from Snapshot"** selector in Settings for instant 1-tap recovery.
+- **Offline Service Worker (`sw.js`)**:
+  - Full PWA Service Worker caching core assets and Google Fonts for 100% offline capability with zero cell signal.
+- **Undo Delete Floating Toast**:
+  - 5-second floating toast notification with an **"Undo"** action whenever an expense is deleted.
+- **Haptic Vibration Feedback**:
+  - Subtle tactile haptic pulses (`navigator.vibrate`) on keypad inputs, expense logging, tab navigation, and theme toggling on mobile devices.
+- **Quick Date Shortcuts on Log View**:
+  - 1-tap chips for **[Today]**, **[Yesterday]**, and **[2d Ago]** to speed up expense entry.
+- **Custom Currency Selector**:
+  - Global currency preference in Settings supporting `$`, `€`, `£`, `¥`, `₹`, `CHF`, `kr`, `R$`, and `₱`.
+- **Security Hardening**:
+  - Strict XSS input sanitization (`escapeHTML`) on all descriptions and CSV imports.
+  - Hardened Content Security Policy (CSP) meta tag in `index.html`.
+
+---
+
 ## [1.0.3] - 2026-08-28
 
 ### Added & Enhanced

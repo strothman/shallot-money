@@ -5,7 +5,7 @@
 # Shallot Money 🧅💰
 **A sleek, mobile-optimized spending tracker and monthly budget planner built with the signature Shallot Plum design system.**
 
-[![Version](https://img.shields.io/badge/version-1.0.3-blue.svg?style=flat-square)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg?style=flat-square)](CHANGELOG.md)
 [![Platform](https://img.shields.io/badge/Platform-Mobile%20PWA%20%7C%20Web-orange.svg?style=flat-square)](#-mobile-first-experience)
 [![Theme](https://img.shields.io/badge/Theme-Shallot%20Plum%20%26%20Copper-purple.svg?style=flat-square)](shallot-theme.css)
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg?style=flat-square)](LICENSE)

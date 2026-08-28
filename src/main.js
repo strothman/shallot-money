@@ -23,10 +23,33 @@ function getDisplayCategoryId(catId) {
 const WEEK_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 // ----------------------------------------------------
+// UTILITIES & SECURITY
+// ----------------------------------------------------
+function escapeHTML(str) {
+  if (typeof str !== 'string') return str;
+  return str.replace(/[&<>'"]/g, tag => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    "'": '&#39;',
+    '"': '&quot;'
+  }[tag] || tag));
+}
+
+function triggerHaptic(duration = 10) {
+  if (navigator.vibrate) {
+    try {
+      navigator.vibrate(duration);
+    } catch (e) {}
+  }
+}
+
+// ----------------------------------------------------
 // APPLICATION STATE
 // ----------------------------------------------------
 let state = {
   income: 0.00,
+  currency: '$',
   expenses: [],
   selectedCategory: 'food',
   theme: 'shallot',
@@ -86,6 +109,9 @@ const historyFeedList = document.getElementById('history-feed-list');
 const settingsModal = document.getElementById('settings-modal');
 const closeSettings = document.getElementById('close-settings');
 const monthlyIncomeInput = document.getElementById('monthly-income-input');
+const currencySelect = document.getElementById('currency-select');
+const snapshotSelect = document.getElementById('snapshot-select');
+const restoreSnapshotBtn = document.getElementById('restore-snapshot-btn');
 const exportDataBtn = document.getElementById('export-data-btn');
 const importDataBtn = document.getElementById('import-data-btn');
 const importFileInput = document.getElementById('import-file-input');
@@ -108,12 +134,123 @@ const deleteConfirmText = document.getElementById('delete-confirm-text');
 const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
 const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
 
+// Undo Toast Elements
+const undoToast = document.getElementById('undo-toast');
+const toastMessage = document.getElementById('toast-message');
+const toastUndoBtn = document.getElementById('toast-undo-btn');
+let lastDeletedExpense = null;
+let toastTimeout = null;
+
 // ----------------------------------------------------
-// LOCALSTORAGE FUNCTIONS
+// LOCALSTORAGE & SNAPSHOT FUNCTIONS
 // ----------------------------------------------------
+const SNAPSHOT_KEY = 'shallot_money_snapshots';
+
 function saveState() {
   localStorage.setItem('shallot_money_state', JSON.stringify(state));
   localStorage.setItem('capybudget_state', JSON.stringify(state)); // dual-write for 100% backward safety
+}
+
+function createSnapshot(reason = 'Automatic backup') {
+  try {
+    const raw = localStorage.getItem(SNAPSHOT_KEY);
+    let snapshots = raw ? JSON.parse(raw) : [];
+    const newSnap = {
+      timestamp: Date.now(),
+      reason,
+      state: JSON.parse(JSON.stringify(state))
+    };
+    snapshots.unshift(newSnap);
+    if (snapshots.length > 5) snapshots = snapshots.slice(0, 5);
+    localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(snapshots));
+    populateSnapshotSelector();
+  } catch (e) {
+    console.warn('Snapshot error:', e);
+  }
+}
+
+function populateSnapshotSelector() {
+  if (!snapshotSelect) return;
+  try {
+    const raw = localStorage.getItem(SNAPSHOT_KEY);
+    const snapshots = raw ? JSON.parse(raw) : [];
+    if (!snapshots || snapshots.length === 0) {
+      snapshotSelect.innerHTML = '<option value="">No snapshots recorded yet</option>';
+      return;
+    }
+    snapshotSelect.innerHTML = snapshots.map((s, idx) => {
+      const d = new Date(s.timestamp);
+      const timeStr = `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      return `<option value="${idx}">[${timeStr}] ${s.reason} (${s.state.expenses?.length || 0} items)</option>`;
+    }).join('');
+  } catch (e) {
+    console.warn('Snapshot populate error:', e);
+  }
+}
+
+function restoreSelectedSnapshot() {
+  if (!snapshotSelect || snapshotSelect.value === '') {
+    alert('Please select a snapshot to restore.');
+    return;
+  }
+  const idx = parseInt(snapshotSelect.value, 10);
+  try {
+    const raw = localStorage.getItem(SNAPSHOT_KEY);
+    const snapshots = raw ? JSON.parse(raw) : [];
+    if (snapshots[idx]) {
+      if (confirm(`Restore snapshot "${snapshots[idx].reason}"? Current data will be replaced.`)) {
+        createSnapshot('Pre-restore backup');
+        state = { ...state, ...snapshots[idx].state };
+        saveState();
+        applyTheme();
+        updateCurrencyUI();
+        updateBillsToggleUI();
+        renderDashboard();
+        renderMonthlyBreakdown();
+        initCategorySelectors();
+        alert('Snapshot restored successfully!');
+      }
+    }
+  } catch (e) {
+    alert('Failed to restore snapshot: ' + e.message);
+  }
+}
+
+function updateCurrencyUI() {
+  const sym = state.currency || '$';
+  document.querySelectorAll('.currency-symbol').forEach(el => {
+    el.textContent = sym;
+  });
+  if (currencySelect) {
+    currencySelect.value = sym;
+  }
+}
+
+function showUndoToast(deletedExpense) {
+  lastDeletedExpense = deletedExpense;
+  if (!undoToast) return;
+
+  toastMessage.textContent = `Deleted "${escapeHTML(deletedExpense.description)}" (${formatCurrency(deletedExpense.amount)})`;
+  undoToast.classList.add('active');
+
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => {
+    undoToast.classList.remove('active');
+    lastDeletedExpense = null;
+  }, 5000);
+}
+
+function handleUndoDelete() {
+  if (lastDeletedExpense) {
+    triggerHaptic(15);
+    state.expenses.unshift(lastDeletedExpense);
+    saveState();
+    renderDashboard();
+    renderMonthlyBreakdown();
+    renderHistory();
+    if (undoToast) undoToast.classList.remove('active');
+    lastDeletedExpense = null;
+  }
 }
 
 function loadState() {
@@ -121,19 +258,24 @@ function loadState() {
   if (saved) {
     try {
       state = { ...state, ...JSON.parse(saved) };
+      if (!state.currency) state.currency = '$';
     } catch (e) {
       console.error('Error loading state from localStorage:', e);
     }
   } else {
     // If no local storage exists, load the imported Excel data directly as default!
     state.income = 3000.00;
+    state.currency = '$';
     state.expenses = [...importedExpenses];
     saveState();
   }
+  updateCurrencyUI();
+  populateSnapshotSelector();
 }
 
 function seedMockData() {
   state.income = 5000;
+  state.currency = '$';
 
   const today = new Date();
   const getPastDateString = (daysAgo) => {
@@ -148,28 +290,23 @@ function seedMockData() {
     { id: '3', amount: 120.00, description: 'Electricity Bill', category: 'bills', date: getPastDateString(1) },
     { id: '4', amount: 45.00, description: 'Cinema Tickets', category: 'entertainment', date: getPastDateString(2) },
     { id: '5', amount: 89.99, description: 'New Shoes', category: 'shopping', date: getPastDateString(3) },
-    { id: '6', amount: 8.50, description: 'Lunch Snack', category: 'food', date: getPastDateString(4) },
-    { id: '7', amount: 12.00, description: 'Parking fee', category: 'transport', date: getPastDateString(6) },
   ];
   saveState();
 }
 
 // ----------------------------------------------------
-// THEME HANDLING
+// THEME MANAGEMENT
 // ----------------------------------------------------
-const THEME_LIST = ['shallot', 'antigravity', 'christmas', 'halloween', 'july4th', 'glacier', 'valentine'];
+const THEMES = ['shallot', 'christmas', 'antigravity', 'halloween', 'july4th', 'glacier', 'valentine'];
 
 function applyTheme() {
-  if (state.theme === 'dark' || state.theme === 'light' || state.theme === 'midnight' || !THEME_LIST.includes(state.theme)) {
+  if (!state.theme || !THEMES.includes(state.theme)) {
     state.theme = 'shallot';
   }
   document.documentElement.setAttribute('data-theme', state.theme);
-  updateThemeSelectors();
-}
 
-function updateThemeSelectors() {
-  const options = document.querySelectorAll('.theme-option');
-  options.forEach(opt => {
+  // Update theme option selection state
+  document.querySelectorAll('.theme-option').forEach(opt => {
     if (opt.getAttribute('data-theme') === state.theme) {
       opt.classList.add('active');
     } else {
@@ -179,17 +316,18 @@ function updateThemeSelectors() {
 }
 
 function toggleTheme() {
-  let idx = THEME_LIST.indexOf(state.theme);
-  if (idx === -1) idx = 0;
-  state.theme = THEME_LIST[(idx + 1) % THEME_LIST.length];
+  triggerHaptic(12);
+  const currentIndex = THEMES.indexOf(state.theme);
+  const nextIndex = (currentIndex + 1) % THEMES.length;
+  state.theme = THEMES[nextIndex];
   applyTheme();
   saveState();
 }
 
 function updateBillsToggleUI() {
   const toggleButtons = [
-    document.getElementById('toggle-monthly-bills'),
-    document.getElementById('toggle-weekly-bills')
+    document.getElementById('toggle-bills-btn'),
+    document.getElementById('monthly-toggle-bills-btn')
   ];
 
   toggleButtons.forEach(btn => {
@@ -209,7 +347,7 @@ function updateBillsToggleUI() {
 }
 
 // ----------------------------------------------------
-// DATE UTILITIES
+// DATE & FORMATTING UTILITIES
 // ----------------------------------------------------
 function formatDateLocal(date) {
   const year = date.getFullYear();
@@ -239,10 +377,13 @@ function getMonthName(date) {
 }
 
 function formatCurrency(amount) {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD'
-  }).format(amount);
+  const sym = state.currency || '$';
+  const val = Number(amount || 0);
+  const formatted = Math.abs(val).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if (val < 0) {
+    return `-${sym}${formatted}`;
+  }
+  return `${sym}${formatted}`;
 }
 
 function formatDateDisplay(dateStr) {
@@ -363,7 +504,7 @@ function renderDashboard() {
 
     return `
       <div class="chart-bar-container">
-        <span class="chart-bar-val ${isToday ? 'today' : ''}">${total > 0 ? '$' + total.toFixed(0) : '&nbsp;'}</span>
+        <span class="chart-bar-val ${isToday ? 'today' : ''}">${total > 0 ? (state.currency || '$') + total.toFixed(0) : '&nbsp;'}</span>
         <div class="chart-bar-wrapper">
           ${segmentsHtml}
         </div>
@@ -477,7 +618,7 @@ function renderDashboard() {
               ${cat.icon}
             </div>
             <div class="item-details">
-              <span class="item-desc">${exp.description}</span>
+              <span class="item-desc">${escapeHTML(exp.description)}</span>
               <span class="item-meta">${formatDateDisplay(exp.date)} &bull; ${cat.label}</span>
             </div>
           </div>
@@ -590,7 +731,7 @@ function renderMonthlyBreakdown() {
 
     return `
       <div class="chart-bar-container">
-        <span class="chart-bar-val ${isCurrentWeek ? 'today' : ''}">${total > 0 ? '$' + total.toFixed(0) : '&nbsp;'}</span>
+        <span class="chart-bar-val ${isCurrentWeek ? 'today' : ''}">${total > 0 ? (state.currency || '$') + total.toFixed(0) : '&nbsp;'}</span>
         <div class="chart-bar-wrapper">
           ${segmentsHtml}
         </div>
@@ -734,7 +875,7 @@ function renderHistory() {
                   ${cat.icon}
                 </div>
                 <div class="item-details">
-                  <span class="item-desc">${exp.description}</span>
+                  <span class="item-desc">${escapeHTML(exp.description)}</span>
                   <span class="item-meta">${cat.label}</span>
                 </div>
               </div>
@@ -793,6 +934,7 @@ function renderHistory() {
   historyFeedList.querySelectorAll('.edit-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
+      triggerHaptic(10);
       const id = btn.getAttribute('data-id');
       openEditExpenseModal(id);
 
@@ -806,6 +948,7 @@ function renderHistory() {
   historyFeedList.querySelectorAll('.delete-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
+      triggerHaptic(10);
       const id = btn.getAttribute('data-id');
       showDeleteConfirmation(id);
 
@@ -849,6 +992,7 @@ function initCategorySelectors() {
 
   categoryPicker.querySelectorAll('.category-pill').forEach(pill => {
     pill.addEventListener('click', () => {
+      triggerHaptic(8);
       categoryPicker.querySelectorAll('.category-pill').forEach(p => p.classList.remove('selected'));
       pill.classList.add('selected');
       state.selectedCategory = pill.getAttribute('data-id');
@@ -867,6 +1011,8 @@ function initCategorySelectors() {
 // EXPENSE ACTIONS
 // ----------------------------------------------------
 function addExpense(amount, description, category, dateStr) {
+  triggerHaptic(15);
+  createSnapshot(`Before adding "${description}"`);
   const newExpense = {
     id: Date.now().toString(),
     amount: parseFloat(amount),
@@ -880,7 +1026,13 @@ function addExpense(amount, description, category, dateStr) {
   // Clear log form inputs
   expenseAmountInput.value = '';
   expenseDescInput.value = '';
-  expenseDateInput.value = new Date().toISOString().split('T')[0];
+  expenseDateInput.value = formatDateLocal(new Date());
+
+  // Reset quick chips to Today
+  document.querySelectorAll('.date-chip').forEach(c => {
+    if (c.getAttribute('data-offset') === '0') c.classList.add('active');
+    else c.classList.remove('active');
+  });
 
   // Reset toggle
   const expenseBtn = document.querySelector('#log-type-toggle [data-type="expense"]');
@@ -911,11 +1063,17 @@ function showDeleteConfirmation(id) {
 }
 
 function deleteExpense(id) {
+  const toDelete = state.expenses.find(exp => exp.id === id);
+  if (!toDelete) return;
+
+  triggerHaptic(15);
+  createSnapshot(`Before deleting "${toDelete.description}"`);
   state.expenses = state.expenses.filter(exp => exp.id !== id);
   saveState();
   renderDashboard();
   renderMonthlyBreakdown();
   renderHistory();
+  showUndoToast(toDelete);
 }
 
 
@@ -1248,6 +1406,7 @@ function setupEventListeners() {
   // Navigation
   tabItems.forEach(tab => {
     tab.addEventListener('click', () => {
+      triggerHaptic(8);
       const targetView = tab.getAttribute('data-view');
 
       tabItems.forEach(t => t.classList.remove('active'));
@@ -1282,6 +1441,7 @@ function setupEventListeners() {
   const toggleWeeklyBillsBtn = document.getElementById('toggle-weekly-bills');
 
   const handleToggleBills = () => {
+    triggerHaptic(10);
     state.hideBillsInBreakdown = !state.hideBillsInBreakdown;
     saveState();
     updateBillsToggleUI();
@@ -1301,10 +1461,12 @@ function setupEventListeners() {
   const nextWeekBtn = document.getElementById('next-week-btn');
   if (prevWeekBtn && nextWeekBtn) {
     prevWeekBtn.addEventListener('click', () => {
+      triggerHaptic(8);
       state.currentWeekOffset--;
       renderDashboard();
     });
     nextWeekBtn.addEventListener('click', () => {
+      triggerHaptic(8);
       state.currentWeekOffset++;
       renderDashboard();
     });
@@ -1315,14 +1477,35 @@ function setupEventListeners() {
   const nextMonthBtn = document.getElementById('next-month-btn');
   if (prevMonthBtn && nextMonthBtn) {
     prevMonthBtn.addEventListener('click', () => {
+      triggerHaptic(8);
       state.currentMonthOffset--;
       renderMonthlyBreakdown();
     });
     nextMonthBtn.addEventListener('click', () => {
+      triggerHaptic(8);
       state.currentMonthOffset++;
       renderMonthlyBreakdown();
     });
   }
+
+  // Undo Toast Action
+  if (toastUndoBtn) {
+    toastUndoBtn.addEventListener('click', handleUndoDelete);
+  }
+
+  // Quick Date Chips on Log Form
+  const dateChips = document.querySelectorAll('.date-chip');
+  dateChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      triggerHaptic(8);
+      dateChips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      const offset = parseInt(chip.getAttribute('data-offset') || '0', 10);
+      const d = new Date();
+      d.setDate(d.getDate() - offset);
+      expenseDateInput.value = formatDateLocal(d);
+    });
+  });
 
   // Log Form Submission
   submitExpenseBtn.addEventListener('click', (e) => {
@@ -1365,6 +1548,8 @@ function setupEventListeners() {
   // Settings Modal Toggle
   settingsBtn.addEventListener('click', () => {
     monthlyIncomeInput.value = state.income;
+    if (currencySelect) currencySelect.value = state.currency || '$';
+    populateSnapshotSelector();
     settingsModal.classList.add('active');
   });
 
@@ -1413,6 +1598,27 @@ function setupEventListeners() {
     }
   });
 
+  // Settings Currency change
+  if (currencySelect) {
+    currencySelect.addEventListener('change', () => {
+      triggerHaptic(10);
+      state.currency = currencySelect.value;
+      saveState();
+      updateCurrencyUI();
+      renderDashboard();
+      renderMonthlyBreakdown();
+      renderHistory();
+    });
+  }
+
+  // Settings Snapshot Restore
+  if (restoreSnapshotBtn) {
+    restoreSnapshotBtn.addEventListener('click', () => {
+      triggerHaptic(10);
+      restoreSelectedSnapshot();
+    });
+  }
+
   // Export JSON
   exportDataBtn.addEventListener('click', () => {
     exportToJSON();
@@ -1457,9 +1663,11 @@ function setupEventListeners() {
           try {
             const parsed = JSON.parse(text);
             if (parsed && typeof parsed === 'object') {
+              createSnapshot('Pre-import backup');
               state = { ...state, ...parsed };
               saveState();
               applyTheme();
+              updateCurrencyUI();
               updateBillsToggleUI();
               renderDashboard();
               renderMonthlyBreakdown();
@@ -1475,6 +1683,7 @@ function setupEventListeners() {
         }
 
         try {
+          createSnapshot('Pre-import backup');
           importFromCSV(text);
           closePaste();
           closeModal();
@@ -1499,9 +1708,11 @@ function setupEventListeners() {
       try {
         const parsed = JSON.parse(event.target.result);
         if (parsed && typeof parsed === 'object') {
+          createSnapshot('Pre-import backup');
           state = { ...state, ...parsed };
           saveState();
           applyTheme();
+          updateCurrencyUI();
           updateBillsToggleUI();
           renderDashboard();
           renderMonthlyBreakdown();
@@ -1539,6 +1750,7 @@ function setupEventListeners() {
       if (!file) return;
       const reader = new FileReader();
       reader.onload = (event) => {
+        createSnapshot('Pre-import backup');
         importFromCSV(event.target.result);
         closeModal();
       };
@@ -1589,8 +1801,10 @@ function setupEventListeners() {
   // Reset Data
   resetAllBtn.addEventListener('click', () => {
     if (confirm('Are you absolutely sure you want to reset all budget and spending data? This cannot be undone.')) {
+      createSnapshot('Pre-reset backup');
       state = {
         income: 0.00,
+        currency: '$',
         expenses: [],
         selectedCategory: 'food',
         theme: 'shallot',
@@ -1600,6 +1814,7 @@ function setupEventListeners() {
       };
       saveState();
       applyTheme();
+      updateCurrencyUI();
       updateBillsToggleUI();
       renderDashboard();
       initCategorySelectors();
@@ -1636,3 +1851,13 @@ document.addEventListener('DOMContentLoaded', init);
 if (document.readyState === 'interactive' || document.readyState === 'complete') {
   init();
 }
+
+// Register Service Worker for offline resilience
+if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(err => {
+      console.warn('SW registration info:', err);
+    });
+  });
+}
+

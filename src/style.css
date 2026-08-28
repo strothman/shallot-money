@@ -1489,5 +1489,121 @@ body {
   text-align: center;
 }
 
+/* Quick Date Chips */
+.date-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.date-quick-chips {
+  display: flex;
+  gap: 6px;
+}
+
+.date-chip {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.date-chip:hover {
+  color: var(--text-primary);
+  border-color: var(--accent-color);
+}
+
+.date-chip.active {
+  background: rgba(61, 35, 74, 0.6);
+  color: var(--accent-color, #d48244);
+  border-color: var(--accent-color, #d48244);
+}
+
+/* Currency & Snapshot Dropdowns */
+.currency-dropdown {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  outline: none;
+  padding: 4px 0;
+  cursor: pointer;
+}
+
+.currency-dropdown option {
+  background: #180d21;
+  color: #f5eff9;
+}
+
+.snapshot-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  padding: 4px 8px;
+}
+
+/* Floating Undo Toast */
+.toast-container {
+  position: absolute;
+  bottom: 84px;
+  left: 20px;
+  right: 20px;
+  background: rgba(38, 21, 51, 0.95);
+  border: 1px solid var(--accent-color, #d48244);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+  border-radius: var(--border-radius-md);
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+  transform: translateY(120px);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+
+.toast-container.active {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.toast-message {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.toast-undo-btn {
+  background: var(--accent-color, #d48244);
+  color: #180d21;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.toast-undo-btn:active {
+  transform: scale(0.95);
+  opacity: 0.9;
+}
+
+
 
 
