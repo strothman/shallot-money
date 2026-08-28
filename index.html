@@ -3,11 +3,11 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/png" href="/capy_track_cap.png" />
+  <link rel="icon" type="image/png" href="/icon.png" />
   <!-- iOS Home Screen Icons -->
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png" />
-  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png" />
-  <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/icon.png" />
+  <link rel="apple-touch-icon" sizes="152x152" href="/icon.png" />
+  <link rel="apple-touch-icon" sizes="120x120" href="/icon.png" />
   <!-- Web App Manifest -->
   <link rel="manifest" href="/manifest.json" />
   <!-- Mobile-first viewport optimized for iPhone 12 Pro Max and standalone look -->
@@ -15,12 +15,12 @@
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Capy-Track" />
-  <title>Capy-Track</title>
-  <!-- Google Fonts: Inter -->
+  <meta name="apple-mobile-web-app-title" content="Shallot Money" />
+  <title>Shallot Money</title>
+  <!-- Google Fonts: Outfit, Inter, Playfair Display -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap"
     rel="stylesheet">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -33,8 +33,8 @@
     <!-- HEADER -->
     <header class="app-header">
       <div class="header-logo">
-        <img src="/capy_track_cap.png" alt="Capy-Track Logo" class="logo-img" />
-        <span class="logo-text">Capy-Track</span>
+        <img src="/icon.png" alt="Shallot Money Logo" class="logo-img" />
+        <span class="logo-text">Shallot Money</span>
       </div>
       <div class="header-actions">
         <button id="theme-toggle" class="icon-btn" aria-label="Cycle Themes">
@@ -265,6 +265,8 @@
             <h4>Theme Color Scheme</h4>
             <p class="settings-info-text">Choose a visual aesthetic for your budget workspace.</p>
             <div class="theme-selector-grid">
+              <button class="theme-option" data-theme="shallot"
+                style="background-color: #180d21; border-color: #d48244;" title="Shallot Plum & Copper Glow"></button>
               <button class="theme-option" data-theme="christmas"
                 style="background-color: #122218; border-color: #ef4444;" title="Christmas Red & Green"></button>
               <button class="theme-option" data-theme="antigravity"

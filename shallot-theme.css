@@ -1,0 +1,47 @@
+/**
+ * Shallot Plum Theme — Design Tokens & CSS Variables
+ * Signature Deep Plum & Copper Glow Palette
+ * Copyright (c) 2026 Shallot (strothman)
+ */
+
+:root,
+[data-theme="shallot"],
+[data-theme="shallot-plum"] {
+  /* Surface & Backgrounds */
+  --shallot-bg-app: #180d21;              /* Deep Velvet Plum (Main App Background) */
+  --shallot-bg-card: #261533;             /* Elevated Plum Surface (Cards, Modals) */
+  --shallot-bg-header: rgba(38, 21, 51, 0.95); /* Frosted Header Glass */
+  --shallot-bg-overlay: rgba(14, 7, 19, 0.82); /* Modal Backdrop Glass */
+
+  /* Brand & Accent Colors */
+  --shallot-primary: #d48244;             /* Warm Shallot Copper / Amber Glow */
+  --shallot-primary-light: #3d234a;       /* Soft Purple-Plum Tint for Pills & Active States */
+  --shallot-primary-hover: #e69150;       /* Brightened Copper on Interaction */
+  --shallot-accent: #f39c12;              /* Golden Core Glow */
+  --shallot-deep-plum: #4a1d6a;           /* Royal Shallot Plum */
+
+  /* Text & Typography */
+  --shallot-text-main: #f5eff9;           /* Pure Soft Lilac-White (High Contrast) */
+  --shallot-text-muted: #bda8c7;          /* Muted Lavender Grey (Secondary Labels) */
+  --shallot-border: rgba(212, 130, 68, 0.22); /* Subtle Copper Glass Border */
+
+  /* Semantic Feedback & Urgency Colors */
+  --shallot-success: #2ecc71;             /* Emerald Sprout Green (Good / Fresh) */
+  --shallot-success-light: #1c402b;       /* Dark Sprout Background */
+  --shallot-warning: #e67e22;             /* Vibrant Carrot Amber (Expiring Soon) */
+  --shallot-warning-light: #4d2f19;       /* Dark Carrot Amber Background */
+  --shallot-danger: #e74c3c;              /* Tomato Crimson (Urgent / Expired) */
+  --shallot-danger-light: #4c1f24;        /* Dark Crimson Background */
+  --shallot-info: #3498db;                /* Freezer Ice Blue */
+  --shallot-info-light: #1b2f42;          /* Dark Ice Blue Background */
+
+  /* Wood & Culinary Textures */
+  --shallot-wood-dark: #1e0f29;
+  --shallot-wood-light: #361c47;
+  --shallot-wood-board: #5a2e76;
+  --shallot-wood-board-border: #753c99;
+
+  /* Typography Fonts */
+  --shallot-font-main: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --shallot-font-display: 'Playfair Display', Georgia, serif;
+}

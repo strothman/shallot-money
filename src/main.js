@@ -29,7 +29,7 @@ let state = {
   income: 0.00,
   expenses: [],
   selectedCategory: 'food',
-  theme: 'dark',
+  theme: 'shallot',
   currentWeekOffset: 0,
   currentMonthOffset: 0,
   hideBillsInBreakdown: false,
@@ -156,11 +156,11 @@ function seedMockData() {
 // ----------------------------------------------------
 // THEME HANDLING
 // ----------------------------------------------------
-const THEME_LIST = ['christmas', 'antigravity', 'halloween', 'july4th', 'glacier', 'valentine'];
+const THEME_LIST = ['shallot', 'antigravity', 'christmas', 'halloween', 'july4th', 'glacier', 'valentine'];
 
 function applyTheme() {
   if (state.theme === 'dark' || state.theme === 'light' || state.theme === 'midnight' || !THEME_LIST.includes(state.theme)) {
-    state.theme = 'antigravity';
+    state.theme = 'shallot';
   }
   document.documentElement.setAttribute('data-theme', state.theme);
   updateThemeSelectors();
@@ -1436,7 +1436,7 @@ function setupEventListeners() {
         income: 0.00,
         expenses: [],
         selectedCategory: 'food',
-        theme: 'dark',
+        theme: 'shallot',
         currentWeekOffset: 0,
         currentMonthOffset: 0,
         hideBillsInBreakdown: false,

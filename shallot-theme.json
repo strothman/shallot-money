@@ -1,0 +1,48 @@
+{
+  "name": "Shallot Plum",
+  "version": "1.0.0",
+  "author": "Shallot (strothman)",
+  "copyright": "Copyright (c) 2026 Shallot (strothman)",
+  "colors": {
+    "background": {
+      "app": "#180d21",
+      "card": "#261533",
+      "header": "rgba(38, 21, 51, 0.95)",
+      "overlay": "rgba(14, 7, 19, 0.82)"
+    },
+    "brand": {
+      "primary": "#d48244",
+      "primaryLight": "#3d234a",
+      "primaryHover": "#e69150",
+      "accent": "#f39c12",
+      "plum": "#4a1d6a"
+    },
+    "text": {
+      "main": "#f5eff9",
+      "muted": "#bda8c7",
+      "border": "rgba(212, 130, 68, 0.22)"
+    },
+    "semantic": {
+      "success": "#2ecc71",
+      "successLight": "#1c402b",
+      "warning": "#e67e22",
+      "warningLight": "#4d2f19",
+      "danger": "#e74c3c",
+      "dangerLight": "#4c1f24",
+      "info": "#3498db",
+      "infoLight": "#1b2f42"
+    },
+    "accents": {
+      "woodDark": "#1e0f29",
+      "woodLight": "#361c47",
+      "woodBoard": "#5a2e76",
+      "woodBorder": "#753c99"
+    }
+  },
+  "typography": {
+    "fontFamily": {
+      "sans": "Outfit, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      "serif": "Playfair Display, Georgia, serif"
+    }
+  }
+}

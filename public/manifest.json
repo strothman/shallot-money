@@ -1,12 +1,18 @@
 {
-  "name": "Capy-Track",
-  "short_name": "Capy-Track",
-  "description": "Premium Spending Tracker",
+  "name": "Shallot Money",
+  "short_name": "Shallot Money",
+  "description": "Shallot Money — Premium Spending & Budget Tracker",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0a0a0a",
-  "theme_color": "#0a0a0a",
+  "background_color": "#180d21",
+  "theme_color": "#180d21",
   "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
     {
       "src": "/apple-touch-icon-120x120.png",
       "sizes": "120x120",
