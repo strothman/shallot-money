@@ -285,6 +285,16 @@
             </div>
           </div>
 
+          <div class="settings-actions">
+            <h4>Custom Categories</h4>
+            <p class="settings-info-text">Customize, add, or delete your spending categories, icons, and colors.</p>
+            <div class="btn-row">
+              <button id="manage-categories-btn" class="secondary-btn" style="width: 100%;">
+                <i data-lucide="tags"></i> Manage Categories
+              </button>
+            </div>
+          </div>
+
           <div class="divider"></div>
 
           <div class="settings-actions">
@@ -376,7 +386,7 @@
           <div class="settings-footer-info">
             <div class="version-badge">
               <img src="./icon.png" alt="Shallot Money" class="version-icon" />
-              <span>Shallot Money <strong>v1.1.0</strong></span>
+              <span>Shallot Money <strong>v1.2.0</strong></span>
             </div>
             <button id="force-update-btn" class="update-app-btn">
               <i data-lucide="refresh-cw"></i> Check for Updates / Reload
@@ -475,6 +485,66 @@
               Delete
             </button>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: CATEGORY MANAGER -->
+    <div id="category-manager-modal" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Manage Categories</h3>
+          <button id="close-category-manager" class="icon-btn" aria-label="Close Category Manager"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body">
+          <p class="settings-info-text">Create personalized spending categories or customize existing ones.</p>
+          <div id="category-manager-list" class="category-manager-list">
+            <!-- Dynamically populated -->
+          </div>
+          <button id="add-new-category-btn" class="primary-btn" style="width: 100%; margin-top: 14px;">
+            <i data-lucide="plus"></i> Add New Category
+          </button>
+          <button id="reset-categories-btn" class="secondary-btn" style="width: 100%; margin-top: 8px; opacity: 0.85;">
+            <i data-lucide="rotate-ccw"></i> Reset to Default Categories
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: CATEGORY FORM (ADD / EDIT) -->
+    <div id="category-form-modal" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="category-form-title">Add Category</h3>
+          <button id="close-category-form" class="icon-btn" aria-label="Close Category Form"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="category-form-id" value="" />
+          <div class="form-group">
+            <label for="category-name-input">Category Name</label>
+            <div class="input-with-icon">
+              <i data-lucide="tag"></i>
+              <input type="text" id="category-name-input" placeholder="e.g. Coffee, Pets, Travel, Gifts" required maxlength="24" />
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 14px;">
+            <label>Choose Icon</label>
+            <div class="icon-picker-grid" id="category-icon-picker">
+              <!-- Dynamically populated icon choices -->
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 14px;">
+            <label>Choose Color</label>
+            <div class="color-picker-row" id="category-color-picker">
+              <!-- Dynamically populated color circles -->
+            </div>
+          </div>
+
+          <button id="save-category-btn" class="primary-btn" style="width: 100%; margin-top: 18px;">
+            <i data-lucide="check"></i> Save Category
+          </button>
         </div>
       </div>
     </div>

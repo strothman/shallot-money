@@ -7,6 +7,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [1.2.0] - 2026-08-28
+
+### Added & Enhanced
+- **Custom Spending Categories Suite**:
+  - Full freedom to create, edit, rename, customize, and delete expense categories.
+- **Curated Icon & Color Palette Picker**:
+  - 32 finance, lifestyle, and household icons (coffee, dog, cat, car, fuel, utensils, plane, gift, gym, etc.).
+  - 12 tailored vibrant HSL theme colors with automated badge background shading.
+- **Quick `+ Add` Tile in Category Grids**:
+  - Added an intuitive `+ Add` tile directly inside the Log Expense and Edit Expense category selectors for on-the-fly category creation.
+- **Category Manager in Settings**:
+  - Added a dedicated **"Manage Categories"** dialog with individual Edit and Delete actions, plus a 1-tap **"Reset to Defaults"** option.
+- **Safety Reassignment on Delete**:
+  - Automatically checks and safely reassigns existing expenses before deleting a category.
+- **Dynamic Weekly & Monthly Chart & Breakdown Sync**:
+  - Weekly and monthly stacked bar charts, totals, and category breakdown lists dynamically adapt to any custom categories.
+- **Smart CSV Import Mapping**:
+  - Automatically detects unknown category names in imported spreadsheets and creates corresponding color-coded categories on the fly.
+
+---
+
 ## [1.1.0] - 2026-08-28
 
 ### Added & Enhanced

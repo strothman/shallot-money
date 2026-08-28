@@ -2,22 +2,69 @@ import './style.css';
 import importedExpenses from './imported_expenses.json';
 
 // ----------------------------------------------------
-// CATEGORY DEFINITIONS
+// CATEGORY DEFINITIONS & PALETTES
 // ----------------------------------------------------
-const CATEGORIES = [
-  { id: 'food', label: 'Food', icon: '<i data-lucide="utensils"></i>', color: '#0d9488', bg: 'rgba(13, 148, 136, 0.15)', isParent: true },
-  { id: 'groceries', label: 'Groceries', icon: '<i data-lucide="shopping-basket"></i>', color: '#10b981', bg: 'rgba(16, 185, 129, 0.15)', parentId: 'food' },
-  { id: 'fastfood', label: 'Fast Food', icon: '<i data-lucide="pizza"></i>', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)', parentId: 'food' },
-  { id: 'transport', label: 'Auto', icon: '<i data-lucide="car"></i>', color: '#2563eb', bg: 'rgba(37, 99, 235, 0.15)' },
-  { id: 'shopping', label: 'Shopping', icon: '<i data-lucide="shopping-bag"></i>', color: '#db2777', bg: 'rgba(219, 39, 119, 0.15)' },
-  { id: 'entertainment', label: 'Entertainment', icon: '<i data-lucide="clapperboard"></i>', color: '#6366f1', bg: 'rgba(99, 102, 241, 0.15)' },
-  { id: 'bills', label: 'Bills', icon: '<i data-lucide="receipt"></i>', color: '#b91c1c', bg: 'rgba(185, 28, 28, 0.15)' },
-  { id: 'gym', label: 'Health', icon: '<i data-lucide="heart-pulse"></i>', color: '#0ea5e9', bg: 'rgba(14, 165, 233, 0.15)' },
+const DEFAULT_CATEGORIES = [
+  { id: 'groceries', label: 'Groceries', iconName: 'shopping-basket', color: '#10b981', bg: 'rgba(16, 185, 129, 0.15)' },
+  { id: 'fastfood', label: 'Fast Food', iconName: 'pizza', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)' },
+  { id: 'transport', label: 'Auto', iconName: 'car', color: '#2563eb', bg: 'rgba(37, 99, 235, 0.15)' },
+  { id: 'shopping', label: 'Shopping', iconName: 'shopping-bag', color: '#db2777', bg: 'rgba(219, 39, 119, 0.15)' },
+  { id: 'entertainment', label: 'Entertainment', iconName: 'clapperboard', color: '#6366f1', bg: 'rgba(99, 102, 241, 0.15)' },
+  { id: 'bills', label: 'Bills', iconName: 'receipt', color: '#b91c1c', bg: 'rgba(185, 28, 28, 0.15)' },
+  { id: 'gym', label: 'Health', iconName: 'heart-pulse', color: '#0ea5e9', bg: 'rgba(14, 165, 233, 0.15)' },
 ];
 
+const AVAILABLE_ICONS = [
+  'shopping-basket', 'pizza', 'utensils', 'coffee', 'car', 'fuel', 'bus', 'plane',
+  'shopping-bag', 'tag', 'gift', 'clapperboard', 'film', 'gamepad-2', 'music', 'tv',
+  'receipt', 'home', 'zap', 'wifi', 'smartphone', 'laptop', 'briefcase', 'wrench',
+  'heart-pulse', 'dumbbell', 'baby', 'dog', 'cat', 'book-open', 'graduation-cap', 'sparkles'
+];
+
+const AVAILABLE_COLORS = [
+  '#10b981', '#0d9488', '#0ea5e9', '#2563eb', '#6366f1', '#8b5cf6',
+  '#d946ef', '#db2777', '#f43f5e', '#b91c1c', '#ea580c', '#f59e0b'
+];
+
+function hexToRgba(hex, alpha = 0.15) {
+  let c = hex.replace('#', '');
+  if (c.length === 3) c = c.split('').map(x => x + x).join('');
+  const num = parseInt(c, 16);
+  const r = (num >> 16) & 255;
+  const g = (num >> 8) & 255;
+  const b = num & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function getCategories() {
+  if (!state.categories || !Array.isArray(state.categories) || state.categories.length === 0) {
+    state.categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+  }
+  return state.categories;
+}
+
+function getCategory(id) {
+  const cats = getCategories();
+  // Support legacy food mapping
+  if (id === 'food') {
+    return cats.find(c => c.id === 'groceries') || cats[0];
+  }
+  return cats.find(c => c.id === id) || {
+    id,
+    label: id.charAt(0).toUpperCase() + id.slice(1),
+    iconName: 'tag',
+    color: '#8b5cf6',
+    bg: 'rgba(139, 92, 246, 0.15)'
+  };
+}
+
+function getCategoryIconHtml(cat) {
+  const iconName = cat.iconName || 'tag';
+  return `<i data-lucide="${iconName}"></i>`;
+}
+
 function getDisplayCategoryId(catId) {
-  const cat = CATEGORIES.find(c => c.id === catId);
-  return (cat && cat.parentId) ? cat.parentId : catId;
+  return catId === 'food' ? 'groceries' : catId;
 }
 
 const WEEK_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -50,8 +97,9 @@ function triggerHaptic(duration = 10) {
 let state = {
   income: 0.00,
   currency: '$',
+  categories: null,
   expenses: [],
-  selectedCategory: 'food',
+  selectedCategory: 'groceries',
   theme: 'shallot',
   currentWeekOffset: 0,
   currentMonthOffset: 0,
@@ -259,6 +307,9 @@ function loadState() {
     try {
       state = { ...state, ...JSON.parse(saved) };
       if (!state.currency) state.currency = '$';
+      if (!state.categories || !Array.isArray(state.categories) || state.categories.length === 0) {
+        state.categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+      }
     } catch (e) {
       console.error('Error loading state from localStorage:', e);
     }
@@ -266,6 +317,7 @@ function loadState() {
     // If no local storage exists, load the imported Excel data directly as default!
     state.income = 3000.00;
     state.currency = '$';
+    state.categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
     state.expenses = [...importedExpenses];
     saveState();
   }
@@ -462,10 +514,11 @@ function renderDashboard() {
   weekSpentVal.textContent = formatCurrency(totalSpentRealWeek);
 
   // Group by day of week and category
+  const cats = getCategories();
   const daySums = Array(7).fill(0);
   const dayCatSums = Array(7).fill(null).map(() => {
     const obj = {};
-    CATEGORIES.forEach(cat => obj[cat.id] = 0);
+    cats.forEach(c => obj[c.id] = 0);
     return obj;
   });
 
@@ -475,8 +528,9 @@ function renderDashboard() {
     if (!state.hideBillsInBreakdown || exp.category !== 'bills') {
       daySums[dayIndex] += exp.amount;
     }
-    const catId = CATEGORIES.some(c => c.id === exp.category) ? exp.category : 'gym';
-    dayCatSums[dayIndex][catId] += exp.amount;
+    const cat = getCategory(exp.category);
+    if (!dayCatSums[dayIndex][cat.id]) dayCatSums[dayIndex][cat.id] = 0;
+    dayCatSums[dayIndex][cat.id] += exp.amount;
   });
 
   const maxDaySum = Math.max(...daySums, 10); // Minimum scale limit of $10
@@ -488,7 +542,7 @@ function renderDashboard() {
     const isToday = state.currentWeekOffset === 0 && today.getDay() === i;
 
     // Create segments for each active category
-    const segmentsHtml = CATEGORIES.map(cat => {
+    const segmentsHtml = cats.map(cat => {
       if (state.hideBillsInBreakdown && cat.id === 'bills') return '';
       const amt = catAmounts[cat.id] || 0;
       if (amt === 0) return '';
@@ -498,7 +552,7 @@ function renderDashboard() {
       return `
         <div class="chart-bar-segment" 
              style="height: ${heightPercent}%; ${bgStyle}" 
-             title="${cat.label}: ${formatCurrency(amt)}"></div>
+             title="${escapeHTML(cat.label)}: ${formatCurrency(amt)}"></div>
       `;
     }).join('');
 
@@ -515,65 +569,31 @@ function renderDashboard() {
 
   // Category breakdown lists
   const catSums = {};
-  CATEGORIES.forEach(cat => catSums[cat.id] = 0);
+  cats.forEach(c => catSums[c.id] = 0);
   weeklyExpenses.forEach(exp => {
-    const rawCatId = CATEGORIES.some(c => c.id === exp.category) ? exp.category : 'gym';
-    catSums[rawCatId] += exp.amount;
+    const cat = getCategory(exp.category);
+    if (!catSums[cat.id]) catSums[cat.id] = 0;
+    catSums[cat.id] += exp.amount;
   });
 
-  const topLevelCategories = CATEGORIES.filter(c => !c.parentId);
-  const rolledUpSums = {};
-  topLevelCategories.forEach(parent => {
-    let sum = catSums[parent.id] || 0;
-    const children = CATEGORIES.filter(c => c.parentId === parent.id);
-    children.forEach(child => {
-      sum += catSums[child.id] || 0;
-    });
-    rolledUpSums[parent.id] = sum;
-  });
+  const sortedCategories = [...cats].sort((a, b) => (catSums[b.id] || 0) - (catSums[a.id] || 0));
 
-  // Sort top-level categories by their rolled-up sums
-  const sortedTopCategories = [...topLevelCategories].sort((a, b) => rolledUpSums[b.id] - rolledUpSums[a.id]);
-
-  let categoryHtml = sortedTopCategories.map(cat => {
+  let categoryHtml = sortedCategories.map(cat => {
     if (state.hideBillsInBreakdown && cat.id === 'bills') return '';
-    const totalAmt = rolledUpSums[cat.id];
-    if (totalAmt === 0) return ''; // Only show active categories
+    const totalAmt = catSums[cat.id] || 0;
+    if (totalAmt === 0) return '';
 
-    let html = `
+    return `
       <div class="category-row">
         <div class="category-row-info">
           <div class="category-icon-wrapper" style="background-color: ${cat.color}">
-            ${cat.icon}
+            ${getCategoryIconHtml(cat)}
           </div>
-          <span class="category-name">${cat.label}</span>
+          <span class="category-name">${escapeHTML(cat.label)}</span>
         </div>
         <span class="category-amt">${formatCurrency(totalAmt)}</span>
       </div>
     `;
-
-    // Render children if this is a parent category
-    if (cat.isParent) {
-      const children = CATEGORIES.filter(c => c.parentId === cat.id);
-      children.forEach(child => {
-        const childAmt = catSums[child.id] || 0;
-        if (childAmt > 0) {
-          html += `
-            <div class="category-row subcategory-row">
-              <div class="category-row-info">
-                <div class="category-icon-wrapper" style="background-color: ${child.color}">
-                  ${child.icon}
-                </div>
-                <span class="category-name">${child.label}</span>
-              </div>
-              <span class="category-amt">${formatCurrency(childAmt)}</span>
-            </div>
-          `;
-        }
-      });
-    }
-
-    return html;
   }).join('');
 
   if (totalSpentWeek > 0) {
@@ -610,16 +630,16 @@ function renderDashboard() {
     `;
   } else {
     recentSpendingList.innerHTML = recentSorted.map(exp => {
-      const cat = CATEGORIES.find(c => c.id === exp.category) || CATEGORIES[CATEGORIES.length - 1];
+      const cat = getCategory(exp.category);
       return `
         <div class="expense-item">
           <div class="item-left">
             <div class="category-icon-wrapper" style="background-color: ${cat.color}">
-              ${cat.icon}
+              ${getCategoryIconHtml(cat)}
             </div>
             <div class="item-details">
               <span class="item-desc">${escapeHTML(exp.description)}</span>
-              <span class="item-meta">${formatDateDisplay(exp.date)} &bull; ${cat.label}</span>
+              <span class="item-meta">${formatDateDisplay(exp.date)} &bull; ${escapeHTML(cat.label)}</span>
             </div>
           </div>
           <div class="item-right">
@@ -658,14 +678,12 @@ function renderMonthlyBreakdown() {
   // Build week ranges for this month
   const weeks = [];
   let weekStart = new Date(firstDay);
-  // Align to start of first week (could be before month start)
   weekStart.setDate(weekStart.getDate() - weekStart.getDay());
 
   while (weekStart <= lastDay) {
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekStart.getDate() + 6);
 
-    // Clamp to month boundaries for labeling
     const displayStart = new Date(Math.max(weekStart.getTime(), firstDay.getTime()));
     const displayEnd = new Date(Math.min(weekEnd.getTime(), lastDay.getTime()));
 
@@ -683,6 +701,7 @@ function renderMonthlyBreakdown() {
   }
 
   // Calculate spending per week and per category
+  const cats = getCategories();
   const weekSums = [];
   const weekCatSums = [];
 
@@ -694,10 +713,11 @@ function renderMonthlyBreakdown() {
     weekSums.push(total);
 
     const catSumsObj = {};
-    CATEGORIES.forEach(cat => catSumsObj[cat.id] = 0);
+    cats.forEach(c => catSumsObj[c.id] = 0);
     weekExpenses.forEach(exp => {
-      const catId = CATEGORIES.some(c => c.id === exp.category) ? exp.category : 'gym';
-      catSumsObj[catId] += exp.amount;
+      const cat = getCategory(exp.category);
+      if (!catSumsObj[cat.id]) catSumsObj[cat.id] = 0;
+      catSumsObj[cat.id] += exp.amount;
     });
     weekCatSums.push(catSumsObj);
   });
@@ -715,7 +735,7 @@ function renderMonthlyBreakdown() {
     const isCurrentWeek = state.currentMonthOffset === 0 && today >= w.start && today <= w.end;
 
     // Create segments for each active category
-    const segmentsHtml = CATEGORIES.map(cat => {
+    const segmentsHtml = cats.map(cat => {
       if (state.hideBillsInBreakdown && cat.id === 'bills') return '';
       const amt = catAmounts[cat.id] || 0;
       if (amt === 0) return '';
@@ -725,7 +745,7 @@ function renderMonthlyBreakdown() {
       return `
         <div class="chart-bar-segment" 
              style="height: ${heightPercent}%; ${bgStyle}" 
-             title="${cat.label}: ${formatCurrency(amt)}"></div>
+             title="${escapeHTML(cat.label)}: ${formatCurrency(amt)}"></div>
       `;
     }).join('');
 
@@ -742,65 +762,31 @@ function renderMonthlyBreakdown() {
 
   // Category breakdown for the month
   const catSums = {};
-  CATEGORIES.forEach(cat => catSums[cat.id] = 0);
+  cats.forEach(c => catSums[c.id] = 0);
   monthExpenses.forEach(exp => {
-    const rawCatId = CATEGORIES.some(c => c.id === exp.category) ? exp.category : 'gym';
-    catSums[rawCatId] += exp.amount;
+    const cat = getCategory(exp.category);
+    if (!catSums[cat.id]) catSums[cat.id] = 0;
+    catSums[cat.id] += exp.amount;
   });
 
-  const topLevelCategories = CATEGORIES.filter(c => !c.parentId);
-  const rolledUpSums = {};
-  topLevelCategories.forEach(parent => {
-    let sum = catSums[parent.id] || 0;
-    const children = CATEGORIES.filter(c => c.parentId === parent.id);
-    children.forEach(child => {
-      sum += catSums[child.id] || 0;
-    });
-    rolledUpSums[parent.id] = sum;
-  });
+  const sortedCategories = [...cats].sort((a, b) => (catSums[b.id] || 0) - (catSums[a.id] || 0));
 
-  // Sort top-level categories by their rolled-up sums
-  const sortedTopCategories = [...topLevelCategories].sort((a, b) => rolledUpSums[b.id] - rolledUpSums[a.id]);
-
-  let categoryHtml = sortedTopCategories.map(cat => {
+  let categoryHtml = sortedCategories.map(cat => {
     if (state.hideBillsInBreakdown && cat.id === 'bills') return '';
-    const totalAmt = rolledUpSums[cat.id];
+    const totalAmt = catSums[cat.id] || 0;
     if (totalAmt === 0) return '';
 
-    let html = `
+    return `
       <div class="category-row">
         <div class="category-row-info">
           <div class="category-icon-wrapper" style="background-color: ${cat.color}">
-            ${cat.icon}
+            ${getCategoryIconHtml(cat)}
           </div>
-          <span class="category-name">${cat.label}</span>
+          <span class="category-name">${escapeHTML(cat.label)}</span>
         </div>
         <span class="category-amt">${formatCurrency(totalAmt)}</span>
       </div>
     `;
-
-    // Render children if this is a parent category
-    if (cat.isParent) {
-      const children = CATEGORIES.filter(c => c.parentId === cat.id);
-      children.forEach(child => {
-        const childAmt = catSums[child.id] || 0;
-        if (childAmt > 0) {
-          html += `
-            <div class="category-row subcategory-row">
-              <div class="category-row-info">
-                <div class="category-icon-wrapper" style="background-color: ${child.color}">
-                  ${child.icon}
-                </div>
-                <span class="category-name">${child.label}</span>
-              </div>
-              <span class="category-amt">${formatCurrency(childAmt)}</span>
-            </div>
-          `;
-        }
-      });
-    }
-
-    return html;
   }).join('');
 
   if (totalSpentMonth > 0) {
@@ -835,9 +821,7 @@ function renderHistory() {
   // Filter expenses
   let filtered = state.expenses.filter(exp => {
     const matchesSearch = exp.description.toLowerCase().includes(searchQuery);
-    const matchesCat = catFilter === 'all' ||
-      exp.category === catFilter ||
-      getDisplayCategoryId(exp.category) === catFilter;
+    const matchesCat = catFilter === 'all' || exp.category === catFilter;
     return matchesSearch && matchesCat;
   });
 
@@ -866,17 +850,17 @@ function renderHistory() {
       const dayTotal = groupExpenses.reduce((sum, exp) => sum + exp.amount, 0);
 
       const itemsHtml = groupExpenses.map(exp => {
-        const cat = CATEGORIES.find(c => c.id === exp.category) || CATEGORIES[CATEGORIES.length - 1];
+        const cat = getCategory(exp.category);
         return `
           <div class="expense-item" data-id="${exp.id}">
             <div class="expense-item-content">
               <div class="item-left">
                 <div class="category-icon-wrapper" style="background-color: ${cat.color}">
-                  ${cat.icon}
+                  ${getCategoryIconHtml(cat)}
                 </div>
                 <div class="item-details">
                   <span class="item-desc">${escapeHTML(exp.description)}</span>
-                  <span class="item-meta">${cat.label}</span>
+                  <span class="item-meta">${escapeHTML(cat.label)}</span>
                 </div>
               </div>
               <div class="item-right">
@@ -912,7 +896,6 @@ function renderHistory() {
   // Hook up click to show action overlays, and buttons inside history list
   historyFeedList.querySelectorAll('.expense-item').forEach(item => {
     item.addEventListener('click', (e) => {
-      // If action buttons or overlay itself clicked, let the button handle it
       if (e.target.closest('.expense-actions-overlay')) {
         return;
       }
@@ -938,7 +921,6 @@ function renderHistory() {
       const id = btn.getAttribute('data-id');
       openEditExpenseModal(id);
 
-      // Close overlay
       const item = btn.closest('.expense-item');
       if (item) item.classList.remove('show-actions');
     });
@@ -952,7 +934,6 @@ function renderHistory() {
       const id = btn.getAttribute('data-id');
       showDeleteConfirmation(id);
 
-      // Close overlay
       const item = btn.closest('.expense-item');
       if (item) item.classList.remove('show-actions');
     });
@@ -972,25 +953,237 @@ function renderHistory() {
   }
 }
 
-function initCategorySelectors() {
-  const selectableCategories = CATEGORIES.filter(cat => !cat.isParent);
+// ----------------------------------------------------
+// CATEGORY MANAGER & SELECTORS
+// ----------------------------------------------------
+let selectedFormIcon = 'shopping-bag';
+let selectedFormColor = '#10b981';
 
-  // Default to first selectable category if current selectedCategory is a parent or not found
-  if (!selectableCategories.some(c => c.id === state.selectedCategory)) {
-    state.selectedCategory = selectableCategories[0]?.id || 'groceries';
-  }
-
-  // Log expense category picker
-  categoryPicker.innerHTML = selectableCategories.map(cat => `
-    <div class="category-pill ${state.selectedCategory === cat.id ? 'selected' : ''}" 
-         data-id="${cat.id}" 
-         style="--selected-color: ${cat.color}; --selected-bg: ${cat.bg}; --category-color: ${cat.color};">
-      <span class="pill-icon">${cat.icon}</span>
-      <span class="pill-label">${cat.label}</span>
+function renderCategoryManagerList() {
+  const listEl = document.getElementById('category-manager-list');
+  if (!listEl) return;
+  const cats = getCategories();
+  listEl.innerHTML = cats.map(cat => `
+    <div class="category-manager-item" data-id="${cat.id}">
+      <div class="category-manager-info">
+        <div class="category-icon-wrapper" style="background-color: ${cat.color};">
+          ${getCategoryIconHtml(cat)}
+        </div>
+        <span class="category-manager-name">${escapeHTML(cat.label)}</span>
+      </div>
+      <div class="category-manager-actions">
+        <button class="category-action-btn edit-cat-btn" data-id="${cat.id}" title="Edit Category">
+          <i data-lucide="edit-3"></i>
+        </button>
+        <button class="category-action-btn delete-cat-btn delete-cat" data-id="${cat.id}" title="Delete Category">
+          <i data-lucide="trash-2"></i>
+        </button>
+      </div>
     </div>
   `).join('');
 
-  categoryPicker.querySelectorAll('.category-pill').forEach(pill => {
+  listEl.querySelectorAll('.edit-cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      triggerHaptic(8);
+      const id = btn.getAttribute('data-id');
+      openCategoryFormModal(id);
+    });
+  });
+
+  listEl.querySelectorAll('.delete-cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      triggerHaptic(10);
+      const id = btn.getAttribute('data-id');
+      deleteCategory(id);
+    });
+  });
+
+  if (window.lucide) window.lucide.createIcons();
+}
+
+function openCategoryFormModal(catId = null) {
+  const modal = document.getElementById('category-form-modal');
+  const titleEl = document.getElementById('category-form-title');
+  const idInput = document.getElementById('category-form-id');
+  const nameInput = document.getElementById('category-name-input');
+  const iconPicker = document.getElementById('category-icon-picker');
+  const colorPicker = document.getElementById('category-color-picker');
+
+  if (catId) {
+    const cat = getCategory(catId);
+    titleEl.textContent = 'Edit Category';
+    idInput.value = cat.id;
+    nameInput.value = cat.label;
+    selectedFormIcon = cat.iconName || 'tag';
+    selectedFormColor = cat.color || '#10b981';
+  } else {
+    titleEl.textContent = 'Add Category';
+    idInput.value = '';
+    nameInput.value = '';
+    selectedFormIcon = AVAILABLE_ICONS[Math.floor(Math.random() * AVAILABLE_ICONS.length)];
+    selectedFormColor = AVAILABLE_COLORS[Math.floor(Math.random() * AVAILABLE_COLORS.length)];
+  }
+
+  // Render icons
+  iconPicker.innerHTML = AVAILABLE_ICONS.map(icon => `
+    <div class="icon-picker-option ${selectedFormIcon === icon ? 'selected' : ''}" data-icon="${icon}" title="${icon}">
+      <i data-lucide="${icon}"></i>
+    </div>
+  `).join('');
+
+  iconPicker.querySelectorAll('.icon-picker-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      triggerHaptic(6);
+      iconPicker.querySelectorAll('.icon-picker-option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      selectedFormIcon = opt.getAttribute('data-icon');
+    });
+  });
+
+  // Render colors
+  colorPicker.innerHTML = AVAILABLE_COLORS.map(c => `
+    <div class="color-picker-option ${selectedFormColor === c ? 'selected' : ''}" 
+         data-color="${c}" 
+         style="background-color: ${c};"></div>
+  `).join('');
+
+  colorPicker.querySelectorAll('.color-picker-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      triggerHaptic(6);
+      colorPicker.querySelectorAll('.color-picker-option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      selectedFormColor = opt.getAttribute('data-color');
+    });
+  });
+
+  if (window.lucide) window.lucide.createIcons();
+  modal.classList.add('active');
+  setTimeout(() => nameInput.focus(), 100);
+}
+
+function saveCategoryForm() {
+  const idInput = document.getElementById('category-form-id');
+  const nameInput = document.getElementById('category-name-input');
+  const rawName = nameInput.value.trim();
+
+  if (!rawName) {
+    alert('Please enter a category name.');
+    return;
+  }
+
+  createSnapshot(`Before category change (${rawName})`);
+  const cats = getCategories();
+  const editId = idInput.value;
+
+  if (editId) {
+    const idx = cats.findIndex(c => c.id === editId);
+    if (idx !== -1) {
+      cats[idx] = {
+        ...cats[idx],
+        label: rawName,
+        iconName: selectedFormIcon,
+        color: selectedFormColor,
+        bg: hexToRgba(selectedFormColor, 0.15)
+      };
+    }
+  } else {
+    const slug = rawName.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 16) + '_' + Date.now().toString().slice(-4);
+    cats.push({
+      id: slug,
+      label: rawName,
+      iconName: selectedFormIcon,
+      color: selectedFormColor,
+      bg: hexToRgba(selectedFormColor, 0.15)
+    });
+  }
+
+  state.categories = cats;
+  saveState();
+
+  const modal = document.getElementById('category-form-modal');
+  if (modal) modal.classList.remove('active');
+
+  renderCategoryManagerList();
+  initCategorySelectors();
+  renderDashboard();
+  renderMonthlyBreakdown();
+  renderHistory();
+}
+
+function deleteCategory(catId) {
+  const cats = getCategories();
+  if (cats.length <= 1) {
+    alert('You must have at least one category.');
+    return;
+  }
+  const catToDelete = cats.find(c => c.id === catId);
+  if (!catToDelete) return;
+
+  const usedCount = state.expenses.filter(e => e.category === catId).length;
+  let confirmMsg = `Delete category "${catToDelete.label}"?`;
+  if (usedCount > 0) {
+    const fallbackCat = cats[0].id === catId ? cats[1] : cats[0];
+    confirmMsg += `\n\nNotice: ${usedCount} existing expense(s) currently use this category and will be reassigned to "${fallbackCat.label}".`;
+  }
+
+  if (confirm(confirmMsg)) {
+    createSnapshot(`Before deleting category "${catToDelete.label}"`);
+    const fallbackCatId = cats[0].id === catId ? cats[1].id : cats[0].id;
+    if (usedCount > 0) {
+      state.expenses.forEach(e => {
+        if (e.category === catId) e.category = fallbackCatId;
+      });
+    }
+    state.categories = cats.filter(c => c.id !== catId);
+    if (state.selectedCategory === catId) {
+      state.selectedCategory = state.categories[0].id;
+    }
+    saveState();
+    renderCategoryManagerList();
+    initCategorySelectors();
+    renderDashboard();
+    renderMonthlyBreakdown();
+    renderHistory();
+  }
+}
+
+function resetCategoriesToDefaults() {
+  if (confirm('Reset all categories back to default list?')) {
+    createSnapshot('Before resetting categories to default');
+    state.categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+    saveState();
+    renderCategoryManagerList();
+    initCategorySelectors();
+    renderDashboard();
+    renderMonthlyBreakdown();
+    renderHistory();
+    alert('Categories have been reset to defaults.');
+  }
+}
+
+function initCategorySelectors() {
+  const cats = getCategories();
+
+  if (!cats.some(c => c.id === state.selectedCategory)) {
+    state.selectedCategory = cats[0]?.id || 'groceries';
+  }
+
+  // Log expense category picker with quick "+ Add New" pill
+  categoryPicker.innerHTML = cats.map(cat => `
+    <div class="category-pill ${state.selectedCategory === cat.id ? 'selected' : ''}" 
+         data-id="${cat.id}" 
+         style="--selected-color: ${cat.color}; --selected-bg: ${cat.bg || 'rgba(255,255,255,0.1)'}; --category-color: ${cat.color};">
+      <span class="pill-icon">${getCategoryIconHtml(cat)}</span>
+      <span class="pill-label">${escapeHTML(cat.label)}</span>
+    </div>
+  `).join('') + `
+    <div class="category-pill category-add-pill" id="log-quick-add-cat" title="Add New Category">
+      <span class="pill-icon"><i data-lucide="plus"></i></span>
+      <span class="pill-label">+ Add</span>
+    </div>
+  `;
+
+  categoryPicker.querySelectorAll('.category-pill:not(.category-add-pill)').forEach(pill => {
     pill.addEventListener('click', () => {
       triggerHaptic(8);
       categoryPicker.querySelectorAll('.category-pill').forEach(p => p.classList.remove('selected'));
@@ -999,110 +1192,59 @@ function initCategorySelectors() {
     });
   });
 
-  // History filter select showing parent/child hierarchy
-  historyFilterCategory.innerHTML = '<option value="all">All Categories</option>' +
-    CATEGORIES.map(cat => {
-      const prefix = cat.parentId ? '— ' : '';
-      return `<option value="${cat.id}">${prefix}${cat.label}</option>`;
-    }).join('');
-}
-
-// ----------------------------------------------------
-// EXPENSE ACTIONS
-// ----------------------------------------------------
-function addExpense(amount, description, category, dateStr) {
-  triggerHaptic(15);
-  createSnapshot(`Before adding "${description}"`);
-  const newExpense = {
-    id: Date.now().toString(),
-    amount: parseFloat(amount),
-    description: description.trim(),
-    category: category,
-    date: dateStr,
-  };
-  state.expenses.push(newExpense);
-  saveState();
-
-  // Clear log form inputs
-  expenseAmountInput.value = '';
-  expenseDescInput.value = '';
-  expenseDateInput.value = formatDateLocal(new Date());
-
-  // Reset quick chips to Today
-  document.querySelectorAll('.date-chip').forEach(c => {
-    if (c.getAttribute('data-offset') === '0') c.classList.add('active');
-    else c.classList.remove('active');
-  });
-
-  // Reset toggle
-  const expenseBtn = document.querySelector('#log-type-toggle [data-type="expense"]');
-  const refundBtn = document.querySelector('#log-type-toggle [data-type="refund"]');
-  if (expenseBtn && refundBtn) {
-    refundBtn.classList.remove('active');
-    expenseBtn.classList.add('active');
+  const logQuickAdd = categoryPicker.querySelector('#log-quick-add-cat');
+  if (logQuickAdd) {
+    logQuickAdd.addEventListener('click', () => {
+      triggerHaptic(10);
+      openCategoryFormModal();
+    });
   }
 
-  // Refresh
-  renderDashboard();
-  renderMonthlyBreakdown();
-  renderHistory();
+  // History filter select
+  historyFilterCategory.innerHTML = '<option value="all">All Categories</option>' +
+    cats.map(cat => `<option value="${cat.id}">${escapeHTML(cat.label)}</option>`).join('');
+
+  if (window.lucide) window.lucide.createIcons();
 }
 
-let expenseIdToDelete = null;
-
-function showDeleteConfirmation(id) {
-  const expense = state.expenses.find(exp => exp.id === id);
-  if (!expense) return;
-
-  expenseIdToDelete = id;
-  const desc = expense.description;
-  const amtStr = formatCurrency(expense.amount);
-
-  deleteConfirmText.textContent = `Are you sure you want to delete the expense: "${desc}" (${amtStr})?`;
-  deleteConfirmModal.classList.add('active');
-}
-
-function deleteExpense(id) {
-  const toDelete = state.expenses.find(exp => exp.id === id);
-  if (!toDelete) return;
-
-  triggerHaptic(15);
-  createSnapshot(`Before deleting "${toDelete.description}"`);
-  state.expenses = state.expenses.filter(exp => exp.id !== id);
-  saveState();
-  renderDashboard();
-  renderMonthlyBreakdown();
-  renderHistory();
-  showUndoToast(toDelete);
-}
-
-
-let editSelectedCategory = 'food';
+let editSelectedCategory = 'groceries';
 
 function initEditCategorySelectors(currentCatId) {
-  const selectableCategories = CATEGORIES.filter(cat => !cat.isParent);
-  editSelectedCategory = currentCatId;
+  const cats = getCategories();
+  editSelectedCategory = cats.some(c => c.id === currentCatId) ? currentCatId : (cats[0]?.id || 'groceries');
 
-  editCategoryPicker.innerHTML = selectableCategories.map(cat => `
+  editCategoryPicker.innerHTML = cats.map(cat => `
     <div class="category-pill ${editSelectedCategory === cat.id ? 'selected' : ''}" 
          data-id="${cat.id}" 
-         style="--selected-color: ${cat.color}; --selected-bg: ${cat.bg}; --category-color: ${cat.color};">
-      <span class="pill-icon">${cat.icon}</span>
-      <span class="pill-label">${cat.label}</span>
+         style="--selected-color: ${cat.color}; --selected-bg: ${cat.bg || 'rgba(255,255,255,0.1)'}; --category-color: ${cat.color};">
+      <span class="pill-icon">${getCategoryIconHtml(cat)}</span>
+      <span class="pill-label">${escapeHTML(cat.label)}</span>
     </div>
-  `).join('');
+  `).join('') + `
+    <div class="category-pill category-add-pill" id="edit-quick-add-cat" title="Add New Category">
+      <span class="pill-icon"><i data-lucide="plus"></i></span>
+      <span class="pill-label">+ Add</span>
+    </div>
+  `;
 
-  editCategoryPicker.querySelectorAll('.category-pill').forEach(pill => {
+  editCategoryPicker.querySelectorAll('.category-pill:not(.category-add-pill)').forEach(pill => {
     pill.addEventListener('click', () => {
+      triggerHaptic(8);
       editCategoryPicker.querySelectorAll('.category-pill').forEach(p => p.classList.remove('selected'));
       pill.classList.add('selected');
       editSelectedCategory = pill.getAttribute('data-id');
     });
   });
 
-  if (window.lucide) {
-    window.lucide.createIcons();
+  const editQuickAdd = editCategoryPicker.querySelector('#edit-quick-add-cat');
+  if (editQuickAdd) {
+    editQuickAdd.addEventListener('click', () => {
+      triggerHaptic(10);
+      openCategoryFormModal();
+    });
   }
+
+  if (window.lucide) window.lucide.createIcons();
 }
 
 function openEditExpenseModal(id) {
@@ -1191,7 +1333,7 @@ async function exportToCSV() {
     .map(exp => {
       // Escape fields that might contain commas or quotes
       const desc = '"' + exp.description.replace(/"/g, '""') + '"';
-      const cat = CATEGORIES.find(c => c.id === exp.category);
+      const cat = getCategory(exp.category);
       const catLabel = cat ? cat.label : exp.category;
       return [exp.date, exp.amount.toFixed(2), desc, catLabel].join(',');
     });
@@ -1326,8 +1468,9 @@ function importFromCSV(fileContent) {
   }
 
   // Build category label-to-id map
+  const cats = getCategories();
   const catMap = {};
-  CATEGORIES.forEach(c => {
+  cats.forEach(c => {
     catMap[c.label.toLowerCase()] = c.id;
     catMap[c.id] = c.id;
   });
@@ -1341,8 +1484,27 @@ function importFromCSV(fileContent) {
     const dateStr = fields[dateIdx];
     const amount = parseFloat(fields[amountIdx]);
     const description = descIdx !== -1 ? fields[descIdx] : 'Imported expense';
-    const catRaw = catIdx !== -1 ? (fields[catIdx] || '').toLowerCase() : '';
-    const category = catMap[catRaw] || 'food';
+    const rawCatName = catIdx !== -1 ? (fields[catIdx] || '').trim() : '';
+    const catLower = rawCatName.toLowerCase();
+
+    let categoryId = catMap[catLower];
+    if (!categoryId && rawCatName) {
+      const slug = rawCatName.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 16) + '_' + Date.now().toString().slice(-4);
+      const randomColor = AVAILABLE_COLORS[cats.length % AVAILABLE_COLORS.length];
+      const newCat = {
+        id: slug,
+        label: rawCatName,
+        iconName: 'tag',
+        color: randomColor,
+        bg: hexToRgba(randomColor, 0.15)
+      };
+      cats.push(newCat);
+      catMap[catLower] = slug;
+      catMap[slug] = slug;
+      categoryId = slug;
+    } else if (!categoryId) {
+      categoryId = cats[0]?.id || 'groceries';
+    }
 
     // Validate
     if (!dateStr || isNaN(amount) || amount === 0) {
@@ -1367,7 +1529,7 @@ function importFromCSV(fileContent) {
       id,
       amount,
       description,
-      category,
+      category: categoryId,
       date: normalizedDate,
     });
     existingIds.add(id);
@@ -1375,6 +1537,7 @@ function importFromCSV(fileContent) {
   }
 
   saveState();
+  initCategorySelectors();
   renderDashboard();
   renderMonthlyBreakdown();
   renderHistory();
@@ -1388,6 +1551,61 @@ function importFromCSV(fileContent) {
 // EVENT LISTENERS & NAVIGATION
 // ----------------------------------------------------
 function setupEventListeners() {
+  // Category Manager Modals
+  const manageCategoriesBtn = document.getElementById('manage-categories-btn');
+  const categoryManagerModal = document.getElementById('category-manager-modal');
+  const closeCategoryManager = document.getElementById('close-category-manager');
+  const addNewCategoryBtn = document.getElementById('add-new-category-btn');
+  const resetCategoriesBtn = document.getElementById('reset-categories-btn');
+
+  const categoryFormModal = document.getElementById('category-form-modal');
+  const closeCategoryForm = document.getElementById('close-category-form');
+  const saveCategoryBtn = document.getElementById('save-category-btn');
+
+  if (manageCategoriesBtn && categoryManagerModal) {
+    manageCategoriesBtn.addEventListener('click', () => {
+      triggerHaptic(8);
+      renderCategoryManagerList();
+      categoryManagerModal.classList.add('active');
+    });
+
+    const closeCatMgr = () => categoryManagerModal.classList.remove('active');
+    if (closeCategoryManager) closeCategoryManager.addEventListener('click', closeCatMgr);
+    categoryManagerModal.addEventListener('click', (e) => {
+      if (e.target === categoryManagerModal) closeCatMgr();
+    });
+  }
+
+  if (addNewCategoryBtn) {
+    addNewCategoryBtn.addEventListener('click', () => {
+      triggerHaptic(8);
+      openCategoryFormModal();
+    });
+  }
+
+  if (resetCategoriesBtn) {
+    resetCategoriesBtn.addEventListener('click', () => {
+      triggerHaptic(10);
+      resetCategoriesToDefaults();
+    });
+  }
+
+  if (categoryFormModal) {
+    const closeCatForm = () => categoryFormModal.classList.remove('active');
+    if (closeCategoryForm) closeCategoryForm.addEventListener('click', closeCatForm);
+    categoryFormModal.addEventListener('click', (e) => {
+      if (e.target === categoryFormModal) closeCatForm();
+    });
+  }
+
+  if (saveCategoryBtn) {
+    saveCategoryBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      triggerHaptic(10);
+      saveCategoryForm();
+    });
+  }
+
   // Transaction Type Toggle Setup
   const setupToggleListeners = (toggleId) => {
     const toggleContainer = document.getElementById(toggleId);
