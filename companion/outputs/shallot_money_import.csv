@@ -213,6 +213,7 @@ Date,Amount,Description,Category
 2025-05-12,10.01,Kroger 7 4915A Dixie,groceries
 2025-05-12,33.73,SHELL OIL x0054 CAVE CITY * KY,transport
 2025-05-12,17.35,Circle K 03228 5203 Gr,transport
+2025-05-12,-505.74,Refund: DDA PURCH REF x4001 HOBBYLOBB 6801 DIXIE H,shopping
 2025-05-13,-10.65,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-05-13,16.84,Wm Superc 5360 Dixie H,shopping
 2025-05-13,107.87,Samsclub 8276,groceries
@@ -302,6 +303,7 @@ Date,Amount,Description,Category
 2025-07-06,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-07-07,30.00,Target Card Srvc Payment,shopping
 2025-07-08,38.93,Kroger Fuel 878 4915 Di,groceries
+2025-07-08,-708.90,Refund: Visa Dda Ref 444500 Sams Club 8276,shopping
 2025-07-09,13.04,PAYPAL *FANATICAL FANAT,shopping
 2025-07-09,35.30,Target Card Srvc Payment,shopping
 2025-07-10,25.00,NJ EZPASS,transport
@@ -471,6 +473,7 @@ Date,Amount,Description,Category
 2025-10-22,6.28,Wm Supercenter 4524,shopping
 2025-10-22,7.67,Viet Hoa Food Market,groceries
 2025-10-23,8.38,PAYPAL *EPIC GAMES,shopping
+2025-10-23,-235.16,Refund: Visa Dda Ref 444500 Sams Club 8276,shopping
 2025-10-24,33.40,CIRCLE K 03228,transport
 2025-10-24,22.28,KROGER #785,groceries
 2025-10-25,-15.99,Refund: KROGER #785,groceries
@@ -951,6 +954,7 @@ Date,Amount,Description,Category
 2026-05-08,1.06,ABC*P 08039 PF DIXIE HWY,shopping
 2026-05-08,11.84,Racetrac 2656,transport
 2026-05-08,3.13,Circle K 03228 5203 Gr,transport
+2026-05-08,-820.80,Refund: Visa Dda Ref 444500 Sams Club 8276,shopping
 2026-05-09,18.01,AMAZON MKTPL*BV39V2R71,shopping
 2026-05-09,11.20,AMAZON MKTPL*918CB7GC3,shopping
 2026-05-10,4.93,AMAZON MKTPL*BV7V02RC1,shopping
@@ -1029,6 +1033,7 @@ Date,Amount,Description,Category
 2026-06-11,10.28,Samsclub 8276,groceries
 2026-06-12,10.59,ROBLOX 1.888.858.2569,shopping
 2026-06-12,34.62,Wm Supercenter 4524,shopping
+2026-06-12,-588.47,Refund: Visa Dda Ref 445501 Samsclub 8276,groceries
 2026-06-13,5.08,PAYPAL *STEAM GAMES,entertainment
 2026-06-13,5.08,PAYPAL *STEAM GAMES,entertainment
 2026-06-13,5.08,PAYPAL *STEAM GAMES,entertainment
@@ -1130,6 +1135,7 @@ Date,Amount,Description,Category
 2026-07-28,27.40,McDonalds 11126,fastfood
 2026-07-28,82.31,WM SUPERCENTER #1170,shopping
 2026-07-29,24.95,FANTASTIC SAMS- VALLEY E,shopping
+2026-07-29,-486.91,Refund: Visa Dda Ref 444500 Sams Club 8276,shopping
 2026-07-30,12.71,AMAZON MKTPL*1J2UM8V53,shopping
 2026-07-30,-1000.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-07-30,5.56,Thorntons 0050,transport

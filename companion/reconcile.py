@@ -317,17 +317,25 @@ def parse_bank_file(fpath):
                 desc = clean_merchant_name(raw_desc)
                 
                 amt = 0.0
+                is_refund = False
+
                 if out_idx != -1 and len(r) > out_idx and clean_amount(r[out_idx]) > 0:
                     amt = clean_amount(r[out_idx])
+                elif in_idx != -1 and len(r) > in_idx and clean_amount(r[in_idx]) > 0:
+                    # Check if this incoming credit is a store return refund (e.g. Sam's Club refund)
+                    if any(kw in raw_lower for kw in ["ref", "refund", "return", "reversal"]):
+                        amt = -clean_amount(r[in_idx])
+                        is_refund = True
                 elif amt_idx != -1 and len(r) > amt_idx:
-                    amt = abs(clean_amount(r[amt_idx]))
+                    amt = clean_amount(r[amt_idx])
                 
-                if d and amt > 0:
+                if d and amt != 0:
+                    display_desc = f"Refund: {desc}" if is_refund and not desc.lower().startswith("refund") else desc
                     transactions.append({
                         "source": "TD Bank" if "td" in fname or "transaction" in fname else "Bank",
                         "date": d,
                         "amount": round(amt, 2),
-                        "description": desc,
+                        "description": display_desc,
                         "raw_desc": raw_desc,
                         "source_key": f"td_{fname}_{d}_{amt:.2f}_{raw_desc}_{r_idx}"
                     })
