@@ -485,23 +485,21 @@ function drillDownToHistory({ startDate, endDate, label, categoryId = null }) {
 
 function renderDashboard() {
   const today = new Date();
+  const currentMonth = today.getMonth();
+  const currentYear = today.getFullYear();
 
-  // 1. Calculate Monthly Pool Stats
-  const targetDate = new Date(today.getFullYear(), today.getMonth() + state.currentMonthOffset, 1);
-  const targetMonth = targetDate.getMonth();
-  const targetYear = targetDate.getFullYear();
-
-  const monthExpenses = state.expenses.filter(exp => {
+  // 1. Calculate Real-Time Current Month Pool Stats (Always locked to active month)
+  const currentMonthExpenses = state.expenses.filter(exp => {
     const expDate = new Date(exp.date + 'T00:00:00');
-    return expDate.getMonth() === targetMonth && expDate.getFullYear() === targetYear;
+    return expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear;
   });
 
-  const totalSpentMonth = monthExpenses.reduce((sum, exp) => sum + exp.amount, 0);
-  const remaining = state.income - totalSpentMonth;
+  const totalSpentCurrentMonth = currentMonthExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+  const remaining = state.income - totalSpentCurrentMonth;
   const percentLeft = state.income > 0 ? Math.max(0, Math.min(100, (remaining / state.income) * 100)) : 0;
 
   poolRemainingVal.textContent = formatCurrency(remaining);
-  poolSpentVal.textContent = formatCurrency(totalSpentMonth);
+  poolSpentVal.textContent = formatCurrency(totalSpentCurrentMonth);
   poolIncomeVal.textContent = formatCurrency(state.income);
   poolProgressFill.style.width = `${percentLeft}%`;
 
