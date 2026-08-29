@@ -1567,22 +1567,49 @@ function parseCSVLine(line) {
 }
 
 function importFromCSV(fileContent) {
-  const lines = fileContent.split(/\r?\n/).filter(l => l.trim() !== '');
-  if (lines.length < 2) {
-    alert('CSV file is empty or has no data rows.');
+  const lines = fileContent.split(/\r?\n/).map(l => l.trim()).filter(l => l !== '');
+  if (lines.length === 0) {
+    alert('Pasted data is empty.');
     return;
   }
 
-  // Parse header to detect column positions
-  const headerFields = parseCSVLine(lines[0]).map(h => h.toLowerCase().trim());
-  const dateIdx = headerFields.findIndex(h => h === 'date');
-  const amountIdx = headerFields.findIndex(h => h === 'amount');
-  const descIdx = headerFields.findIndex(h => h.includes('desc'));
-  const catIdx = headerFields.findIndex(h => h.includes('cat'));
+  // Find header line or detect columns
+  let headerIndex = -1;
+  let dateIdx = -1;
+  let amountIdx = -1;
+  let descIdx = -1;
+  let catIdx = -1;
 
-  if (dateIdx === -1 || amountIdx === -1) {
-    alert('CSV must have at least "Date" and "Amount" columns.');
-    return;
+  for (let i = 0; i < Math.min(10, lines.length); i++) {
+    const fields = parseCSVLine(lines[i]).map(h => h.toLowerCase().trim());
+    const dIdx = fields.findIndex(h => h === 'date' || h === 'transaction date' || h === 'posting date');
+    const aIdx = fields.findIndex(h => h === 'amount' || h === 'debit' || h === 'cost' || h === 'total');
+    if (dIdx !== -1 && aIdx !== -1) {
+      headerIndex = i;
+      dateIdx = dIdx;
+      amountIdx = aIdx;
+      descIdx = fields.findIndex(h => h.includes('desc') || h.includes('merchant') || h.includes('payee') || h.includes('memo'));
+      catIdx = fields.findIndex(h => h.includes('cat') || h.includes('type'));
+      break;
+    }
+  }
+
+  let startRow = 1;
+  if (headerIndex !== -1) {
+    startRow = headerIndex + 1;
+  } else {
+    // Headerless check
+    const firstRow = parseCSVLine(lines[0]);
+    if (firstRow.length >= 2 && !isNaN(parseFloat(firstRow[1]))) {
+      dateIdx = 0;
+      amountIdx = 1;
+      descIdx = firstRow.length > 2 ? 2 : -1;
+      catIdx = firstRow.length > 3 ? 3 : -1;
+      startRow = 0;
+    } else {
+      alert('Could not find "Date" and "Amount" columns. Please verify the CSV text contains dates and amounts.');
+      return;
+    }
   }
 
   // Build category label-to-id map
@@ -1597,7 +1624,7 @@ function importFromCSV(fileContent) {
   let addedCount = 0;
   let skippedCount = 0;
 
-  for (let i = 1; i < lines.length; i++) {
+  for (let i = startRow; i < lines.length; i++) {
     const fields = parseCSVLine(lines[i]);
     const dateStr = fields[dateIdx];
     const amount = parseFloat(fields[amountIdx]);
@@ -2048,9 +2075,21 @@ function setupEventListeners() {
         }
 
         // Auto-detect JSON vs CSV
-        if (text.startsWith('{') || text.startsWith('[')) {
+        const jsonStartObj = text.indexOf('{');
+        const jsonEndObj = text.lastIndexOf('}');
+        const jsonStartArr = text.indexOf('[');
+        const jsonEndArr = text.lastIndexOf(']');
+
+        let jsonCandidate = null;
+        if (jsonStartObj !== -1 && jsonEndObj > jsonStartObj) {
+          jsonCandidate = text.slice(jsonStartObj, jsonEndObj + 1);
+        } else if (jsonStartArr !== -1 && jsonEndArr > jsonStartArr) {
+          jsonCandidate = text.slice(jsonStartArr, jsonEndArr + 1);
+        }
+
+        if (jsonCandidate) {
           try {
-            const parsed = JSON.parse(text);
+            const parsed = JSON.parse(jsonCandidate);
             if (parsed && typeof parsed === 'object') {
               createSnapshot('Pre-import backup');
               state = { ...state, ...parsed };
@@ -2061,7 +2100,7 @@ function setupEventListeners() {
               renderDashboard();
               renderMonthlyBreakdown();
               initCategorySelectors();
-              alert('JSON Backup successfully imported!');
+              alert(`Backup successfully imported with ${state.expenses.length} transactions!`);
               closePaste();
               closeModal();
               return;
