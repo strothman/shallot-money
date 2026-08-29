@@ -1553,9 +1553,21 @@ function deduplicateExpenses() {
   const uniqueList = [];
   let duplicatesCount = 0;
 
+  // Known legitimate twin charges / dual memberships
+  const dualChargeKeywords = ['planet fitness', 'membership', 'gym', 'subscription'];
+
   state.expenses.forEach(exp => {
+    const descLower = (exp.description || '').toLowerCase().trim();
+    const isDualExempt = dualChargeKeywords.some(kw => descLower.includes(kw));
+
+    if (isDualExempt) {
+      // Keep all legitimate dual memberships intact
+      uniqueList.push(exp);
+      return;
+    }
+
     // Unique key matching normalized date, absolute amount (2 decimals), and lowercase description
-    const key = `${exp.date}_${Math.abs(exp.amount).toFixed(2)}_${(exp.description || '').toLowerCase().trim()}`;
+    const key = `${exp.date}_${Math.abs(exp.amount).toFixed(2)}_${descLower}`;
     if (seen.has(key)) {
       duplicatesCount++;
     } else {
@@ -1565,11 +1577,11 @@ function deduplicateExpenses() {
   });
 
   if (duplicatesCount === 0) {
-    alert('No exact duplicates found! Your spending history is already 100% clean.');
+    alert('No duplicate expenses found! (Legitimate dual charges like Planet Fitness memberships are safely protected).');
     return;
   }
 
-  if (confirm(`Found ${duplicatesCount} exact duplicate expense(s).\n\nRemove duplicates now? (An automatic backup snapshot will be saved first).`)) {
+  if (confirm(`Found ${duplicatesCount} exact duplicate expense(s).\n\nRemove duplicates now? (Your dual Planet Fitness memberships will NOT be touched, and an automatic backup snapshot will be saved first).`)) {
     createSnapshot(`Before removing ${duplicatesCount} duplicates`);
     state.expenses = uniqueList;
     saveState();

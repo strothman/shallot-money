@@ -229,7 +229,7 @@ def parse_bank_file(fpath):
             credit_idx = header.index("credit") if "credit" in header else -1
             cat_idx = header.index("category") if "category" in header else -1
 
-            for r in rows[1:]:
+            for r_idx, r in enumerate(rows[1:], start=1):
                 if len(r) <= max(t_date_idx, desc_idx):
                     continue
                 d = parse_date(r[t_date_idx])
@@ -243,7 +243,8 @@ def parse_bank_file(fpath):
                         "date": d,
                         "amount": round(debit, 2),
                         "description": desc,
-                        "orig_cat": r[cat_idx] if cat_idx != -1 and len(r) > cat_idx else ""
+                        "orig_cat": r[cat_idx] if cat_idx != -1 and len(r) > cat_idx else "",
+                        "source_key": f"capone_{fname}_{d}_{debit:.2f}_{desc}_{r_idx}"
                     })
                 elif credit > 0:
                     # Refund
@@ -252,7 +253,8 @@ def parse_bank_file(fpath):
                         "date": d,
                         "amount": round(-credit, 2),
                         "description": f"Refund: {desc}",
-                        "orig_cat": r[cat_idx] if cat_idx != -1 and len(r) > cat_idx else ""
+                        "orig_cat": r[cat_idx] if cat_idx != -1 and len(r) > cat_idx else "",
+                        "source_key": f"capone_{fname}_{d}_{-credit:.2f}_{desc}_{r_idx}"
                     })
 
         # EBT CSV pattern: Date, Merchant, Amount, Location, Transaction, Type
@@ -261,7 +263,7 @@ def parse_bank_file(fpath):
             merch_idx = header.index("merchant") if "merchant" in header else 1
             amt_idx = header.index("amount") if "amount" in header else 2
 
-            for r in rows[1:]:
+            for r_idx, r in enumerate(rows[1:], start=1):
                 if len(r) <= max(date_idx, merch_idx, amt_idx):
                     continue
                 d = parse_date(r[date_idx])
@@ -273,7 +275,8 @@ def parse_bank_file(fpath):
                         "date": d,
                         "amount": round(amt, 2),
                         "description": f"{clean_merchant_name(merch)} (EBT)",
-                        "force_category": "groceries"
+                        "force_category": "groceries",
+                        "source_key": f"ebt_{fname}_{d}_{amt:.2f}_{merch}_{r_idx}"
                     })
 
         # TD Bank pattern: Date, Description, Amount / Withdrawals
@@ -296,7 +299,7 @@ def parse_bank_file(fpath):
                 elif "deposit" in col or "credit" in col or "in" in col:
                     in_idx = idx
 
-            for r in rows[1:]:
+            for r_idx, r in enumerate(rows[1:], start=1):
                 if date_idx == -1 or len(r) <= date_idx:
                     continue
                 d = parse_date(r[date_idx])
@@ -325,7 +328,8 @@ def parse_bank_file(fpath):
                         "date": d,
                         "amount": round(amt, 2),
                         "description": desc,
-                        "raw_desc": raw_desc
+                        "raw_desc": raw_desc,
+                        "source_key": f"td_{fname}_{d}_{amt:.2f}_{raw_desc}_{r_idx}"
                     })
 
     return transactions
@@ -393,19 +397,22 @@ def run_reconciliation():
             "date": tx_date.strftime("%Y-%m-%d"),
             "amount": tx_amt,
             "description": final_desc,
-            "category": category
+            "category": category,
+            "source_key": tx.get("source_key")
         })
 
-    # Deduplicate exact matching date, amount, description
+    # Deduplicate only across overlapping files, while preserving legitimate same-statement charges (e.g. dual Planet Fitness memberships)
     unique_expenses = []
-    seen_keys = set()
+    seen_file_entries = set()
     dup_count = 0
+
     for exp in reconciled_expenses:
-        key = (exp["date"], f"{exp['amount']:.2f}", exp["description"].lower().strip())
-        if key in seen_keys:
+        file_key = exp.get("source_key")
+        if file_key and file_key in seen_file_entries:
             dup_count += 1
             continue
-        seen_keys.add(key)
+        if file_key:
+            seen_file_entries.add(file_key)
         unique_expenses.append(exp)
 
     # Sort chronological
