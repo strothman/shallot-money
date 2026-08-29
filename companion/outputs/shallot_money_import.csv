@@ -14,8 +14,8 @@ Date,Amount,Description,Category
 2025-01-03,22.65,KROGER FUEL #8785,groceries
 2025-01-03,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-01-11,10.65,APPLE.COM/BILL,bills
-2025-01-12,10.65,PP*GOOGLE ROBLOX,shopping
-2025-01-12,9.99,PAYPAL *ROBLOXCORPO,shopping
+2025-01-12,10.65,PP*GOOGLE ROBLOX,entertainment
+2025-01-12,9.99,PAYPAL *ROBLOXCORPO,entertainment
 2025-01-14,2.12,APPLE.COM/BILL,bills
 2025-01-14,31.15,INTEREST CHARGE:PURCHASES,bills
 2025-01-21,9.53,PAYPAL *STEAM GAMES,entertainment
@@ -27,7 +27,7 @@ Date,Amount,Description,Category
 2025-01-23,15.89,BLIZZARD *US979661638,shopping
 2025-01-24,-50.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-01-24,-6.82,Refund: CREDIT-CASH BACK REWARD,shopping
-2025-01-27,5.32,PP*GOOGLE ROBLOX,shopping
+2025-01-27,5.32,PP*GOOGLE ROBLOX,entertainment
 2025-01-27,28.66,KROGER #785,groceries
 2025-01-28,40.55,KROGER #785,groceries
 2025-01-28,28.07,TST* ROOSTERS  - DIXIE HW,fastfood
@@ -67,12 +67,12 @@ Date,Amount,Description,Category
 2025-02-28,0.99,APPLE.COM/BILL,bills
 2025-03-01,-0.67,Refund: CREDIT-CASH BACK REWARD,shopping
 2025-03-01,-300.00,Refund: CAPITAL ONE MOBILE PYMT,transport
-2025-03-02,1.05,PAYPAL *EPIC GAMES,shopping
-2025-03-02,10.59,PAYPAL *EPIC GAMES,shopping
-2025-03-02,0.52,PAYPAL *EPIC GAMES,shopping
-2025-03-02,0.78,PAYPAL *EPIC GAMES,shopping
-2025-03-02,1.05,PAYPAL *EPIC GAMES,shopping
-2025-03-03,5.29,PAYPAL *EPIC GAMES,shopping
+2025-03-02,1.05,PAYPAL *EPIC GAMES,entertainment
+2025-03-02,10.59,PAYPAL *EPIC GAMES,entertainment
+2025-03-02,0.52,PAYPAL *EPIC GAMES,entertainment
+2025-03-02,0.78,PAYPAL *EPIC GAMES,entertainment
+2025-03-02,1.05,PAYPAL *EPIC GAMES,entertainment
+2025-03-03,5.29,PAYPAL *EPIC GAMES,entertainment
 2025-03-03,14.60,CINEMARK 1092 ONLINE,entertainment
 2025-03-03,-201.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-03-03,500.00,Venmo Payment,shopping
@@ -80,10 +80,10 @@ Date,Amount,Description,Category
 2025-03-05,52.99,PAYPAL *STEAM GAMES,entertainment
 2025-03-05,-138.62,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-03-06,15.89,BLIZZARD *US997696273,shopping
-2025-03-07,1.05,PAYPAL *EPIC GAMES,shopping
-2025-03-07,2.11,PAYPAL *EPIC GAMES,shopping
-2025-03-07,0.52,PAYPAL *EPIC GAMES,shopping
-2025-03-07,0.52,PAYPAL *EPIC GAMES,shopping
+2025-03-07,1.05,PAYPAL *EPIC GAMES,entertainment
+2025-03-07,2.11,PAYPAL *EPIC GAMES,entertainment
+2025-03-07,0.52,PAYPAL *EPIC GAMES,entertainment
+2025-03-07,0.52,PAYPAL *EPIC GAMES,entertainment
 2025-03-07,444.77,GEICO  *AUTO,bills
 2025-03-07,5.32,APPLE.COM/BILL,bills
 2025-03-09,-129.00,Refund: CAPITAL ONE MOBILE PYMT,transport
@@ -96,13 +96,13 @@ Date,Amount,Description,Category
 2025-03-20,3.18,APPLE.COM/BILL,bills
 2025-03-22,9.53,PAYPAL *PADDLE.NET,shopping
 2025-03-22,62.06,SAMSCLUB #8276,groceries
-2025-03-23,1.05,PAYPAL *EPIC GAMES,shopping
-2025-03-23,5.29,PAYPAL *EPIC GAMES,shopping
-2025-03-24,15.89,PAYPAL *EPIC GAMES,shopping
-2025-03-24,5.29,PAYPAL *EPIC GAMES,shopping
+2025-03-23,1.05,PAYPAL *EPIC GAMES,entertainment
+2025-03-23,5.29,PAYPAL *EPIC GAMES,entertainment
+2025-03-24,15.89,PAYPAL *EPIC GAMES,entertainment
+2025-03-24,5.29,PAYPAL *EPIC GAMES,entertainment
 2025-03-25,9.32,PRP ICE CREAM CORNER,shopping
-2025-03-25,10.59,PAYPAL *EPIC GAMES,shopping
-2025-03-25,1.05,PAYPAL *EPIC GAMES,shopping
+2025-03-25,10.59,PAYPAL *EPIC GAMES,entertainment
+2025-03-25,1.05,PAYPAL *EPIC GAMES,entertainment
 2025-03-25,37.79,KROGER FUEL #8785,groceries
 2025-03-25,6.97,KROGER #785,groceries
 2025-03-25,25.90,AMAZON MKTPL*1B7W00KL3,shopping
@@ -116,10 +116,10 @@ Date,Amount,Description,Category
 2025-03-28,13.56,SQ *RUBY THAI KITCHEN,shopping
 2025-03-28,-2.80,Refund: CREDIT-CASH BACK REWARD,shopping
 2025-03-29,18.00,ARBYS 0085,fastfood
-2025-03-29,1.05,PAYPAL *EPIC GAMES,shopping
-2025-03-29,0.52,PAYPAL *EPIC GAMES,shopping
-2025-03-29,0.52,PAYPAL *EPIC GAMES,shopping
-2025-03-29,0.52,PAYPAL *EPIC GAMES,shopping
+2025-03-29,1.05,PAYPAL *EPIC GAMES,entertainment
+2025-03-29,0.52,PAYPAL *EPIC GAMES,entertainment
+2025-03-29,0.52,PAYPAL *EPIC GAMES,entertainment
+2025-03-29,0.52,PAYPAL *EPIC GAMES,entertainment
 2025-03-29,0.99,APPLE.COM/BILL,bills
 2025-03-30,5.18,SAMS CLUB #8276,shopping
 2025-03-30,12.68,SAMS CLUB #8276,shopping
@@ -127,7 +127,7 @@ Date,Amount,Description,Category
 2025-04-01,70.79,WM SUPERCENTER #5417,shopping
 2025-04-01,29.19,TST* ROOSTERS  - DIXIE HW,fastfood
 2025-04-01,-300.00,Refund: CAPITAL ONE MOBILE PYMT,transport
-2025-04-02,1.05,PAYPAL *EPIC GAMES,shopping
+2025-04-02,1.05,PAYPAL *EPIC GAMES,entertainment
 2025-04-02,86.56,Target Card Srvc Payment,shopping
 2025-04-02,500.00,Venmo Payment,shopping
 2025-04-02,300.00,Venmo Payment,shopping
@@ -135,12 +135,12 @@ Date,Amount,Description,Category
 2025-04-04,2.11,PAYPAL *MICROSOFT,shopping
 2025-04-04,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-04-04,-1.77,Refund: CREDIT-CASH BACK REWARD,shopping
-2025-04-05,5.29,PAYPAL *EPIC GAMES,shopping
-2025-04-05,10.59,PAYPAL *EPIC GAMES,shopping
+2025-04-05,5.29,PAYPAL *EPIC GAMES,entertainment
+2025-04-05,10.59,PAYPAL *EPIC GAMES,entertainment
 2025-04-07,5.71,SSA LOUISVILLE ZOO,shopping
 2025-04-07,26.72,Wal Mart 4524,groceries
 2025-04-07,49.78,Wal Mart 4524,groceries
-2025-04-08,1.05,PAYPAL *EPIC GAMES,shopping
+2025-04-08,1.05,PAYPAL *EPIC GAMES,entertainment
 2025-04-08,35.49,Kroger Fu 4915 Dixie H,groceries
 2025-04-08,7.08,Lowe S 705,shopping
 2025-04-09,252.25,WAL-MART #5417,groceries
@@ -148,7 +148,7 @@ Date,Amount,Description,Category
 2025-04-11,9.04,PRP ICE CREAM CORNER,shopping
 2025-04-11,10.65,APPLE.COM/BILL,bills
 2025-04-11,15.46,APPLE.COM/BILL,bills
-2025-04-12,10.99,PAYPAL *RIOTGAMESIN,shopping
+2025-04-12,10.99,PAYPAL *RIOTGAMESIN,entertainment
 2025-04-12,32.07,INTEREST CHARGE:PURCHASES,bills
 2025-04-13,34.92,THE HOME DEPOT #2302,shopping
 2025-04-13,29.80,WAL-MART #4524,groceries
@@ -186,16 +186,16 @@ Date,Amount,Description,Category
 2025-04-25,29.66,LOWES #00705*,shopping
 2025-04-27,4.62,THORNTONS #0050,transport
 2025-04-27,-8.12,Refund: CREDIT-CASH BACK REWARD,shopping
-2025-04-28,1.05,PAYPAL *EPIC GAMES,shopping
-2025-04-28,5.29,PAYPAL *EPIC GAMES,shopping
+2025-04-28,1.05,PAYPAL *EPIC GAMES,entertainment
+2025-04-28,5.29,PAYPAL *EPIC GAMES,entertainment
 2025-04-28,37.96,CIRCLE K 03228,transport
 2025-04-28,12.50,CIRCLE K 03228,transport
-2025-04-28,7.43,PAYPAL *EPIC GAMES,shopping
+2025-04-28,7.43,PAYPAL *EPIC GAMES,entertainment
 2025-04-28,34.85,MEIJER STORE #162,groceries
 2025-04-28,14.80,LOWES #00705*,shopping
 2025-04-29,47.82,WM SUPERCENTER #4524,shopping
 2025-04-29,0.99,APPLE.COM/BILL,bills
-2025-04-30,4.01,PAYPAL *EPIC GAMES,shopping
+2025-04-30,4.01,PAYPAL *EPIC GAMES,entertainment
 2025-04-30,-299.70,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-04-30,-500.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-04-30,26.18,Wm Superc 5360 Dixie H,shopping
@@ -287,12 +287,12 @@ Date,Amount,Description,Category
 2025-06-25,43.34,New Albanian Brewing Com,shopping
 2025-06-27,49.34,PAYPAL *STEAM GAMES,entertainment
 2025-06-27,7.94,PAYPAL *STEAM GAMES,entertainment
-2025-06-28,12.71,PAYPAL *EPIC GAMES,shopping
+2025-06-28,12.71,PAYPAL *EPIC GAMES,entertainment
 2025-06-29,86.24,PAYPAL *LAGOSEC INC,shopping
 2025-06-29,74.40,SAMSCLUB #8276,groceries
-2025-06-29,7.85,PAYPAL *EPIC GAMES,shopping
-2025-06-29,8.33,PAYPAL *EPIC GAMES,shopping
-2025-06-29,5.97,PAYPAL *EPIC GAMES,shopping
+2025-06-29,7.85,PAYPAL *EPIC GAMES,entertainment
+2025-06-29,8.33,PAYPAL *EPIC GAMES,entertainment
+2025-06-29,5.97,PAYPAL *EPIC GAMES,entertainment
 2025-06-29,0.99,APPLE.COM/BILL,bills
 2025-07-01,35.48,TST* ROOSTERS  - DIXIE HW,fastfood
 2025-07-01,-400.00,Refund: CAPITAL ONE MOBILE PYMT,transport
@@ -453,7 +453,7 @@ Date,Amount,Description,Category
 2025-10-09,5.00,Venmo Payment,shopping
 2025-10-10,-14.50,Refund: CREDIT-CASH BACK REWARD,shopping
 2025-10-11,74.19,PAYPAL *STEAM GAMES,entertainment
-2025-10-11,4.76,PAYPAL *EPIC GAMES,shopping
+2025-10-11,4.76,PAYPAL *EPIC GAMES,entertainment
 2025-10-11,24.51,Nintendo CA1481496780,entertainment
 2025-10-11,10.65,APPLE.COM/BILL,bills
 2025-10-14,-9.62,Refund: APPLE.COM/BILL,bills
@@ -472,7 +472,7 @@ Date,Amount,Description,Category
 2025-10-21,14.82,Sams Club 8276,shopping
 2025-10-22,6.28,Wm Supercenter 4524,shopping
 2025-10-22,7.67,Viet Hoa Food Market,groceries
-2025-10-23,8.38,PAYPAL *EPIC GAMES,shopping
+2025-10-23,8.38,PAYPAL *EPIC GAMES,entertainment
 2025-10-23,-235.16,Refund: Visa Dda Ref 444500 Sams Club 8276,shopping
 2025-10-24,33.40,CIRCLE K 03228,transport
 2025-10-24,22.28,KROGER #785,groceries
@@ -609,7 +609,7 @@ Date,Amount,Description,Category
 2025-12-24,7.94,PAYPAL *STEAM GAMES,entertainment
 2025-12-24,4.23,PAYPAL *STEAM GAMES,entertainment
 2025-12-26,15.04,WAL-MART #4524,groceries
-2025-12-26,4.99,PAYPAL *ROBLOXCORPO,shopping
+2025-12-26,4.99,PAYPAL *ROBLOXCORPO,entertainment
 2025-12-26,33.90,AMAZON MKTPL*CQ53M1SD3,shopping
 2025-12-27,35.47,JIMMY JOHNS - 4387,fastfood
 2025-12-27,10.59,PAYPAL *STEAM GAMES,entertainment
@@ -632,8 +632,8 @@ Date,Amount,Description,Category
 2025-12-31,183.81,Affirm.Com Payme Affirm.Com,shopping
 2026-01-01,-4.55,Refund: CREDIT-CASH BACK REWARD,shopping
 2026-01-01,10.59,PAYPAL *STEAM GAMES,entertainment
-2026-01-02,6.36,PAYPAL *EPIC GAMES,shopping
-2026-01-02,14.31,PAYPAL *EPIC GAMES,shopping
+2026-01-02,6.36,PAYPAL *EPIC GAMES,entertainment
+2026-01-02,14.31,PAYPAL *EPIC GAMES,entertainment
 2026-01-02,11.62,PAYPAL *KINGUINDIGI,shopping
 2026-01-02,59.85,Target Card Srvc Payment,shopping
 2026-01-02,24.84,Wm Supercenter 4524,shopping
@@ -751,7 +751,7 @@ Date,Amount,Description,Category
 2026-02-26,26.00,PICABOO YEARBOOKS,shopping
 2026-02-27,-700.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-02-27,-3.72,Refund: CREDIT-CASH BACK REWARD,shopping
-2026-02-28,10.65,GOOGLE *Roblox,shopping
+2026-02-28,10.65,GOOGLE *Roblox,entertainment
 2026-03-02,-50.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-03-02,-300.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-03-02,24.01,Kroger 785,groceries
@@ -817,7 +817,7 @@ Date,Amount,Description,Category
 2026-03-26,30.18,AMAZON MKTPL*BG8E83IA2,shopping
 2026-03-26,4.00,Thorntons 0050 0050,transport
 2026-03-26,10.42,Kroger 785,groceries
-2026-03-28,10.65,Google Roblox,shopping
+2026-03-28,10.65,Google Roblox,entertainment
 2026-03-29,114.56,SAMS CLUB #8276,shopping
 2026-03-30,37.13,WAL-MART #4524,groceries
 2026-03-30,13.72,Sams Club 8276,shopping
@@ -913,7 +913,7 @@ Date,Amount,Description,Category
 2026-04-27,9.91,Wal Mart 4524,groceries
 2026-04-27,10.97,Jimmy Johns 4387,fastfood
 2026-04-28,27.51,PENN STATION - 93,shopping
-2026-04-28,10.65,Google Roblox,shopping
+2026-04-28,10.65,Google Roblox,entertainment
 2026-04-28,14.84,Circle K 03228 5203 Gr,transport
 2026-04-28,7.09,Circle K 03228 5203 Gr,transport
 2026-04-28,10.58,Meijer Store 162,groceries
@@ -987,7 +987,7 @@ Date,Amount,Description,Category
 2026-05-26,41.36,Kroger Fuel 878 4915 Di,groceries
 2026-05-26,11.65,Domino S 1436,fastfood
 2026-05-28,43.29,SAMSCLUB #8276,groceries
-2026-05-28,10.65,Google Roblox,shopping
+2026-05-28,10.65,Google Roblox,entertainment
 2026-05-28,13.72,Sams Club 8276,shopping
 2026-05-29,39.39,JIMMY JOHNS - 4387,fastfood
 2026-05-30,-2.71,Refund: CREDIT-CASH BACK REWARD,shopping
@@ -1031,7 +1031,7 @@ Date,Amount,Description,Category
 2026-06-11,13.77,AMAZON MKTPL*199389BF3,shopping
 2026-06-11,6.75,AMAZON MKTPL*BY2NF8NA3,shopping
 2026-06-11,10.28,Samsclub 8276,groceries
-2026-06-12,10.59,ROBLOX 1.888.858.2569,shopping
+2026-06-12,10.59,ROBLOX 1.888.858.2569,entertainment
 2026-06-12,34.62,Wm Supercenter 4524,shopping
 2026-06-12,-588.47,Refund: Visa Dda Ref 445501 Samsclub 8276,groceries
 2026-06-13,5.08,PAYPAL *STEAM GAMES,entertainment
@@ -1149,7 +1149,7 @@ Date,Amount,Description,Category
 2026-08-03,27.75,Kroger Fuel 878 4915 Di,groceries
 2026-08-03,12.36,Wal Mart 4524,groceries
 2026-08-03,14.82,Domino S 1436,fastfood
-2026-08-03,5.29,Roblox 1 888 858 2569 Corp Roblox C * Ca,shopping
+2026-08-03,5.29,Roblox 1 888 858 2569 Corp Roblox C * Ca,entertainment
 2026-08-05,37.37,Etsy.com*MeYDecals,shopping
 2026-08-05,3.35,CIRCLEK x3228,transport
 2026-08-05,24.13,Tst Roosters Dixie H,fastfood

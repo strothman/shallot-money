@@ -7,6 +7,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [1.4.0] - 2026-08-28
+
+### Added & Enhanced
+- **Refined 7-Category Taxonomy & Icon Palette**:
+  - `Groceries`: Emerald Green (`#10b981`) • `shopping-basket`
+  - `Gas & Auto`: Amber Gold (`#f59e0b`) • `fuel`
+  - `Fast Food & Dining`: Coral Red (`#f43f5e`) • `utensils`
+  - `Bills & Utilities`: Electric Blue (`#2563eb`) • `receipt`
+  - `Gaming & Fun`: Royal Violet (`#8b5cf6`) • `gamepad-2`
+  - `Gym & Health`: Cyan Teal (`#0ea5e9`) • `dumbbell`
+  - `Shopping`: Rose Pink (`#db2777`) • `shopping-bag`
+- **Store Return & Refund Tracking**:
+  - Automatically captures store returns and refunds as negative expense credits to accurately adjust monthly totals.
+- **Enhanced Reconciler Rules**:
+  - Added specialized rules for digital services, gaming platforms, utility providers, and dual gym memberships.
+
+---
+
 ## [1.3.0] - 2026-08-28
 
 ### Added & Enhanced

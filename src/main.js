@@ -6,12 +6,12 @@ import importedExpenses from './imported_expenses.json';
 // ----------------------------------------------------
 const DEFAULT_CATEGORIES = [
   { id: 'groceries', label: 'Groceries', iconName: 'shopping-basket', color: '#10b981', bg: 'rgba(16, 185, 129, 0.15)' },
-  { id: 'fastfood', label: 'Fast Food', iconName: 'pizza', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)' },
-  { id: 'transport', label: 'Auto', iconName: 'car', color: '#2563eb', bg: 'rgba(37, 99, 235, 0.15)' },
+  { id: 'transport', label: 'Gas & Auto', iconName: 'fuel', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)' },
+  { id: 'fastfood', label: 'Fast Food', iconName: 'utensils', color: '#f43f5e', bg: 'rgba(244, 63, 94, 0.15)' },
+  { id: 'bills', label: 'Bills', iconName: 'receipt', color: '#2563eb', bg: 'rgba(37, 99, 235, 0.15)' },
+  { id: 'entertainment', label: 'Gaming & Fun', iconName: 'gamepad-2', color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.15)' },
+  { id: 'gym', label: 'Gym & Health', iconName: 'dumbbell', color: '#0ea5e9', bg: 'rgba(14, 165, 233, 0.15)' },
   { id: 'shopping', label: 'Shopping', iconName: 'shopping-bag', color: '#db2777', bg: 'rgba(219, 39, 119, 0.15)' },
-  { id: 'entertainment', label: 'Entertainment', iconName: 'clapperboard', color: '#6366f1', bg: 'rgba(99, 102, 241, 0.15)' },
-  { id: 'bills', label: 'Bills', iconName: 'receipt', color: '#b91c1c', bg: 'rgba(185, 28, 28, 0.15)' },
-  { id: 'gym', label: 'Health', iconName: 'heart-pulse', color: '#0ea5e9', bg: 'rgba(14, 165, 233, 0.15)' },
 ];
 
 const AVAILABLE_ICONS = [
