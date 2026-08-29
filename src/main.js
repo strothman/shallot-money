@@ -2106,7 +2106,38 @@ function setupEventListeners() {
               return;
             }
           } catch (err) {
-            console.warn('Failed to parse as JSON, trying CSV:', err);
+            console.warn('Failed to parse as JSON, trying salvage / CSV:', err);
+          }
+        }
+
+        // Fragmented JSON salvage fallback (e.g. if chat app cut off start/end brackets)
+        if (text.includes('"amount"') && text.includes('"date"')) {
+          const expenseRegex = /\{[^{}]*"amount"\s*:\s*([0-9.-]+)[^{}]*"description"\s*:\s*"([^"]*)"[^{}]*"category"\s*:\s*"([^"]*)"[^{}]*"date"\s*:\s*"([^"]+)"[^{}]*\}/g;
+          const salvaged = [];
+          let match;
+          while ((match = expenseRegex.exec(text)) !== null) {
+            salvaged.push({
+              id: `salvaged_${Date.now()}_${match[4]}_${match[1]}_${salvaged.length}`,
+              amount: parseFloat(match[1]),
+              description: match[2] || 'Imported item',
+              category: match[3] || 'groceries',
+              date: match[4],
+              type: 'expense'
+            });
+          }
+          if (salvaged.length > 0) {
+            createSnapshot('Pre-import backup');
+            const map = new Map(state.expenses.map(e => [e.id, e]));
+            salvaged.forEach(e => map.set(e.id, e));
+            state.expenses = Array.from(map.values());
+            saveState();
+            renderDashboard();
+            renderMonthlyBreakdown();
+            renderHistory();
+            alert(`Successfully salvaged and imported ${salvaged.length} transactions from text!`);
+            closePaste();
+            closeModal();
+            return;
           }
         }
 
