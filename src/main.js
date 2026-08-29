@@ -455,7 +455,9 @@ function formatDateDisplay(dateStr) {
 }
 
 // ----------------------------------------------------
-// UI RENDERING
+// UI RENDERING & DRILL-DOWN INVESTIGATION
+// ----------------------------------------------------
+function drillDownToHistory({ startDate, endDate, label, categoryId = null }) {
   state.historyDrillDownFilter = { startDate, endDate, label, categoryId };
 
   if (categoryId) {
