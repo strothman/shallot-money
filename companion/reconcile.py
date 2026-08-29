@@ -247,12 +247,20 @@ def parse_bank_file(fpath):
                         "source_key": f"capone_{fname}_{d}_{debit:.2f}_{desc}_{r_idx}"
                     })
                 elif credit > 0:
-                    # Refund
+                    desc_lower = desc.lower()
+                    # Ignore balance payments and cash back credits (only count merchant returns/refunds)
+                    if any(kw in desc_lower for kw in [
+                        "capital one mobile pymt", "payment - thank you", "credit-cash back reward",
+                        "payment/credit", "online payment", "autopay", "rewards credit"
+                    ]):
+                        continue
+
+                    # Legitimate merchant refund
                     transactions.append({
                         "source": "Capital One",
                         "date": d,
                         "amount": round(-credit, 2),
-                        "description": f"Refund: {desc}",
+                        "description": f"Refund: {desc}" if not desc.lower().startswith("refund") else desc,
                         "orig_cat": r[cat_idx] if cat_idx != -1 and len(r) > cat_idx else "",
                         "source_key": f"capone_{fname}_{d}_{-credit:.2f}_{desc}_{r_idx}"
                     })

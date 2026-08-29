@@ -12,7 +12,6 @@ Date,Amount,Description,Category
 2025-01-02,255.00,Venmo Payment,shopping
 2025-01-02,45.00,Venmo Payment,shopping
 2025-01-03,22.65,KROGER FUEL #8785,groceries
-2025-01-03,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-01-11,10.65,APPLE.COM/BILL,bills
 2025-01-12,10.65,PP*GOOGLE ROBLOX,entertainment
 2025-01-12,9.99,PAYPAL *ROBLOXCORPO,entertainment
@@ -23,10 +22,8 @@ Date,Amount,Description,Category
 2025-01-21,32.55,CIRCLE K 03228,transport
 2025-01-22,5.00,PAYPAL *PATREON INC  MEMB,entertainment
 2025-01-22,21.20,OPENAI *CHATGPT SUBSCR,shopping
-2025-01-23,29.32,DENNY'S #8769,shopping
+2025-01-23,29.32,DENNY'S #8769,fastfood
 2025-01-23,15.89,BLIZZARD *US979661638,shopping
-2025-01-24,-50.00,Refund: CAPITAL ONE MOBILE PYMT,transport
-2025-01-24,-6.82,Refund: CREDIT-CASH BACK REWARD,shopping
 2025-01-27,5.32,PP*GOOGLE ROBLOX,entertainment
 2025-01-27,28.66,KROGER #785,groceries
 2025-01-28,40.55,KROGER #785,groceries
@@ -36,37 +33,27 @@ Date,Amount,Description,Category
 2025-01-29,26.63,VIET HOA FOOD MARKET,groceries
 2025-01-29,34.70,KROGER FUEL #8785,groceries
 2025-01-29,0.99,APPLE.COM/BILL,bills
-2025-01-30,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-01-31,500.00,Venmo Payment,shopping
 2025-01-31,300.00,Venmo Payment,shopping
-2025-02-01,-200.00,Refund: CAPITAL ONE MOBILE PYMT,transport
-2025-02-02,-50.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-02-02,17.41,WM SUPERCENTER #4524,shopping
 2025-02-02,22.71,KROGER #785,groceries
 2025-02-04,9.99,ZYGORGUIDES.COM,shopping
-2025-02-04,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-02-06,11.62,SAMS CLUB #8276,shopping
 2025-02-06,15.89,BLIZZARD *US994872528,shopping
 2025-02-11,10.65,APPLE.COM/BILL,bills
 2025-02-11,42.40,"ETSY, INC.",shopping
 2025-02-11,31.25,INTEREST CHARGE:PURCHASES,bills
-2025-02-13,15.03,PENN STATION - 93,shopping
+2025-02-13,15.03,PENN STATION - 93,fastfood
 2025-02-14,11.33,Subway 21369,fastfood
 2025-02-15,36.53,KROGER FUEL #8785,groceries
-2025-02-15,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-02-18,110.27,KY JEFFERSON COUNTY CLERK,shopping
-2025-02-19,-25.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-02-20,6.28,WM SUPERCENTER #4524,shopping
-2025-02-21,-150.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-02-22,9.53,PAYPAL *PADDLE.NET,shopping
-2025-02-22,-5.89,Refund: CREDIT-CASH BACK REWARD,shopping
 2025-02-23,31.78,SAMSCLUB #8276,groceries
 2025-02-23,15.89,BLIZZARD *US996496805,shopping
 2025-02-26,5.29,PAYPAL *STEAM GAMES,entertainment
 2025-02-27,2.97,OCULUS *ZGFYMKQ5Z2,shopping
 2025-02-28,0.99,APPLE.COM/BILL,bills
-2025-03-01,-0.67,Refund: CREDIT-CASH BACK REWARD,shopping
-2025-03-01,-300.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-03-02,1.05,PAYPAL *EPIC GAMES,entertainment
 2025-03-02,10.59,PAYPAL *EPIC GAMES,entertainment
 2025-03-02,0.52,PAYPAL *EPIC GAMES,entertainment
@@ -74,11 +61,9 @@ Date,Amount,Description,Category
 2025-03-02,1.05,PAYPAL *EPIC GAMES,entertainment
 2025-03-03,5.29,PAYPAL *EPIC GAMES,entertainment
 2025-03-03,14.60,CINEMARK 1092 ONLINE,entertainment
-2025-03-03,-201.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-03-03,500.00,Venmo Payment,shopping
 2025-03-03,300.00,Venmo Payment,shopping
 2025-03-05,52.99,PAYPAL *STEAM GAMES,entertainment
-2025-03-05,-138.62,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-03-06,15.89,BLIZZARD *US997696273,shopping
 2025-03-07,1.05,PAYPAL *EPIC GAMES,entertainment
 2025-03-07,2.11,PAYPAL *EPIC GAMES,entertainment
@@ -86,9 +71,7 @@ Date,Amount,Description,Category
 2025-03-07,0.52,PAYPAL *EPIC GAMES,entertainment
 2025-03-07,444.77,GEICO  *AUTO,bills
 2025-03-07,5.32,APPLE.COM/BILL,bills
-2025-03-09,-129.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-03-10,32.27,KROGER FUEL #8785,groceries
-2025-03-10,-5.65,Refund: CREDIT-CASH BACK REWARD,shopping
 2025-03-11,10.65,APPLE.COM/BILL,bills
 2025-03-13,-31.78,Refund: SAMS CLUB #8276,shopping
 2025-03-14,32.06,INTEREST CHARGE:PURCHASES,bills
@@ -100,7 +83,7 @@ Date,Amount,Description,Category
 2025-03-23,5.29,PAYPAL *EPIC GAMES,entertainment
 2025-03-24,15.89,PAYPAL *EPIC GAMES,entertainment
 2025-03-24,5.29,PAYPAL *EPIC GAMES,entertainment
-2025-03-25,9.32,PRP ICE CREAM CORNER,shopping
+2025-03-25,9.32,PRP ICE CREAM CORNER,fastfood
 2025-03-25,10.59,PAYPAL *EPIC GAMES,entertainment
 2025-03-25,1.05,PAYPAL *EPIC GAMES,entertainment
 2025-03-25,37.79,KROGER FUEL #8785,groceries
@@ -114,7 +97,6 @@ Date,Amount,Description,Category
 2025-03-28,9.54,CARTER'S #1428,shopping
 2025-03-28,6.25,CIRCLE K 03228,transport
 2025-03-28,13.56,SQ *RUBY THAI KITCHEN,shopping
-2025-03-28,-2.80,Refund: CREDIT-CASH BACK REWARD,shopping
 2025-03-29,18.00,ARBYS 0085,fastfood
 2025-03-29,1.05,PAYPAL *EPIC GAMES,entertainment
 2025-03-29,0.52,PAYPAL *EPIC GAMES,entertainment
@@ -126,18 +108,14 @@ Date,Amount,Description,Category
 2025-03-31,3.99,KROGER #785,groceries
 2025-04-01,70.79,WM SUPERCENTER #5417,shopping
 2025-04-01,29.19,TST* ROOSTERS  - DIXIE HW,fastfood
-2025-04-01,-300.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-04-02,1.05,PAYPAL *EPIC GAMES,entertainment
 2025-04-02,86.56,Target Card Srvc Payment,shopping
 2025-04-02,500.00,Venmo Payment,shopping
 2025-04-02,300.00,Venmo Payment,shopping
-2025-04-03,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-04-04,2.11,PAYPAL *MICROSOFT,shopping
-2025-04-04,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
-2025-04-04,-1.77,Refund: CREDIT-CASH BACK REWARD,shopping
 2025-04-05,5.29,PAYPAL *EPIC GAMES,entertainment
 2025-04-05,10.59,PAYPAL *EPIC GAMES,entertainment
-2025-04-07,5.71,SSA LOUISVILLE ZOO,shopping
+2025-04-07,5.71,SSA LOUISVILLE ZOO,entertainment
 2025-04-07,26.72,Wal Mart 4524,groceries
 2025-04-07,49.78,Wal Mart 4524,groceries
 2025-04-08,1.05,PAYPAL *EPIC GAMES,entertainment
@@ -145,7 +123,7 @@ Date,Amount,Description,Category
 2025-04-08,7.08,Lowe S 705,shopping
 2025-04-09,252.25,WAL-MART #5417,groceries
 2025-04-10,7.51,Circle K 03228 5203 Gr,transport
-2025-04-11,9.04,PRP ICE CREAM CORNER,shopping
+2025-04-11,9.04,PRP ICE CREAM CORNER,fastfood
 2025-04-11,10.65,APPLE.COM/BILL,bills
 2025-04-11,15.46,APPLE.COM/BILL,bills
 2025-04-12,10.99,PAYPAL *RIOTGAMESIN,entertainment
@@ -185,7 +163,6 @@ Date,Amount,Description,Category
 2025-04-25,10.47,KROGER #785,groceries
 2025-04-25,29.66,LOWES #00705*,shopping
 2025-04-27,4.62,THORNTONS #0050,transport
-2025-04-27,-8.12,Refund: CREDIT-CASH BACK REWARD,shopping
 2025-04-28,1.05,PAYPAL *EPIC GAMES,entertainment
 2025-04-28,5.29,PAYPAL *EPIC GAMES,entertainment
 2025-04-28,37.96,CIRCLE K 03228,transport
@@ -196,16 +173,13 @@ Date,Amount,Description,Category
 2025-04-29,47.82,WM SUPERCENTER #4524,shopping
 2025-04-29,0.99,APPLE.COM/BILL,bills
 2025-04-30,4.01,PAYPAL *EPIC GAMES,entertainment
-2025-04-30,-299.70,Refund: CAPITAL ONE MOBILE PYMT,transport
-2025-04-30,-500.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-04-30,26.18,Wm Superc 5360 Dixie H,shopping
 2025-05-01,400.00,Venmo Payment,shopping
 2025-05-02,10.04,AMAZON MKTPL*NI31T8FM2,shopping
 2025-05-05,50.71,Sams Club Sam S Club,shopping
 2025-05-05,9.80,Kroger 7 4915A Dixie,groceries
-2025-05-05,26.26,Penn Station 93,shopping
+2025-05-05,26.26,Penn Station 93,fastfood
 2025-05-05,19.06,Jimmy Johns 4387,fastfood
-2025-05-06,-111.03,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-05-07,49.14,Wal Mart 4524,groceries
 2025-05-08,51.62,Wm Superc 5360 Dixie H,shopping
 2025-05-09,26.46,Hobbylobb 6801 Dixie H,shopping
@@ -214,7 +188,6 @@ Date,Amount,Description,Category
 2025-05-12,33.73,SHELL OIL x0054 CAVE CITY * KY,transport
 2025-05-12,17.35,Circle K 03228 5203 Gr,transport
 2025-05-12,-505.74,Refund: DDA PURCH REF x4001 HOBBYLOBB 6801 DIXIE H,shopping
-2025-05-13,-10.65,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-05-13,16.84,Wm Superc 5360 Dixie H,shopping
 2025-05-13,107.87,Samsclub 8276,groceries
 2025-05-13,2.10,Circle K 03228,transport
@@ -245,8 +218,6 @@ Date,Amount,Description,Category
 2025-05-29,0.99,APPLE.COM/BILL,bills
 2025-05-29,11.62,Samsclub 8276,groceries
 2025-05-30,14.60,CINEMARK 1092 ONLINE,entertainment
-2025-05-30,-300.00,Refund: CAPITAL ONE MOBILE PYMT,transport
-2025-05-31,-250.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-06-01,8.06,WM SUPERCENTER #4524,shopping
 2025-06-02,12.89,Amazon.com*N62V83LF0,shopping
 2025-06-02,264.99,GOOGLE *Google One,shopping
@@ -258,8 +229,6 @@ Date,Amount,Description,Category
 2025-06-03,33.59,Kroger Fu 4915 Dixie H,groceries
 2025-06-04,6.46,Wm Superc 5360 Dixie H,shopping
 2025-06-05,42.64,APPLE.COM/BILL,bills
-2025-06-06,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
-2025-06-09,-35.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-06-10,40.67,Wm Superc 5360 Dixie H,shopping
 2025-06-11,10.65,APPLE.COM/BILL,bills
 2025-06-11,21.19,OCULUS *29WZKR86Z2,shopping
@@ -277,8 +246,6 @@ Date,Amount,Description,Category
 2025-06-16,28.25,Viet Hoa Food Market,groceries
 2025-06-19,74.56,SAMSCLUB #8276,groceries
 2025-06-20,11.66,Sams Club 6622 Preston,shopping
-2025-06-22,-5.46,Refund: CREDIT-CASH BACK REWARD,shopping
-2025-06-22,-55.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-06-23,6.88,KROGER #785,groceries
 2025-06-23,2.29,Kroger 7 4915A Dixie,groceries
 2025-06-23,3.13,Circle K 03228 5203 Gr,transport
@@ -295,12 +262,8 @@ Date,Amount,Description,Category
 2025-06-29,5.97,PAYPAL *EPIC GAMES,entertainment
 2025-06-29,0.99,APPLE.COM/BILL,bills
 2025-07-01,35.48,TST* ROOSTERS  - DIXIE HW,fastfood
-2025-07-01,-400.00,Refund: CAPITAL ONE MOBILE PYMT,transport
-2025-07-01,-201.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-07-01,7.09,Circle K 03228 5203 Gr,transport
 2025-07-02,300.00,Venmo Payment,shopping
-2025-07-04,-66.22,Refund: CAPITAL ONE MOBILE PYMT,transport
-2025-07-06,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-07-07,30.00,Target Card Srvc Payment,shopping
 2025-07-08,38.93,Kroger Fuel 878 4915 Di,groceries
 2025-07-08,-708.90,Refund: Visa Dda Ref 444500 Sams Club 8276,shopping
@@ -310,31 +273,26 @@ Date,Amount,Description,Category
 2025-07-11,10.65,APPLE.COM/BILL,bills
 2025-07-11,33.15,Wm Superc 5360 Dixie H,shopping
 2025-07-11,35.38,Jimmy Johns 4387,fastfood
-2025-07-12,-25.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-07-14,34.10,INTEREST CHARGE:PURCHASES,bills
-2025-07-14,-23.69,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-07-15,9.41,Circle K 03228 5203 Gr,transport
 2025-07-16,3.17,PAYPAL *STEAM GAMES,entertainment
 2025-07-16,3.17,PAYPAL *STEAM GAMES,entertainment
 2025-07-17,6.97,Kroger 780 10645 Dixie,groceries
 2025-07-17,8.44,Cinemark 1092 Rstbar,entertainment
-2025-07-18,109.96,JM AUTO LLC,shopping
+2025-07-18,109.96,JM AUTO LLC,transport
 2025-07-18,1.06,Five Belo 10435 Dixie,shopping
 2025-07-18,7.72,Circle K 03228 5203 Gr,transport
 2025-07-19,73.35,SAMS CLUB #8276,shopping
 2025-07-19,11.62,SAMS CLUB #8276,shopping
-2025-07-21,-75.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-07-22,31.79,OCULUS *VNHM7VC6Z2,shopping
 2025-07-23,25.79,AMAZON MKTPL*OE43839E3,shopping
 2025-07-23,35.59,Kroger Fuel Ctr 10649 Di,groceries
 2025-07-25,3.13,Circle K 03228 5203 Gr,transport
 2025-07-25,3.04,Thorntons 0050 0050,transport
-2025-07-26,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-07-28,2.51,Circle K 03228 5203 Gr,transport
 2025-07-28,23.12,Target Card Srvc Payment,shopping
 2025-07-28,19.28,Sams Club 6622 Preston,shopping
 2025-07-29,0.99,APPLE.COM/BILL,bills
-2025-07-30,-150.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-07-30,2.11,Taco Bell 22842 Mount Washing * Ky,fastfood
 2025-07-30,24.04,Taco Bell 22842 Mount Washing * Ky,fastfood
 2025-07-31,35.44,Pilot 0392 Sonora * Ky,shopping
@@ -344,12 +302,10 @@ Date,Amount,Description,Category
 2025-08-01,154.76,Target Card Srvc Payment,shopping
 2025-08-01,200.00,Affirm Inc Affirm Pay,shopping
 2025-08-01,38.28,Affirm Inc Affirm Pay,shopping
-2025-08-03,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-08-04,43.16,Wal Mart 4524,groceries
 2025-08-04,4.91,Kroger 785 4915A Dixie,groceries
 2025-08-04,44.72,Wm Superc 5360 Dixie H,shopping
 2025-08-07,72.59,Wm Superc 5360 Dixie H,shopping
-2025-08-08,-50.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-08-08,10.60,Venmo Payment,shopping
 2025-08-08,22.41,Rf Kort 888 644 0001 * Ky,shopping
 2025-08-11,10.65,APPLE.COM/BILL,bills
@@ -372,9 +328,7 @@ Date,Amount,Description,Category
 2025-08-27,14.82,Samsclub 8276,groceries
 2025-08-27,23.10,Tst Roosters Dixie H,fastfood
 2025-08-28,72.71,RF *KORT,shopping
-2025-08-29,-74.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-08-29,0.99,APPLE.COM/BILL,bills
-2025-08-31,-250.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-09-02,-11.82,Refund: SAMS CLUB #8276,shopping
 2025-09-02,300.00,Venmo Payment,shopping
 2025-09-02,200.00,Affirm Inc Affirm Pay,shopping
@@ -388,13 +342,10 @@ Date,Amount,Description,Category
 2025-09-04,11.50,SIMPLERAISE.COM,shopping
 2025-09-05,16.19,Thorntons 0050 0050,transport
 2025-09-06,23.28,PAYPAL *STEAM GAMES,entertainment
-2025-09-07,-75.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-09-08,10.00,Venmo Payment,shopping
 2025-09-08,5.86,Wm Superc 5360 Dixie H,shopping
-2025-09-09,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-09-09,32.53,Circle K 03228 5203 Gr,transport
 2025-09-10,10.59,PAYPAL *STEAM GAMES,entertainment
-2025-09-10,-10.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-09-10,7.89,Speedway 44065,transport
 2025-09-10,9.81,Cinemark 1092 Boxcon,entertainment
 2025-09-11,10.65,APPLE.COM/BILL,bills
@@ -416,8 +367,6 @@ Date,Amount,Description,Category
 2025-09-23,450.62,GEICO  *AUTO,bills
 2025-09-23,55.00,SQ *LINCOLN HERITAGE COUN,shopping
 2025-09-23,60.48,Wm Supercenter 4524,shopping
-2025-09-24,-5.57,Refund: CREDIT-CASH BACK REWARD,shopping
-2025-09-24,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-09-24,5.99,Viet Hoa Food Market,groceries
 2025-09-24,11.62,Sam S Club,shopping
 2025-09-25,190.04,Target Card Srvc Payment,shopping
@@ -430,7 +379,6 @@ Date,Amount,Description,Category
 2025-09-30,45.47,SAMS CLUB #8276,shopping
 2025-09-30,9.08,PAYPAL *ETSY INC,shopping
 2025-09-30,11.62,Sams Club 8276,shopping
-2025-10-01,-200.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-10-02,14.83,PAYPAL *STEAM GAMES,entertainment
 2025-10-02,68.40,Wm Supercenter 4524,shopping
 2025-10-02,75.81,Target Card Srvc Payment,shopping
@@ -440,10 +388,7 @@ Date,Amount,Description,Category
 2025-10-03,23.84,PAYPAL *STEAM GAMES,entertainment
 2025-10-03,21.19,PAYPAL *STEAM GAMES,entertainment
 2025-10-03,7.94,PAYPAL *STEAM GAMES,entertainment
-2025-10-03,-98.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-10-03,4.22,Hobbylobby,shopping
-2025-10-04,-97.00,Refund: CAPITAL ONE MOBILE PYMT,transport
-2025-10-06,-110.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-10-06,47.22,Jimmy Johns 4387,fastfood
 2025-10-06,11.65,Hobbylobby,shopping
 2025-10-07,31.79,PAYPAL *STEAM GAMES,entertainment
@@ -451,7 +396,6 @@ Date,Amount,Description,Category
 2025-10-08,803.48,Amazon.com*NF41B8XM0,shopping
 2025-10-08,48.93,Wm Supercenter 4524,shopping
 2025-10-09,5.00,Venmo Payment,shopping
-2025-10-10,-14.50,Refund: CREDIT-CASH BACK REWARD,shopping
 2025-10-11,74.19,PAYPAL *STEAM GAMES,entertainment
 2025-10-11,4.76,PAYPAL *EPIC GAMES,entertainment
 2025-10-11,24.51,Nintendo CA1481496780,entertainment
@@ -462,7 +406,6 @@ Date,Amount,Description,Category
 2025-10-14,27.93,Kroger 785,groceries
 2025-10-14,1.58,Hobbylobby,shopping
 2025-10-14,40.26,Thorntons 0050 0050,transport
-2025-10-15,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-10-15,8.26,Wawa 7604,transport
 2025-10-15,2.51,Circle K 03228,transport
 2025-10-16,6.25,Circle K 03228,transport
@@ -480,25 +423,18 @@ Date,Amount,Description,Category
 2025-10-25,39.23,WM SUPERCENTER #4524,shopping
 2025-10-25,14.63,KROGER #785,groceries
 2025-10-26,25.00,WALGREENS #4163,gym
-2025-10-27,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
-2025-10-27,-200.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-10-27,1.67,Circle K 03228,transport
 2025-10-28,2.51,Circle K 03228,transport
 2025-10-29,66.08,WM SUPERCENTER #4524,shopping
 2025-10-29,0.99,APPLE.COM/BILL,bills
 2025-10-29,4.90,Kroger 785 4915A Dixie,groceries
-2025-10-30,-300.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-10-30,10.67,Target T 1513,shopping
 2025-10-30,10.30,Circle K 03228,transport
-2025-10-31,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-10-31,20.14,Target Card Srvc Payment,shopping
 2025-10-31,300.00,Venmo Payment,shopping
 2025-10-31,200.00,Affirm Inc Affirm Pay,shopping
 2025-11-01,15.89,PAYPAL *STEAM GAMES,entertainment
-2025-11-01,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
-2025-11-02,-200.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-11-02,10.59,NVIDIA CORPORATION,shopping
-2025-11-03,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-11-03,120.07,Venmo Payment,shopping
 2025-11-03,18.82,Wal Mart 4524,groceries
 2025-11-04,4.23,PAYPAL *STEAM GAMES,entertainment
@@ -515,8 +451,6 @@ Date,Amount,Description,Category
 2025-11-10,21.20,Five Below 7165,shopping
 2025-11-10,3.64,Jimmy Johns 4387,fastfood
 2025-11-10,1.67,Circle K 03228,transport
-2025-11-11,-3.13,Refund: CREDIT-CASH BACK REWARD,shopping
-2025-11-11,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-11-12,31.78,PAYPAL *STEAM GAMES,entertainment
 2025-11-12,7.20,Wal Mart 4524,groceries
 2025-11-12,12.94,Wal Mart 4524,groceries
@@ -527,7 +461,6 @@ Date,Amount,Description,Category
 2025-11-14,20.01,CULVERS,shopping
 2025-11-17,41.85,High Spirit Liquor,shopping
 2025-11-19,9.99,GOOGLE *YouTube Member,shopping
-2025-11-19,-17.56,Refund: CREDIT-CASH BACK REWARD,shopping
 2025-11-19,22.00,Venmo Payment,shopping
 2025-11-20,73.13,SP YEEPS.COM,shopping
 2025-11-20,6.28,Wal Mart 4524,groceries
@@ -545,8 +478,6 @@ Date,Amount,Description,Category
 2025-11-26,12.83,Circle K 03228,transport
 2025-11-28,25.63,Pizza Hut 036951,fastfood
 2025-11-29,0.99,APPLE.COM/BILL,bills
-2025-11-29,-302.00,Refund: CAPITAL ONE MOBILE PYMT,transport
-2025-11-29,-300.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-11-30,10.61,PAYPAL *KINGUINDIGI,shopping
 2025-12-01,7.99,PP*HUMBLEBUNDL HUMBLEBUND,shopping
 2025-12-01,15.94,PP*HUMBLEBUNDL HUMBLEBUND,shopping
@@ -555,7 +486,6 @@ Date,Amount,Description,Category
 2025-12-01,180.00,Affirm.Com Payme Affirm.Com,shopping
 2025-12-01,74.26,Target Card Srvc Payment,shopping
 2025-12-01,46.08,Wal Mart 1170,groceries
-2025-12-02,-65.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-12-02,7.17,Wal Mart 4524,groceries
 2025-12-02,25.60,Circle K Mid-Wes Preauthpmt Circle K - M-5203 Gre Oodlouisville Ky,transport
 2025-12-03,21.19,PAYPAL *STEAM GAMES,entertainment
@@ -619,32 +549,26 @@ Date,Amount,Description,Category
 2025-12-29,18.74,SAMSCLUB #8276,groceries
 2025-12-29,-33.90,Refund: AMAZON MKTPLACE PMTS,shopping
 2025-12-29,29.67,AMAZON MKTPL*VM6A90E83,shopping
-2025-12-29,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-12-29,17.62,Wal Mart 4524,groceries
 2025-12-29,11.28,Circle K 03228,transport
 2025-12-30,41.80,Amazon.com*AK01X5A43,shopping
 2025-12-30,42.38,AMAZON MKTPL*NU8911Q33,shopping
-2025-12-30,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-12-30,70.41,Wm Supercenter 4524,shopping
-2025-12-31,-111.11,Refund: CAPITAL ONE MOBILE PYMT,transport
 2025-12-31,16.57,Wal Mart 4524,groceries
 2025-12-31,300.00,Venmo Payment,shopping
 2025-12-31,183.81,Affirm.Com Payme Affirm.Com,shopping
-2026-01-01,-4.55,Refund: CREDIT-CASH BACK REWARD,shopping
 2026-01-01,10.59,PAYPAL *STEAM GAMES,entertainment
 2026-01-02,6.36,PAYPAL *EPIC GAMES,entertainment
 2026-01-02,14.31,PAYPAL *EPIC GAMES,entertainment
 2026-01-02,11.62,PAYPAL *KINGUINDIGI,shopping
 2026-01-02,59.85,Target Card Srvc Payment,shopping
 2026-01-02,24.84,Wm Supercenter 4524,shopping
-2026-01-03,-112.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-01-06,2.96,PAYPAL *STEAM GAMES,entertainment
 2026-01-06,-41.80,Refund: Amazon.com,shopping
 2026-01-07,3.13,Circle K 03228 5203 Gr,transport
 2026-01-07,93.85,Wal Mart 4524,groceries
 2026-01-07,28.11,Circle K Mid-Wes Preauthpmt Circle K - M-5203 Gre Oodlouisville Ky,transport
 2026-01-08,20.82,Wm Supercenter 1170,shopping
-2026-01-12,-120.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-01-12,3.13,Circle K 03228 5203 Gr,transport
 2026-01-13,98.58,Amazon.com*0O2A61NJ3,shopping
 2026-01-14,21.19,TEBEX.ORG,shopping
@@ -662,7 +586,6 @@ Date,Amount,Description,Category
 2026-01-19,10.55,AMAZON MKTPL*179ZK0K13,shopping
 2026-01-19,30.20,AMAZON MKTPL*007EY5H73,shopping
 2026-01-20,9.53,Jimmy Johns 4387,fastfood
-2026-01-21,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-01-22,46.47,WAL-MART #4524,groceries
 2026-01-22,-30.20,Refund: AMAZON MKTPLACE PMTS,shopping
 2026-01-22,8.06,AMAZON MKTPL*MI2IA77H3,shopping
@@ -682,9 +605,7 @@ Date,Amount,Description,Category
 2026-01-28,93.87,Wal Mart 4524,groceries
 2026-01-28,31.46,Kroger 785,groceries
 2026-01-29,10.58,HOBBY-LOBBY #640,shopping
-2026-01-30,-500.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-02-01,92.86,BLIZZARD *US1031278149,shopping
-2026-02-02,-400.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-02-02,17.40,Kroger 785,groceries
 2026-02-02,5.10,Kroger 785 4915A Dixie,groceries
 2026-02-02,6.25,Circle K 03228 5203 Gr,transport
@@ -695,7 +616,6 @@ Date,Amount,Description,Category
 2026-02-04,13.65,Wm Supercenter 4524,shopping
 2026-02-04,24.15,Tst Roosters Dixie H,fastfood
 2026-02-06,4.17,OCULUS *FPD8DEH5Z2,shopping
-2026-02-07,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-02-07,25.08,Amazon.com*O51SN54S3,shopping
 2026-02-07,10.59,OCULUS *HEWDSED5Z2,shopping
 2026-02-09,6.25,Circle K 03228 5203 Gr,transport
@@ -729,8 +649,6 @@ Date,Amount,Description,Category
 2026-02-18,1.29,WM SUPERCENTER #4524,shopping
 2026-02-18,22.61,WAL-MART #1170,groceries
 2026-02-18,6.35,KROGER #785,groceries
-2026-02-18,-100.00,Refund: CAPITAL ONE MOBILE PYMT,transport
-2026-02-18,-50.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-02-18,15.89,BLIZZARD *US1033756608,shopping
 2026-02-18,1.05,Circle K 03228 5203 Gr,transport
 2026-02-19,21.38,HOBBY-LOBBY #640,shopping
@@ -749,11 +667,7 @@ Date,Amount,Description,Category
 2026-02-26,14.82,SAMS CLUB #8276,shopping
 2026-02-26,-9.34,Refund: SAMSCLUB #8276,groceries
 2026-02-26,26.00,PICABOO YEARBOOKS,shopping
-2026-02-27,-700.00,Refund: CAPITAL ONE MOBILE PYMT,transport
-2026-02-27,-3.72,Refund: CREDIT-CASH BACK REWARD,shopping
 2026-02-28,10.65,GOOGLE *Roblox,entertainment
-2026-03-02,-50.00,Refund: CAPITAL ONE MOBILE PYMT,transport
-2026-03-02,-300.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-03-02,24.01,Kroger 785,groceries
 2026-03-02,20.04,Kroger Fuel 878 4915 Di,groceries
 2026-03-02,325.00,Venmo Payment,shopping
@@ -761,7 +675,6 @@ Date,Amount,Description,Category
 2026-03-02,14.18,Wal Mart 4524,groceries
 2026-03-03,7.41,AMAZON MKTPL*BE0AX10R1,shopping
 2026-03-03,15.89,BLIZZARD *US1035822152,shopping
-2026-03-03,-2.37,Refund: CREDIT-CASH BACK REWARD,shopping
 2026-03-03,47.68,Amazon.com*BP1V86FP2,shopping
 2026-03-03,51.57,Wm Supercenter 4524,shopping
 2026-03-04,-8.87,Refund: SAMS CLUB #8276,shopping
@@ -770,7 +683,7 @@ Date,Amount,Description,Category
 2026-03-04,5.30,Samsclub 8276,groceries
 2026-03-04,230.16,Geico Auto 800 841 3000 * Dc,bills
 2026-03-04,41.09,Tst Roosters Dixie H,fastfood
-2026-03-05,109.96,Jm Auto Llc,shopping
+2026-03-05,109.96,Jm Auto Llc,transport
 2026-03-06,55.05,AMAZON MKTPL*BP2MD9BY2,shopping
 2026-03-06,15.57,Circle K 03228,transport
 2026-03-08,31.79,OCULUS *P9PP4HH5Z2,shopping
@@ -778,7 +691,6 @@ Date,Amount,Description,Category
 2026-03-09,45.00,Wal Mart 4524,groceries
 2026-03-09,2.99,Jimmy Johns 4387,fastfood
 2026-03-09,21.48,Jimmy Johns 4387,fastfood
-2026-03-10,-55.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-03-10,6.25,Circle K 03228,transport
 2026-03-11,39.21,AMAZON MKTPL*BD5YR40C2,shopping
 2026-03-11,3.13,Circle K 03228,transport
@@ -812,7 +724,6 @@ Date,Amount,Description,Category
 2026-03-23,45.98,Circle K Mid-Wes Preauthpmt Circle K - M-5203 Gre Oodlouisville Ky,transport
 2026-03-24,139.72,WAL-MART #1170,groceries
 2026-03-24,-39.21,Refund: AMAZON MKTPLACE PMTS,shopping
-2026-03-25,-5.06,Refund: CREDIT-CASH BACK REWARD,shopping
 2026-03-26,9.14,CIRCLE K 03228,transport
 2026-03-26,30.18,AMAZON MKTPL*BG8E83IA2,shopping
 2026-03-26,4.00,Thorntons 0050 0050,transport
@@ -822,33 +733,27 @@ Date,Amount,Description,Category
 2026-03-30,37.13,WAL-MART #4524,groceries
 2026-03-30,13.72,Sams Club 8276,shopping
 2026-03-30,7.40,Kroger 785 4915A Dixie,groceries
-2026-03-31,-2.66,Refund: CREDIT-CASH BACK REWARD,shopping
 2026-03-31,-10.58,Refund: AMAZON MKTPLACE PMTS,shopping
 2026-03-31,-9.53,Refund: AMAZON MKTPLACE PMTS,shopping
 2026-03-31,-9.53,Refund: AMAZON MKTPLACE PMTS,shopping
 2026-03-31,18.91,TST* ROOSTERS  - DIXIE HW,fastfood
 2026-03-31,14.82,Samsclub 8276,groceries
-2026-04-01,-700.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-04-01,27.00,Venmo Payment,shopping
 2026-04-02,9.14,Circle K 03228,transport
 2026-04-02,325.00,Venmo Payment,shopping
 2026-04-02,38.82,Venmo Payment,shopping
 2026-04-02,230.11,Geico Auto 800 841 3000 * Dc,bills
-2026-04-03,-0.25,Refund: CREDIT-CASH BACK REWARD,shopping
-2026-04-03,-75.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-04-03,126.88,Wal Mart 5417,groceries
 2026-04-03,144.64,Samsclub 8276,groceries
 2026-04-03,15.82,Samsclub 8276,groceries
 2026-04-04,27.54,AMAZON MKTPL*B74746PF2,shopping
 2026-04-04,15.89,BLIZZARD *US1039529878,shopping
 2026-04-05,47.69,SP YEEPS.COM,shopping
-2026-04-06,-150.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-04-06,16.95,Circle K 03228,transport
 2026-04-06,76.82,Target Card Srvc Payment,shopping
 2026-04-06,74.10,Kroger 785,groceries
 2026-04-06,58.50,Meijer Store 162,groceries
 2026-04-06,38.34,Wm Supercenter 4524,shopping
-2026-04-07,-35.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-04-07,16.66,PAYPAL *STEAM GAMES,entertainment
 2026-04-07,15.07,AMAZON MKTPL*BC82S1FN0,shopping
 2026-04-07,4.98,Wal Mart 4524,groceries
@@ -856,11 +761,9 @@ Date,Amount,Description,Category
 2026-04-07,39.85,Jimmy Johns 4387,fastfood
 2026-04-08,55.42,CIRCLE K MIDWEST PREAUTHPMT Circle K M5203 Green d,transport
 2026-04-09,22.05,WENDYS 7550,fastfood
-2026-04-09,156.00,LOUISVILLE ZOO ONLINE,shopping
+2026-04-09,156.00,LOUISVILLE ZOO ONLINE,entertainment
 2026-04-09,162.98,SAMS CLUB #8276,shopping
-2026-04-10,-111.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-04-10,3.35,Circle K 03228,transport
-2026-04-11,-123.45,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-04-13,0.01,ABC*P 08039 PF DIXIE HWY,shopping
 2026-04-13,51.91,INTEREST CHARGE:PURCHASES,bills
 2026-04-13,3.13,Circle K 03228,transport
@@ -869,7 +772,6 @@ Date,Amount,Description,Category
 2026-04-14,-42.33,Refund: WM SUPERCENTER #1170,shopping
 2026-04-14,12.82,PIZZA HUT 036951,fastfood
 2026-04-14,171.39,WM SUPERCENTER #1170,shopping
-2026-04-14,-4.65,Refund: CREDIT-CASH BACK REWARD,shopping
 2026-04-14,14.09,Thorntons 0056 0056,transport
 2026-04-15,108.37,Meijer Store 162,groceries
 2026-04-15,30.29,Tst Roosters Dixie H,fastfood
@@ -879,7 +781,7 @@ Date,Amount,Description,Category
 2026-04-17,15.90,ABC*PLANET FITNESS DIXIE,gym
 2026-04-17,7.09,Circle K 03228 5203 Gr,transport
 2026-04-17,8.48,Viet Hoa Food Market,groceries
-2026-04-17,4.88,Prp Ice Cream Corner,shopping
+2026-04-17,4.88,Prp Ice Cream Corner,fastfood
 2026-04-18,4.32,WENDY'S 807,fastfood
 2026-04-18,25.95,WENDY'S 807,fastfood
 2026-04-19,32.90,STUDENTREASURES PUBLISHI,shopping
@@ -889,10 +791,10 @@ Date,Amount,Description,Category
 2026-04-22,11.00,Scholastic Education,shopping
 2026-04-22,10.00,PAYPAL *PATREON MEMBERSH,entertainment
 2026-04-22,28.91,CIRCLE K MIDWEST PREAUTHPMT Circle K M5203 Green d,transport
-2026-04-23,-155.00,Refund: LOUISVILLE ZOO ONLINE,shopping
+2026-04-23,-155.00,Refund: LOUISVILLE ZOO ONLINE,entertainment
 2026-04-23,3.04,THORNTONS #0050,transport
-2026-04-23,50.00,LOUISVILLE ZOO,shopping
-2026-04-23,2395.29,JM AUTO LLC,shopping
+2026-04-23,50.00,LOUISVILLE ZOO,entertainment
+2026-04-23,2395.29,JM AUTO LLC,transport
 2026-04-23,73.13,AMAZON MKTPL*BJ1YC8EW2,shopping
 2026-04-23,6.86,PAYPAL *STEAM GAMES,entertainment
 2026-04-23,7.62,PAYPAL *STEAM GAMES,entertainment
@@ -904,7 +806,6 @@ Date,Amount,Description,Category
 2026-04-24,63.49,Sams Club 8276,shopping
 2026-04-25,-25.00,Refund: CASH BACK,shopping
 2026-04-26,25.22,McDonalds 11126,fastfood
-2026-04-26,-50.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-04-27,13.97,Kroger 780,groceries
 2026-04-27,10.00,Mcdonald S F10593,fastfood
 2026-04-27,5.30,Walgreens Store 10201 Di,gym
@@ -912,14 +813,12 @@ Date,Amount,Description,Category
 2026-04-27,12.72,Lowe S 705,shopping
 2026-04-27,9.91,Wal Mart 4524,groceries
 2026-04-27,10.97,Jimmy Johns 4387,fastfood
-2026-04-28,27.51,PENN STATION - 93,shopping
+2026-04-28,27.51,PENN STATION - 93,fastfood
 2026-04-28,10.65,Google Roblox,entertainment
 2026-04-28,14.84,Circle K 03228 5203 Gr,transport
 2026-04-28,7.09,Circle K 03228 5203 Gr,transport
 2026-04-28,10.58,Meijer Store 162,groceries
 2026-04-28,4.54,Meijer Store 162,groceries
-2026-04-29,-500.00,Refund: CAPITAL ONE MOBILE PYMT,transport
-2026-04-29,-700.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-04-29,0.99,APPLE.COM/BILL,bills
 2026-04-29,21.31,APPLE.COM/BILL,bills
 2026-04-29,54.05,CIRCLE K MIDWEST PREAUTHPMT Circle K M5203 Green d,transport
@@ -933,7 +832,6 @@ Date,Amount,Description,Category
 2026-05-02,4.76,PAYPAL *STEAM GAMES,entertainment
 2026-05-02,9.43,PAYPAL *STEAM GAMES,entertainment
 2026-05-02,9.99,Google YouTube Member,bills
-2026-05-02,-50.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-05-04,8.48,Circle K 03228 5203 Gr,transport
 2026-05-04,89.85,Wal Mart 4524,groceries
 2026-05-05,5.36,KY-IN RIVERLINK TOLL,transport
@@ -990,9 +888,6 @@ Date,Amount,Description,Category
 2026-05-28,10.65,Google Roblox,entertainment
 2026-05-28,13.72,Sams Club 8276,shopping
 2026-05-29,39.39,JIMMY JOHNS - 4387,fastfood
-2026-05-30,-2.71,Refund: CREDIT-CASH BACK REWARD,shopping
-2026-05-30,-800.00,Refund: CAPITAL ONE MOBILE PYMT,transport
-2026-05-30,-300.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-06-01,51.94,ABC*PLANET FITNESS DIXIE,gym
 2026-06-01,53.17,Walgreens Store 5100 Dix,gym
 2026-06-01,325.00,Venmo Payment,shopping
@@ -1005,7 +900,6 @@ Date,Amount,Description,Category
 2026-06-02,25.89,AMAZON MKTPL*TG93270H3,shopping
 2026-06-02,35.20,Target Card Srvc Payment,shopping
 2026-06-03,24.69,McDonalds 11126,fastfood
-2026-06-03,-150.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-06-03,7.16,Cinemark 1092 Rstbar,entertainment
 2026-06-03,43.04,Tst Roosters Dixie H,fastfood
 2026-06-04,29.96,Wal Mart 4524,groceries
@@ -1020,7 +914,6 @@ Date,Amount,Description,Category
 2026-06-08,5.30,Circle K 03312 14000 T,transport
 2026-06-08,29.15,Kroger Fuel 829 7509 Te,groceries
 2026-06-08,56.08,Walmart Com 800 925 6278 * Ar,groceries
-2026-06-09,-180.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-06-10,-14.83,Refund: AMAZON MKTPLACE PMTS,shopping
 2026-06-10,-25.42,Refund: AMAZON MKTPLACE PMTS,shopping
 2026-06-10,3.02,Wal Mart 4524,groceries
@@ -1072,7 +965,6 @@ Date,Amount,Description,Category
 2026-06-29,-13.77,Refund: AMAZON MKTPLACE PMTS,shopping
 2026-06-29,7.93,Circle K 03228,transport
 2026-06-30,32.10,WENDYS 7550,fastfood
-2026-06-30,-1000.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-06-30,38.34,Kroger #785 (EBT),groceries
 2026-06-30,3.35,Circle K 03228,transport
 2026-06-30,39.95,Kroger 785,groceries
@@ -1125,7 +1017,7 @@ Date,Amount,Description,Category
 2026-07-22,28.32,Tst Roosters Dixie H,fastfood
 2026-07-23,0.99,APPLE.COM/BILL,bills
 2026-07-23,7.93,CIRCLEK x3228,transport
-2026-07-24,185.00,JM AUTO LLC,shopping
+2026-07-24,185.00,JM AUTO LLC,transport
 2026-07-24,28.34,Wal-Mart #4524 (EBT),groceries
 2026-07-27,199.71,Sams Club #8276 (EBT),groceries
 2026-07-27,165.50,Sams Club #8276 (EBT),groceries
@@ -1137,7 +1029,6 @@ Date,Amount,Description,Category
 2026-07-29,24.95,FANTASTIC SAMS- VALLEY E,shopping
 2026-07-29,-486.91,Refund: Visa Dda Ref 444500 Sams Club 8276,shopping
 2026-07-30,12.71,AMAZON MKTPL*1J2UM8V53,shopping
-2026-07-30,-1000.00,Refund: CAPITAL ONE MOBILE PYMT,transport
 2026-07-30,5.56,Thorntons 0050,transport
 2026-07-31,99.92,Wm Supercenter 4524,shopping
 2026-07-31,425.00,Venmo Payment,shopping
