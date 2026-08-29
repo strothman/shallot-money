@@ -1,42 +1,42 @@
 {
   "merchant_rules": {
     "groceries": [
-      "kroger", "walmart", "wal-mart", "wal mart", "aldi", "publix", "trader joe", "whole foods", 
-      "food lion", "wegmans", "heb", "safeway", "sprouts", "harris teeter", "viet hoa",
-      "market basket", "shoprite", "giant eagle", "meijer", "supermarket", "grocery", "samsclub", "sam's club"
+      "kroger", "walmart", "wal-mart", "wal mart", "wm superc", "aldi", "publix", "trader joe", "whole foods", 
+      "food lion", "wegmans", "heb", "safeway", "sprouts", "harris teeter", "viet hoa", "bj wholesale", "iga express",
+      "market basket", "shoprite", "giant eagle", "meijer", "supermarket", "grocery", "samsclub", "sam's club", "liquor"
     ],
     "fastfood": [
-      "mcdonald", "wendy", "taco bell", "chick-fil-a", "burger king", "subway", "roosters",
-      "chipotle", "starbucks", "dunkin", "panera", "domino", "pizza hut", "penn station", "denny",
-      "popeyes", "kfc", "panda express", "sonic drive", "five guys", "dairy queen", "ice cream",
-      "jack in the box", "jimmy john", "innout", "in-n-out", "arby", "restaurant", "cafe", "tst*"
+      "mcdonald", "wendy", "taco bell", "chick-fil-a", "burger king", "subway", "roosters", "culver", "indi", "indis",
+      "chipotle", "starbucks", "dunkin", "panera", "domino", "pizza hut", "papa john", "penn station", "denny",
+      "popeyes", "kfc", "panda express", "sonic drive", "five guys", "dairy queen", "ice cream", "kona ice", "schlotzsky",
+      "texas roadhouse", "ruby thai", "dirty bird", "brewing", "woo hoo", "restaurant", "cafe", "tst*", "sq *"
     ],
     "transport": [
-      "shell", "exxon", "mobil", "wawa", "chevron", "sunoco", "speedway", "thorntons", "thornton",
+      "shell", "exxon", "mobil", "wawa", "chevron", "sunoco", "speedway", "thorntons", "thornton", "pilot",
       "bp ", "marathon", "circle k", "circlek", "racetrac", "sheetz", "loves travel", "jm auto", "auto llc",
       "autozone", "advance auto", "o'reilly", "pep boys", "jiffy lube", "valvoline", "tire", "mechanic",
       "uber", "lyft", "gas", "fuel", "parking", "toll", "ezpass", "sunpass"
     ],
     "bills": [
-      "electric", "power", "duke energy", "dominion", "fpl", "comed",
-      "water", "utility", "sewer", "waste", "trash",
+      "electric", "power", "duke energy", "dominion", "fpl", "comed", "affirm",
+      "water", "utility", "sewer", "waste", "trash", "clerk", "kyrenew", "ky.gov",
       "verizon", "at&t", "t-mobile", "sprint", "xfinity", "comcast", "spectrum", "charter",
-      "netflix", "spotify", "hulu", "disney", "apple.com/bill", "prime video", "hbo", "max",
+      "netflix", "spotify", "hulu", "disney", "apple.com/bill", "prime video", "hbo", "max", "google one", "chatgpt", "openai",
       "amzn digital", "youtube sub", "google youtube", "interest charge", "annual fee", "late fee",
       "geico", "state farm", "progressive", "allstate", "insurance", "loan", "mortgage"
     ],
     "shopping": [
       "amazon", "amzn", "target", "best buy", "ebay", "walmart.com", "dollar tree",
-      "dollar general", "family dollar", "tj maxx", "marshalls", "ross", "kohls",
-      "macy", "nordstrom", "home depot", "lowe", "ikea", "costco", "sam's club", "ollie"
+      "dollar general", "family dollar", "tj maxx", "marshalls", "ross", "kohls", "five below", "five belo",
+      "macy", "nordstrom", "home depot", "lowe", "ikea", "costco", "sam's club", "ollie", "hobby lobby", "hobbylobby", "hobby-lobby", "carter"
     ],
     "entertainment": [
-      "steam", "roblox", "playstation", "xbox", "nintendo", "twitch", "patreon", "zoo", "louisville zoo",
-      "cinema", "amc", "regal", "cinemark", "theatre", "theater", "ticketmaster", "stubhub", "bowling", "games"
+      "steam", "roblox", "playstation", "xbox", "nintendo", "twitch", "patreon", "zoo", "louisville zoo", "blizzard", "oculus",
+      "cinema", "amc", "regal", "cinemark", "theatre", "theater", "ticketmaster", "stubhub", "bowling", "games", "humblebund", "fanatical", "kinguin", "tebex", "zygor", "yeeps", "museum", "derby"
     ],
     "gym": [
-      "cvs", "walgreens", "rite aid", "pharmacy", "planet fitness", "anytime fitness",
-      "la fitness", "crunch", "gold's gym", "ymca", "doctor", "dental", "hospital", "urgent care"
+      "cvs", "walgreens", "rite aid", "pharmacy", "planet fitness", "pf dixie", "anytime fitness", "kort",
+      "la fitness", "crunch", "gold's gym", "ymca", "doctor", "dental", "hospital", "urgent care", "physical therapy"
     ]
   }
 }
