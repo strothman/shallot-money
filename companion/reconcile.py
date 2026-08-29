@@ -49,6 +49,8 @@ def parse_date(date_str):
     if not date_str:
         return None
     date_str = str(date_str).strip()
+    if 'T' in date_str:
+        date_str = date_str.split('T')[0]
     for fmt in ('%Y-%m-%d', '%m/%d/%Y', '%m-%d-%Y', '%m/%d/%y', '%Y/%m/%d', '%b %d, %Y', '%B %d, %Y'):
         try:
             return datetime.strptime(date_str, fmt).date()
@@ -253,6 +255,27 @@ def parse_bank_file(fpath):
                         "orig_cat": r[cat_idx] if cat_idx != -1 and len(r) > cat_idx else ""
                     })
 
+        # EBT CSV pattern: Date, Merchant, Amount, Location, Transaction, Type
+        elif "ebt" in fname or ("merchant" in header and "location" in header):
+            date_idx = header.index("date") if "date" in header else 0
+            merch_idx = header.index("merchant") if "merchant" in header else 1
+            amt_idx = header.index("amount") if "amount" in header else 2
+
+            for r in rows[1:]:
+                if len(r) <= max(date_idx, merch_idx, amt_idx):
+                    continue
+                d = parse_date(r[date_idx])
+                merch = r[merch_idx].strip()
+                amt = abs(clean_amount(r[amt_idx]))
+                if d and amt > 0:
+                    transactions.append({
+                        "source": "EBT",
+                        "date": d,
+                        "amount": round(amt, 2),
+                        "description": f"{clean_merchant_name(merch)} (EBT)",
+                        "force_category": "groceries"
+                    })
+
         # TD Bank pattern: Date, Description, Amount / Withdrawals
         else:
             date_idx = -1
@@ -361,6 +384,8 @@ def run_reconciliation():
         if matched_receipt:
             final_desc = matched_receipt["raw"]
             category = "groceries" if matched_receipt["store"] == "Kroger" else auto_categorize(final_desc, rules)
+        elif tx.get("force_category"):
+            category = tx["force_category"]
         else:
             category = auto_categorize(tx_desc, rules)
 
@@ -371,19 +396,33 @@ def run_reconciliation():
             "category": category
         })
 
+    # Deduplicate exact matching date, amount, description
+    unique_expenses = []
+    seen_keys = set()
+    dup_count = 0
+    for exp in reconciled_expenses:
+        key = (exp["date"], f"{exp['amount']:.2f}", exp["description"].lower().strip())
+        if key in seen_keys:
+            dup_count += 1
+            continue
+        seen_keys.add(key)
+        unique_expenses.append(exp)
+
     # Sort chronological
-    reconciled_expenses.sort(key=lambda x: x["date"])
+    unique_expenses.sort(key=lambda x: x["date"])
 
     # Export CSV
     out_file = os.path.join(OUTPUTS_DIR, "shallot_money_import.csv")
     with open(out_file, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(["Date", "Amount", "Description", "Category"])
-        for exp in reconciled_expenses:
+        for exp in unique_expenses:
             writer.writerow([exp["date"], f"{exp['amount']:.2f}", exp["description"], exp["category"]])
 
     print("\n" + "-" * 65)
-    print(f"🎉 SUCCESS! Reconciled {len(reconciled_expenses)} transactions.")
+    print(f"🎉 SUCCESS! Reconciled {len(unique_expenses)} unique transactions.")
+    if dup_count > 0:
+        print(f"🧹 Cleaned up {dup_count} exact duplicate rows from overlapping files.")
     print(f"📄 Output generated at:\n   {out_file}")
     print("-" * 65)
 

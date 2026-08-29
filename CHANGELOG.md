@@ -7,6 +7,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [1.3.0] - 2026-08-28
+
+### Added & Enhanced
+- **"Clean Exact Duplicates" Feature**:
+  - Added a 1-tap **"Clean Exact Duplicates"** tool in Settings.
+  - Automatically identifies and purges duplicate transactions sharing the same date, amount, and merchant name.
+  - Automatically creates a rollback recovery snapshot before cleaning duplicates.
+- **PC Companion Auto-Deduplication**:
+  - Reconciler script automatically deduplicates transactions across overlapping statements and date ranges.
+
+---
+
 ## [1.2.0] - 2026-08-28
 
 ### Added & Enhanced

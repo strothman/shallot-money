@@ -1547,6 +1547,39 @@ function importFromCSV(fileContent) {
   alert(msg);
 }
 
+function deduplicateExpenses() {
+  triggerHaptic(12);
+  const seen = new Set();
+  const uniqueList = [];
+  let duplicatesCount = 0;
+
+  state.expenses.forEach(exp => {
+    // Unique key matching normalized date, absolute amount (2 decimals), and lowercase description
+    const key = `${exp.date}_${Math.abs(exp.amount).toFixed(2)}_${(exp.description || '').toLowerCase().trim()}`;
+    if (seen.has(key)) {
+      duplicatesCount++;
+    } else {
+      seen.add(key);
+      uniqueList.push(exp);
+    }
+  });
+
+  if (duplicatesCount === 0) {
+    alert('No exact duplicates found! Your spending history is already 100% clean.');
+    return;
+  }
+
+  if (confirm(`Found ${duplicatesCount} exact duplicate expense(s).\n\nRemove duplicates now? (An automatic backup snapshot will be saved first).`)) {
+    createSnapshot(`Before removing ${duplicatesCount} duplicates`);
+    state.expenses = uniqueList;
+    saveState();
+    renderDashboard();
+    renderMonthlyBreakdown();
+    renderHistory();
+    alert(`Cleaned up ${duplicatesCount} duplicate(s)! Total unique expenses: ${state.expenses.length}.`);
+  }
+}
+
 // ----------------------------------------------------
 // EVENT LISTENERS & NAVIGATION
 // ----------------------------------------------------
@@ -1846,6 +1879,14 @@ function setupEventListeners() {
   if (copyDataBtn) {
     copyDataBtn.addEventListener('click', () => {
       copyJSONBackup();
+    });
+  }
+
+  // Deduplicate Expenses Handler
+  const dedupBtn = document.getElementById('dedup-btn');
+  if (dedupBtn) {
+    dedupBtn.addEventListener('click', () => {
+      deduplicateExpenses();
     });
   }
 
