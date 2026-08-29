@@ -512,6 +512,24 @@ body {
   flex: 1;
   height: 100%;
   justify-content: flex-end;
+  cursor: pointer;
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  border-radius: 8px;
+  padding: 2px 0;
+}
+
+.chart-bar-container:hover {
+  transform: translateY(-4px);
+}
+
+.chart-bar-container:hover .chart-bar-val {
+  color: var(--accent-color);
+  transform: scale(1.1);
+}
+
+.chart-bar-container:active {
+  transform: scale(0.94);
 }
 
 .chart-bar-val {
@@ -519,6 +537,7 @@ body {
   font-weight: 700;
   color: var(--text-secondary);
   margin-bottom: 4px;
+  transition: color 0.15s ease, transform 0.15s ease;
 }
 
 .chart-bar-wrapper {
@@ -530,6 +549,73 @@ body {
   flex-direction: column;
   justify-content: flex-end;
   overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Category Row Interactivity */
+.category-row {
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+  border-radius: 8px;
+  padding: 6px 8px;
+}
+
+.category-row:hover:not(.total-row) {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateX(4px);
+}
+
+.category-row:active:not(.total-row) {
+  transform: scale(0.98);
+}
+
+/* History Filter Banner */
+.history-filter-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.18), rgba(236, 72, 153, 0.15));
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.history-filter-banner .banner-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #f3e8ff;
+}
+
+.history-filter-banner .banner-content i {
+  width: 16px;
+  height: 16px;
+  color: #c084fc;
+}
+
+.clear-banner-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.clear-banner-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
 }
 
 .chart-bar-fill {

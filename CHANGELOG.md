@@ -7,6 +7,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [1.5.0] - 2026-08-28
+
+### Added & Enhanced
+- **Interactive Chart Drill-Down & Investigation**:
+  - **1-Click Weekly & Monthly Bar Drill-Down**: Tap any bar or dollar total in the weekly or monthly breakdown charts to immediately open the History tab filtered to that exact time window!
+  - **1-Click Category Breakdown Drill-Down**: Tap any category row in the breakdown lists (e.g. *Shopping in April 2026*) to view every transaction in that category for that period.
+  - **Active Filter Banner**: Added an animated, dismissible filter banner with 1-tap **"Clear Filter"** button.
+  - **Tactile Hover & Tap Feedback**: Added smooth lift animations and haptic feedback when tapping bars and categories.
+
+---
+
 ## [1.4.0] - 2026-08-28
 
 ### Added & Enhanced

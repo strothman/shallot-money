@@ -456,37 +456,59 @@ function formatDateDisplay(dateStr) {
 
 // ----------------------------------------------------
 // UI RENDERING
-// ----------------------------------------------------
-function renderDashboard() {
-  const today = new Date();
-  const currentMonth = today.getMonth();
-  const currentYear = today.getFullYear();
+  state.historyDrillDownFilter = { startDate, endDate, label, categoryId };
 
-  // 1. Calculate Monthly stats
-  const monthlyExpenses = state.expenses.filter(exp => {
-    const expDate = new Date(exp.date + 'T00:00:00');
-    return expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear;
+  if (categoryId) {
+    historyFilterCategory.value = categoryId;
+  } else {
+    historyFilterCategory.value = 'all';
+  }
+
+  // Switch to History Tab
+  tabItems.forEach(t => t.classList.remove('active'));
+  const historyTab = Array.from(tabItems).find(t => t.getAttribute('data-view') === 'view-history');
+  if (historyTab) historyTab.classList.add('active');
+
+  Object.keys(views).forEach(key => {
+    if (views[key].id === 'view-history') {
+      views[key].classList.add('active');
+    } else {
+      views[key].classList.remove('active');
+    }
   });
 
-  const totalSpentMonth = monthlyExpenses.reduce((sum, exp) => sum + exp.amount, 0);
-  const remainingPool = state.income - totalSpentMonth;
+  renderHistory();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-  poolIncomeVal.textContent = formatCurrency(state.income);
-  poolRemainingVal.textContent = formatCurrency(remainingPool);
+function renderDashboard() {
+  const today = new Date();
+
+  // 1. Calculate Monthly Pool Stats
+  const targetDate = new Date(today.getFullYear(), today.getMonth() + state.currentMonthOffset, 1);
+  const targetMonth = targetDate.getMonth();
+  const targetYear = targetDate.getFullYear();
+
+  const monthExpenses = state.expenses.filter(exp => {
+    const expDate = new Date(exp.date + 'T00:00:00');
+    return expDate.getMonth() === targetMonth && expDate.getFullYear() === targetYear;
+  });
+
+  const totalSpentMonth = monthExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+  const remaining = state.income - totalSpentMonth;
+  const percentLeft = state.income > 0 ? Math.max(0, Math.min(100, (remaining / state.income) * 100)) : 0;
+
+  poolRemainingVal.textContent = formatCurrency(remaining);
   poolSpentVal.textContent = formatCurrency(totalSpentMonth);
+  poolIncomeVal.textContent = formatCurrency(state.income);
+  poolProgressFill.style.width = `${percentLeft}%`;
 
-  // Remaining Pool Progress fill calculation
-  let fillPercentage = 0;
-  if (state.income > 0) {
-    fillPercentage = Math.max(0, Math.min(100, (remainingPool / state.income) * 100));
-  }
-  poolProgressFill.style.width = `${fillPercentage}%`;
-
-  // Set color accent of progress fill based on pool health
-  if (fillPercentage < 15) {
-    poolProgressFill.style.background = 'var(--danger-color)';
-  } else if (fillPercentage < 40) {
-    poolProgressFill.style.background = 'var(--warning-color)';
+  if (percentLeft > 50) {
+    poolProgressFill.style.background = 'var(--emerald-500)';
+  } else if (percentLeft > 20) {
+    poolProgressFill.style.background = 'var(--amber-500)';
+  } else if (percentLeft > 0) {
+    poolProgressFill.style.background = 'var(--rose-500)';
   } else {
     poolProgressFill.style.background = 'white';
   }
@@ -557,7 +579,7 @@ function renderDashboard() {
     }).join('');
 
     return `
-      <div class="chart-bar-container">
+      <div class="chart-bar-container" data-day-index="${i}">
         <span class="chart-bar-val ${isToday ? 'today' : ''}">${total > 0 ? (state.currency || '$') + total.toFixed(0) : '&nbsp;'}</span>
         <div class="chart-bar-wrapper">
           ${segmentsHtml}
@@ -566,6 +588,22 @@ function renderDashboard() {
       </div>
     `;
   }).join('');
+
+  // Attach click listeners to daily bars
+  weeklyChartBars.querySelectorAll('.chart-bar-container').forEach(barEl => {
+    barEl.addEventListener('click', () => {
+      const idx = parseInt(barEl.getAttribute('data-day-index'), 10);
+      const d = new Date(startOfWeek);
+      d.setDate(d.getDate() + idx);
+      const dateStr = formatDateLocal(d);
+      const total = daySums[idx];
+      drillDownToHistory({
+        startDate: dateStr,
+        endDate: dateStr,
+        label: `${formatDateDisplay(dateStr)} — ${formatCurrency(total)}`,
+      });
+    });
+  });
 
   // Category breakdown lists
   const catSums = {};
@@ -584,7 +622,7 @@ function renderDashboard() {
     if (totalAmt === 0) return '';
 
     return `
-      <div class="category-row">
+      <div class="category-row" data-cat-id="${cat.id}">
         <div class="category-row-info">
           <div class="category-icon-wrapper" style="background-color: ${cat.color}">
             ${getCategoryIconHtml(cat)}
@@ -615,6 +653,21 @@ function renderDashboard() {
   }
 
   categoryBreakdownList.innerHTML = categoryHtml;
+
+  // Attach click listeners to weekly category rows
+  categoryBreakdownList.querySelectorAll('.category-row:not(.total-row)').forEach(rowEl => {
+    rowEl.addEventListener('click', () => {
+      const catId = rowEl.getAttribute('data-cat-id');
+      const cat = getCategory(catId);
+      const catTotal = catSums[catId] || 0;
+      drillDownToHistory({
+        startDate: startOfWeekStr,
+        endDate: endOfWeekStr,
+        label: `${cat.label} (${formatDateDisplay(startOfWeekStr)} - ${formatDateDisplay(endOfWeekStr)}) — ${formatCurrency(catTotal)}`,
+        categoryId: catId
+      });
+    });
+  });
 
   // 3. Render Recent list
   const recentSorted = [...state.expenses]
@@ -777,7 +830,7 @@ function renderMonthlyBreakdown() {
     if (totalAmt === 0) return '';
 
     return `
-      <div class="category-row">
+      <div class="category-row" data-cat-id="${cat.id}">
         <div class="category-row-info">
           <div class="category-icon-wrapper" style="background-color: ${cat.color}">
             ${getCategoryIconHtml(cat)}
@@ -809,6 +862,39 @@ function renderMonthlyBreakdown() {
 
   monthlyCategoryBreakdownList.innerHTML = categoryHtml;
 
+  // Attach click listeners to monthly weekly bars
+  monthlyChartBars.querySelectorAll('.chart-bar-container').forEach((barEl, i) => {
+    barEl.addEventListener('click', () => {
+      const w = weeks[i];
+      const total = weekSums[i];
+      const startDay = w.displayStart.getDate();
+      const endDay = w.displayEnd.getDate();
+      const label = startDay === endDay ? `${startDay}` : `${startDay}-${endDay}`;
+      drillDownToHistory({
+        startDate: w.startStr,
+        endDate: w.endStr,
+        label: `${targetDate.toLocaleString('default', { month: 'long', year: 'numeric' })} (${label}) — ${formatCurrency(total)}`,
+      });
+    });
+  });
+
+  // Attach click listeners to monthly category rows
+  monthlyCategoryBreakdownList.querySelectorAll('.category-row:not(.total-row)').forEach(rowEl => {
+    rowEl.addEventListener('click', () => {
+      const catId = rowEl.getAttribute('data-cat-id');
+      const cat = getCategory(catId);
+      const catTotal = catSums[catId] || 0;
+      const monthStartStr = `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}-01`;
+      const monthEndStr = `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}-${new Date(targetYear, targetMonth + 1, 0).getDate()}`;
+      drillDownToHistory({
+        startDate: monthStartStr,
+        endDate: monthEndStr,
+        label: `${cat.label} (${targetDate.toLocaleString('default', { month: 'long', year: 'numeric' })}) — ${formatCurrency(catTotal)}`,
+        categoryId: catId
+      });
+    });
+  });
+
   if (window.lucide) {
     window.lucide.createIcons();
   }
@@ -818,11 +904,43 @@ function renderHistory() {
   const searchQuery = historySearchInput.value.toLowerCase().trim();
   const catFilter = historyFilterCategory.value;
 
+  const banner = document.getElementById('history-filter-banner');
+  const bannerLabel = document.getElementById('history-filter-label');
+  const clearBannerBtn = document.getElementById('clear-history-filter-btn');
+
+  if (state.historyDrillDownFilter) {
+    if (banner && bannerLabel) {
+      banner.style.display = 'flex';
+      bannerLabel.textContent = `Showing: ${state.historyDrillDownFilter.label}`;
+    }
+  } else {
+    if (banner) banner.style.display = 'none';
+  }
+
+  if (clearBannerBtn) {
+    clearBannerBtn.onclick = () => {
+      triggerHaptic(8);
+      state.historyDrillDownFilter = null;
+      historyFilterCategory.value = 'all';
+      historySearchInput.value = '';
+      renderHistory();
+    };
+  }
+
   // Filter expenses
   let filtered = state.expenses.filter(exp => {
     const matchesSearch = exp.description.toLowerCase().includes(searchQuery);
     const matchesCat = catFilter === 'all' || exp.category === catFilter;
-    return matchesSearch && matchesCat;
+
+    let matchesDrillDown = true;
+    if (state.historyDrillDownFilter) {
+      const { startDate, endDate, categoryId } = state.historyDrillDownFilter;
+      if (startDate && exp.date < startDate) matchesDrillDown = false;
+      if (endDate && exp.date > endDate) matchesDrillDown = false;
+      if (categoryId && exp.category !== categoryId) matchesDrillDown = false;
+    }
+
+    return matchesSearch && matchesCat && matchesDrillDown;
   });
 
   // Sort descending by date
