@@ -106,7 +106,7 @@ Shallot Money uses the unified **Shallot Plum** design tokens shared across the 
 ## 📂 Project Structure
 
 ```
-utilapp-moneytracker/
+Shallot-Money/
 ├── public/
 │   ├── favicon.ico         # Multi-size Windows & browser icon
 │   ├── icon.ico            # Master desktop icon
