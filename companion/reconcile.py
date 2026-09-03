@@ -102,7 +102,7 @@ def load_store_receipts(inputs_dir):
                                 "date": d,
                                 "amount": round(amt, 2),
                                 "items": item_names,
-                                "raw": f"Kroger ({', '.join(item_names[:3]) + '...' if item_names else 'Groceries'})"
+                                "raw": f"Kroger ({', '.join(item_names) if item_names else 'Groceries'})"
                             })
             elif fpath.endswith(".csv"):
                 with open(fpath, "r", encoding="utf-8", errors="ignore") as f:
@@ -126,7 +126,7 @@ def load_store_receipts(inputs_dir):
                                 "date": d,
                                 "amount": round(amt, 2),
                                 "items": items,
-                                "raw": f"Kroger ({', '.join(items[:3]) if items else 'Groceries'})"
+                                "raw": f"Kroger ({', '.join(items) if items else 'Groceries'})"
                             })
         except Exception as e:
             print(f"[!] Warning reading Kroger receipt {fpath}: {e}")
@@ -149,7 +149,7 @@ def load_store_receipts(inputs_dir):
                                 "date": d,
                                 "amount": round(amt, 2),
                                 "items": item_names,
-                                "raw": f"Walmart ({', '.join(item_names[:3]) + '...' if item_names else 'Groceries & Goods'})"
+                                "raw": f"Walmart ({', '.join(item_names) if item_names else 'Groceries & Goods'})"
                             })
             elif fpath.endswith(".csv"):
                 with open(fpath, "r", encoding="utf-8", errors="ignore") as f:
@@ -172,7 +172,7 @@ def load_store_receipts(inputs_dir):
                                 "date": d,
                                 "amount": round(amt, 2),
                                 "items": items,
-                                "raw": f"Walmart ({', '.join(items[:3]) if items else 'Goods'})"
+                                "raw": f"Walmart ({', '.join(items) if items else 'Goods'})"
                             })
         except Exception as e:
             print(f"[!] Warning reading Walmart receipt {fpath}: {e}")
@@ -401,8 +401,10 @@ def run_reconciliation():
                 break
 
         final_desc = tx_desc
+        items_list = []
         if matched_receipt:
             final_desc = matched_receipt["raw"]
+            items_list = matched_receipt.get("items", [])
             category = "groceries" if matched_receipt["store"] == "Kroger" else auto_categorize(final_desc, rules)
         elif tx.get("force_category"):
             category = tx["force_category"]
@@ -414,6 +416,7 @@ def run_reconciliation():
             "amount": tx_amt,
             "description": final_desc,
             "category": category,
+            "items": "; ".join(items_list) if items_list else "",
             "source_key": tx.get("source_key")
         })
 
@@ -438,9 +441,9 @@ def run_reconciliation():
     out_file = os.path.join(OUTPUTS_DIR, "shallot_money_import.csv")
     with open(out_file, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        writer.writerow(["Date", "Amount", "Description", "Category"])
+        writer.writerow(["Date", "Amount", "Description", "Category", "Items"])
         for exp in unique_expenses:
-            writer.writerow([exp["date"], f"{exp['amount']:.2f}", exp["description"], exp["category"]])
+            writer.writerow([exp["date"], f"{exp['amount']:.2f}", exp["description"], exp["category"], exp.get("items", "")])
 
     print("\n" + "-" * 65)
     print(f"🎉 SUCCESS! Reconciled {len(unique_expenses)} unique transactions.")

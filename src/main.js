@@ -92,6 +92,176 @@ function triggerHaptic(duration = 10) {
 }
 
 // ----------------------------------------------------
+// SMART ITEM CATEGORIZATION ENGINE
+// ----------------------------------------------------
+const ITEM_RULES = {
+  groceries: [
+    'lettuce', 'tomato', 'potato', 'potatoes', 'onion', 'onions', 'garlic', 'apple', 'apples', 'banana', 'bananas',
+    'cherry', 'cherries', 'fruit', 'fruits', 'vegetable', 'vegetables', 'produce', 'salad', 'milk', 'cheese', 'cheeses',
+    'butter', 'yogurt', 'cream', 'creamer', 'egg', 'eggs', 'bread', 'buns', 'bagel', 'bagels', 'tortilla', 'tortillas',
+    'chicken', 'beef', 'pork', 'meat', 'patty', 'patties', 'nugget', 'nuggets', 'nugs', 'fries', 'fish', 'salmon',
+    'tuna', 'turkey', 'bacon', 'sausage', 'water', 'cereal', 'salsa', 'chips', 'sauce', 'oil', 'pasta', 'rice',
+    'soup', 'bean', 'beans', 'flour', 'sugar', 'spice', 'spices', 'pepper', 'salt', 'cookie', 'cookies', 'sweet bread',
+    'donette', 'donettes', 'can', 'cans', 'groceries', 'grocery', 'lime', 'lemon', 'orange', 'berry', 'berries'
+  ],
+  fastfood: [
+    'sandwich', 'sandwiches', 'pizza', 'pizzas', 'burger', 'burgers', 'taco', 'tacos', 'burrito', 'burritos',
+    'subway', 'mcdonald', 'wendy', 'kfc', 'popeye', 'starbucks', 'dunkin', 'panera', 'chipotle', 'smoothie', 'smoothies',
+    'shake', 'shakes', 'ice cream', 'donut', 'donuts', 'combo', 'meal', 'nuggets meal', 'fry', 'drink', 'drinks',
+    'coffee', 'latte', 'frappe', 'biscuit', 'wings'
+  ],
+  transport: [
+    'gas', 'fuel', 'unleaded', 'diesel', 'oil change', 'car wash', 'tire', 'tires', 'wiper', 'wipers',
+    'parking', 'toll', 'tolls', 'uber', 'lyft', 'auto', 'brake', 'brakes', 'alignment', 'transit'
+  ],
+  bills: [
+    'prime', 'amazon prime', 'subscription', 'sub', 'membership', 'cloud', 'icloud', 'netflix', 'spotify',
+    'hulu', 'disney', 'utility', 'electric', 'power', 'water bill', 'internet', 'wifi', 'cable', 'phone',
+    'insurance', 'storage', 'domain', 'hosting'
+  ],
+  entertainment: [
+    'game', 'games', 'gaming', 'steam', 'arena', 'sineus arena', 'ticket', 'tickets', 'movie', 'movies', 'cinema',
+    'theatre', 'theater', 'nintendo', 'playstation', 'xbox', 'roblox', 'oculus', 'concert', 'museum', 'dlc'
+  ],
+  gym: [
+    'fitness', 'gym', 'workout', 'protein', 'powder', 'creatine', 'vitamin', 'vitamins', 'supplement', 'supplements',
+    'dumbbell', 'bandage', 'band-aid', 'advil', 'tylenol', 'medicine', 'pharmacy', 'prescription', 'first aid',
+    'shaker', 'electrolytes'
+  ],
+  shopping: [
+    'sock', 'socks', 'shirt', 'shirts', 'pants', 'jeans', 'hoodie', 'jacket', 'shoes', 'boots', 'sunglasses',
+    'glasses', 'towel', 'towels', 'soap', 'shampoo', 'conditioner', 'deodorant', 'toothpaste', 'toothbrush',
+    'cleaner', 'detergent', 'bleach', 'sponge', 'paper towel', 'toilet paper', 'tissue', 'trash bag', 'trash bags',
+    'card', 'cards', 'gift', 'gift card', 'amazon card', 'charger', 'cable', 'cord', 'case', 'pillow', 'blanket',
+    'candle', 'lamp', 'bulb', 'battery', 'batteries', 'tape', 'tool', 'tools', 'blender', 'pan', 'pot', 'knife',
+    'plate', 'cup', 'mug', 'clothes', 'clothing', 'apparel', 'hardware'
+  ]
+};
+
+function categorizeItem(itemName) {
+  if (!itemName || typeof itemName !== 'string') return null;
+  const lower = itemName.toLowerCase().trim();
+
+  // Keyword / Substring search across item rules
+  for (const [catId, keywords] of Object.entries(ITEM_RULES)) {
+    for (const kw of keywords) {
+      const regex = new RegExp(`\\b${kw}`, 'i');
+      if (regex.test(lower) || lower.includes(kw)) {
+        return catId;
+      }
+    }
+  }
+
+  return null;
+}
+
+function predictCategoryFromItems(items) {
+  if (!items || !Array.isArray(items) || items.length === 0) return null;
+
+  const counts = {};
+  items.forEach(item => {
+    const cat = categorizeItem(item);
+    if (cat) {
+      counts[cat] = (counts[cat] || 0) + 1;
+    }
+  });
+
+  const sortedCats = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+  return sortedCats.length > 0 ? sortedCats[0] : null;
+}
+
+function parseExpenseDetails(exp) {
+  let cleanDesc = (exp.description || '').trim();
+  let items = [];
+
+  if (Array.isArray(exp.items) && exp.items.length > 0) {
+    items = exp.items.map(it => String(it).trim()).filter(Boolean);
+  } else if (typeof exp.items === 'string' && exp.items.trim()) {
+    items = exp.items.split(/[,;\n]+/).map(it => it.trim()).filter(Boolean);
+  }
+
+  // If no explicit items, check description for patterns like "Merchant (item1, item2, ...)"
+  if (items.length === 0 && cleanDesc) {
+    const parenMatch = cleanDesc.match(/^(.*?)\s*\((.+)\)\s*$/);
+    if (parenMatch) {
+      const candidateMerchant = parenMatch[1].trim();
+      const rawItems = parenMatch[2].trim();
+      // Split items by commas or semicolons
+      const splitItems = rawItems.split(/[,;]+/).map(s => s.trim()).filter(Boolean);
+      if (candidateMerchant && splitItems.length > 0) {
+        cleanDesc = candidateMerchant;
+        items = splitItems;
+      }
+    }
+  }
+
+  // Smart classify each item
+  const categorizedItems = items.map(item => {
+    const detectedCatId = categorizeItem(item);
+    return {
+      name: item,
+      categoryId: detectedCatId || exp.category || 'groceries'
+    };
+  });
+
+  // Calculate multi-category distribution
+  const catDistribution = {};
+  categorizedItems.forEach(ci => {
+    catDistribution[ci.categoryId] = (catDistribution[ci.categoryId] || 0) + 1;
+  });
+
+  return {
+    merchant: cleanDesc || 'Expense',
+    rawDescription: exp.description || '',
+    items: items,
+    categorizedItems: categorizedItems,
+    catDistribution: catDistribution,
+    hasItems: items.length > 0
+  };
+}
+
+function renderReceiptDrawerHtml(details, drawerId) {
+  if (!details.hasItems) return '';
+
+  const distKeys = Object.keys(details.catDistribution);
+  const distHtml = distKeys.length > 1 ? `
+    <div class="receipt-drawer-cats">
+      ${distKeys.map(cId => {
+        const c = getCategory(cId);
+        const count = details.catDistribution[cId];
+        return `
+          <span class="receipt-cat-tag" style="--cat-color: ${c.color}; --cat-bg: ${c.bg}; --cat-border: ${c.color}40;">
+            <span class="cat-dot"></span>
+            <span>${escapeHTML(c.label)} (${count})</span>
+          </span>
+        `;
+      }).join('')}
+    </div>
+  ` : '';
+
+  return `
+    <div class="expense-items-drawer" id="${drawerId}">
+      <div class="receipt-drawer-header">
+        <span class="receipt-drawer-title"><i data-lucide="receipt"></i> Purchased Items (${details.items.length})</span>
+        ${distHtml}
+      </div>
+      <div class="receipt-item-chips">
+        ${details.categorizedItems.map(ci => {
+          const c = getCategory(ci.categoryId);
+          return `
+            <span class="receipt-item-chip" style="--item-cat-color: ${c.color}; --item-cat-bg: ${c.bg}; --item-cat-border: ${c.color}35; --item-cat-bg-hover: ${c.bg}">
+              <span class="item-chip-dot" style="background-color: ${c.color};"></span>
+              <span class="item-chip-label">${escapeHTML(ci.name)}</span>
+              <span class="item-chip-cat" style="color: ${c.color};">${escapeHTML(c.label)}</span>
+            </span>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// ----------------------------------------------------
 // APPLICATION STATE
 // ----------------------------------------------------
 let state = {
@@ -144,6 +314,7 @@ const monthlyCategoryBreakdownList = document.getElementById('monthly-category-b
 // Log Expense Elements
 const expenseAmountInput = document.getElementById('expense-amount');
 const expenseDescInput = document.getElementById('expense-desc');
+const expenseItemsInput = document.getElementById('expense-items');
 const expenseDateInput = document.getElementById('expense-date');
 const categoryPicker = document.getElementById('category-picker');
 const submitExpenseBtn = document.getElementById('submit-expense-btn');
@@ -171,6 +342,7 @@ const closeEditExpense = document.getElementById('close-edit-expense');
 const editExpenseId = document.getElementById('edit-expense-id');
 const editExpenseAmount = document.getElementById('edit-expense-amount');
 const editExpenseDesc = document.getElementById('edit-expense-desc');
+const editExpenseItemsInput = document.getElementById('edit-expense-items');
 const editExpenseDate = document.getElementById('edit-expense-date');
 const editCategoryPicker = document.getElementById('edit-category-picker');
 const saveExpenseBtn = document.getElementById('save-expense-btn');
@@ -684,23 +856,56 @@ function renderDashboard() {
   } else {
     recentSpendingList.innerHTML = recentSorted.map(exp => {
       const cat = getCategory(exp.category);
+      const details = parseExpenseDetails(exp);
+      const hasItems = details.hasItems;
+
+      const receiptPillHtml = hasItems ? `
+        <button type="button" class="receipt-pill" data-drawer-id="drawer-recent-${exp.id}" title="Click to view purchased items">
+          <i data-lucide="shopping-bag"></i>
+          <span>${details.items.length} ${details.items.length === 1 ? 'item' : 'items'}</span>
+          <span class="receipt-toggle-chevron"><i data-lucide="chevron-down"></i></span>
+        </button>
+      ` : '';
+
+      const drawerHtml = renderReceiptDrawerHtml(details, `drawer-recent-${exp.id}`);
+
       return `
-        <div class="expense-item">
-          <div class="item-left">
-            <div class="category-icon-wrapper" style="background-color: ${cat.color}">
-              ${getCategoryIconHtml(cat)}
+        <div class="expense-item" data-id="${exp.id}">
+          <div class="expense-item-content">
+            <div class="item-left">
+              <div class="category-icon-wrapper" style="background-color: ${cat.color}">
+                ${getCategoryIconHtml(cat)}
+              </div>
+              <div class="item-details">
+                <div class="item-title-row">
+                  <span class="item-desc">${escapeHTML(details.merchant)}</span>
+                  ${receiptPillHtml}
+                </div>
+                <span class="item-meta">${formatDateDisplay(exp.date)} &bull; ${escapeHTML(cat.label)}</span>
+              </div>
             </div>
-            <div class="item-details">
-              <span class="item-desc">${escapeHTML(exp.description)}</span>
-              <span class="item-meta">${formatDateDisplay(exp.date)} &bull; ${escapeHTML(cat.label)}</span>
+            <div class="item-right">
+              <span class="item-amount ${exp.amount < 0 ? 'refund' : ''}">${formatCurrency(exp.amount)}</span>
             </div>
           </div>
-          <div class="item-right">
-            <span class="item-amount ${exp.amount < 0 ? 'refund' : ''}">${formatCurrency(exp.amount)}</span>
-          </div>
+          ${drawerHtml}
         </div>
       `;
     }).join('');
+
+    // Attach click listeners for recent receipt pills
+    recentSpendingList.querySelectorAll('.receipt-pill').forEach(pill => {
+      pill.addEventListener('click', (e) => {
+        e.stopPropagation();
+        triggerHaptic(6);
+        const drawerId = pill.getAttribute('data-drawer-id');
+        const drawer = document.getElementById(drawerId);
+        if (drawer) {
+          const isOpen = drawer.classList.toggle('open');
+          pill.classList.toggle('open', isOpen);
+        }
+      });
+    });
   }
 
   // Reinitialize icons in dynamically added DOM
@@ -929,7 +1134,10 @@ function renderHistory() {
 
   // Filter expenses
   let filtered = state.expenses.filter(exp => {
-    const matchesSearch = exp.description.toLowerCase().includes(searchQuery);
+    const details = parseExpenseDetails(exp);
+    const matchesDesc = details.merchant.toLowerCase().includes(searchQuery) || (exp.description || '').toLowerCase().includes(searchQuery);
+    const matchesItems = details.items.some(item => item.toLowerCase().includes(searchQuery));
+    const matchesSearch = matchesDesc || matchesItems;
     const matchesCat = catFilter === 'all' || exp.category === catFilter;
 
     let matchesDrillDown = true;
@@ -969,6 +1177,19 @@ function renderHistory() {
 
       const itemsHtml = groupExpenses.map(exp => {
         const cat = getCategory(exp.category);
+        const details = parseExpenseDetails(exp);
+        const hasItems = details.hasItems;
+
+        const receiptPillHtml = hasItems ? `
+          <button type="button" class="receipt-pill" data-drawer-id="drawer-hist-${exp.id}" title="Click to view purchased items">
+            <i data-lucide="shopping-bag"></i>
+            <span>${details.items.length} ${details.items.length === 1 ? 'item' : 'items'}</span>
+            <span class="receipt-toggle-chevron"><i data-lucide="chevron-down"></i></span>
+          </button>
+        ` : '';
+
+        const drawerHtml = renderReceiptDrawerHtml(details, `drawer-hist-${exp.id}`);
+
         return `
           <div class="expense-item" data-id="${exp.id}">
             <div class="expense-item-content">
@@ -977,7 +1198,10 @@ function renderHistory() {
                   ${getCategoryIconHtml(cat)}
                 </div>
                 <div class="item-details">
-                  <span class="item-desc">${escapeHTML(exp.description)}</span>
+                  <div class="item-title-row">
+                    <span class="item-desc">${escapeHTML(details.merchant)}</span>
+                    ${receiptPillHtml}
+                  </div>
                   <span class="item-meta">${escapeHTML(cat.label)}</span>
                 </div>
               </div>
@@ -985,6 +1209,7 @@ function renderHistory() {
                 <span class="item-amount ${exp.amount < 0 ? 'refund' : ''}">${formatCurrency(exp.amount)}</span>
               </div>
             </div>
+            ${drawerHtml}
             <div class="expense-actions-overlay">
               <button class="action-btn edit-btn" data-id="${exp.id}" title="Edit Expense">
                 <i data-lucide="edit-3"></i>
@@ -1011,10 +1236,10 @@ function renderHistory() {
     }).join('');
   }
 
-  // Hook up click to show action overlays, and buttons inside history list
+  // Hook up click to show action overlays, ignoring clicks on overlays, receipt pills, or drawers
   historyFeedList.querySelectorAll('.expense-item').forEach(item => {
     item.addEventListener('click', (e) => {
-      if (e.target.closest('.expense-actions-overlay')) {
+      if (e.target.closest('.expense-actions-overlay') || e.target.closest('.receipt-pill') || e.target.closest('.expense-items-drawer')) {
         return;
       }
 
@@ -1027,6 +1252,20 @@ function renderHistory() {
 
       if (!wasShown) {
         item.classList.add('show-actions');
+      }
+    });
+  });
+
+  // Attach click listeners for history receipt pills
+  historyFeedList.querySelectorAll('.receipt-pill').forEach(pill => {
+    pill.addEventListener('click', (e) => {
+      e.stopPropagation();
+      triggerHaptic(6);
+      const drawerId = pill.getAttribute('data-drawer-id');
+      const drawer = document.getElementById(drawerId);
+      if (drawer) {
+        const isOpen = drawer.classList.toggle('open');
+        pill.classList.toggle('open', isOpen);
       }
     });
   });
@@ -1069,6 +1308,76 @@ function renderHistory() {
   if (window.lucide) {
     window.lucide.createIcons();
   }
+}
+
+// ----------------------------------------------------
+// EXPENSE MUTATION ACTIONS (ADD, EDIT, DELETE)
+// ----------------------------------------------------
+let expenseIdToDelete = null;
+
+function showDeleteConfirmation(id) {
+  const expense = state.expenses.find(exp => exp.id === id);
+  if (!expense) return;
+
+  expenseIdToDelete = id;
+  const details = parseExpenseDetails(expense);
+  const amtStr = formatCurrency(expense.amount);
+
+  deleteConfirmText.textContent = `Are you sure you want to delete "${details.merchant}" (${amtStr})?`;
+  deleteConfirmModal.classList.add('active');
+}
+
+function deleteExpense(id) {
+  const expenseToDelete = state.expenses.find(exp => exp.id === id);
+  if (!expenseToDelete) return;
+
+  createSnapshot(`Before deleting expense "${expenseToDelete.description}"`);
+  state.expenses = state.expenses.filter(exp => exp.id !== id);
+  saveState();
+  showUndoToast(expenseToDelete);
+  renderDashboard();
+  renderMonthlyBreakdown();
+  renderHistory();
+}
+
+function addExpense(amount, description, category, dateStr, items = null) {
+  let parsedItems = [];
+  if (Array.isArray(items)) {
+    parsedItems = items.map(s => String(s).trim()).filter(Boolean);
+  } else if (typeof items === 'string' && items.trim()) {
+    parsedItems = items.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean);
+  }
+
+  const newExpense = {
+    id: 'exp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+    amount: parseFloat(amount),
+    description: description.trim(),
+    category: category,
+    date: dateStr,
+    ...(parsedItems.length > 0 ? { items: parsedItems } : {})
+  };
+
+  createSnapshot(`Before adding expense "${description}"`);
+  state.expenses.unshift(newExpense);
+  saveState();
+
+  // Clear log form inputs
+  expenseAmountInput.value = '';
+  expenseDescInput.value = '';
+  if (expenseItemsInput) expenseItemsInput.value = '';
+  expenseDateInput.value = formatDateLocal(new Date());
+
+  // Reset toggle
+  const expenseBtn = document.querySelector('#log-type-toggle [data-type="expense"]');
+  const refundBtn = document.querySelector('#log-type-toggle [data-type="refund"]');
+  if (expenseBtn && refundBtn) {
+    refundBtn.classList.remove('active');
+    expenseBtn.classList.add('active');
+  }
+
+  renderDashboard();
+  renderMonthlyBreakdown();
+  renderHistory();
 }
 
 // ----------------------------------------------------
@@ -1369,9 +1678,14 @@ function openEditExpenseModal(id) {
   const expense = state.expenses.find(exp => exp.id === id);
   if (!expense) return;
 
+  const details = parseExpenseDetails(expense);
+
   editExpenseId.value = id;
   editExpenseAmount.value = Math.abs(expense.amount).toFixed(2);
-  editExpenseDesc.value = expense.description;
+  editExpenseDesc.value = details.merchant;
+  if (editExpenseItemsInput) {
+    editExpenseItemsInput.value = details.items.join(', ');
+  }
   editExpenseDate.value = expense.date;
 
   // Set toggle state
@@ -1395,7 +1709,8 @@ function openEditExpenseModal(id) {
 function saveExpense() {
   const id = editExpenseId.value;
   const amountRaw = editExpenseAmount.value;
-  const desc = editExpenseDesc.value;
+  const desc = editExpenseDesc.value.trim();
+  const rawItems = editExpenseItemsInput ? editExpenseItemsInput.value.trim() : '';
   const date = editExpenseDate.value;
 
   const cleanAmountStr = amountRaw.replace(/[^-0-9.]/g, '');
@@ -1409,7 +1724,7 @@ function saveExpense() {
   // Determine sign based on segmented toggle
   const isRefund = document.querySelector('#edit-type-toggle [data-type="refund"]').classList.contains('active');
   amount = isRefund ? -Math.abs(amount) : Math.abs(amount);
-  if (!desc.trim()) {
+  if (!desc) {
     alert('Please describe what this expense was for.');
     return;
   }
@@ -1418,15 +1733,23 @@ function saveExpense() {
     return;
   }
 
+  const parsedItems = rawItems ? rawItems.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean) : [];
+
   const expenseIndex = state.expenses.findIndex(exp => exp.id === id);
   if (expenseIndex !== -1) {
-    state.expenses[expenseIndex] = {
+    const updated = {
       ...state.expenses[expenseIndex],
       amount: parseFloat(amount),
-      description: desc.trim(),
+      description: desc,
       category: editSelectedCategory,
       date: date
     };
+    if (parsedItems.length > 0) {
+      updated.items = parsedItems;
+    } else {
+      delete updated.items;
+    }
+    state.expenses[expenseIndex] = updated;
     saveState();
 
     // Refresh
@@ -1445,15 +1768,16 @@ function saveExpense() {
 // ----------------------------------------------------
 async function exportToCSV() {
   const filename = `shallot_money_expenses_${formatDateLocal(new Date())}.csv`;
-  const headers = ['Date', 'Amount', 'Description', 'Category'];
+  const headers = ['Date', 'Amount', 'Description', 'Category', 'Items'];
   const rows = [...state.expenses]
     .sort((a, b) => a.date.localeCompare(b.date))
     .map(exp => {
-      // Escape fields that might contain commas or quotes
-      const desc = '"' + exp.description.replace(/"/g, '""') + '"';
+      const details = parseExpenseDetails(exp);
+      const desc = '"' + details.merchant.replace(/"/g, '""') + '"';
       const cat = getCategory(exp.category);
       const catLabel = cat ? cat.label : exp.category;
-      return [exp.date, exp.amount.toFixed(2), desc, catLabel].join(',');
+      const itemsStr = details.items.length > 0 ? '"' + details.items.join('; ').replace(/"/g, '""') + '"' : '""';
+      return [exp.date, exp.amount.toFixed(2), desc, catLabel, itemsStr].join(',');
     });
 
   const csvContent = [headers.join(','), ...rows].join('\n');
@@ -1579,6 +1903,7 @@ function importFromCSV(fileContent) {
   let amountIdx = -1;
   let descIdx = -1;
   let catIdx = -1;
+  let itemsIdx = -1;
 
   for (let i = 0; i < Math.min(10, lines.length); i++) {
     const fields = parseCSVLine(lines[i]).map(h => h.toLowerCase().trim());
@@ -1590,6 +1915,7 @@ function importFromCSV(fileContent) {
       amountIdx = aIdx;
       descIdx = fields.findIndex(h => h.includes('desc') || h.includes('merchant') || h.includes('payee') || h.includes('memo'));
       catIdx = fields.findIndex(h => h.includes('cat') || h.includes('type'));
+      itemsIdx = fields.findIndex(h => h === 'items' || h === 'item' || h.includes('purchased') || h.includes('note'));
       break;
     }
   }
@@ -1605,6 +1931,7 @@ function importFromCSV(fileContent) {
       amountIdx = 1;
       descIdx = firstRow.length > 2 ? 2 : -1;
       catIdx = firstRow.length > 3 ? 3 : -1;
+      itemsIdx = firstRow.length > 4 ? 4 : -1;
       startRow = 0;
     } else {
       alert('Could not find "Date" and "Amount" columns. Please verify the CSV text contains dates and amounts.');
@@ -1630,6 +1957,7 @@ function importFromCSV(fileContent) {
     const amount = parseFloat(fields[amountIdx]);
     const description = descIdx !== -1 ? fields[descIdx] : 'Imported expense';
     const rawCatName = catIdx !== -1 ? (fields[catIdx] || '').trim() : '';
+    const rawItems = itemsIdx !== -1 && fields.length > itemsIdx ? (fields[itemsIdx] || '').trim() : '';
     const catLower = rawCatName.toLowerCase();
 
     let categoryId = catMap[catLower];
@@ -1670,13 +1998,20 @@ function importFromCSV(fileContent) {
       continue;
     }
 
-    state.expenses.push({
+    const parsedItems = rawItems ? rawItems.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean) : [];
+
+    const newExpense = {
       id,
       amount,
       description,
       category: categoryId,
       date: normalizedDate,
-    });
+    };
+    if (parsedItems.length > 0) {
+      newExpense.items = parsedItems;
+    }
+
+    state.expenses.push(newExpense);
     existingIds.add(id);
     addedCount++;
   }
@@ -1920,6 +2255,7 @@ function setupEventListeners() {
     e.preventDefault();
     const amountRaw = expenseAmountInput.value;
     const desc = expenseDescInput.value;
+    const itemsRaw = expenseItemsInput ? expenseItemsInput.value.trim() : '';
     const date = expenseDateInput.value;
 
     const cleanAmountStr = amountRaw.replace(/[^-0-9.]/g, '');
@@ -1942,12 +2278,58 @@ function setupEventListeners() {
       return;
     }
 
-    addExpense(amount, desc, state.selectedCategory, date);
+    addExpense(amount, desc, state.selectedCategory, date, itemsRaw);
 
     // Auto switch back to dashboard after logging
     const dashboardTab = Array.from(tabItems).find(t => t.getAttribute('data-view') === 'view-dashboard');
     if (dashboardTab) dashboardTab.click();
   });
+
+  // Smart Auto-Categorization on Log Form as user types items or description
+  if (expenseItemsInput && categoryPicker) {
+    let userManuallySelectedCategory = false;
+
+    // Notice if user explicitly clicks a category pill
+    categoryPicker.addEventListener('click', (e) => {
+      if (e.target.closest('.category-pill:not(.category-add-pill)')) {
+        userManuallySelectedCategory = true;
+      }
+    });
+
+    const handleAutoCategorize = () => {
+      if (userManuallySelectedCategory) return;
+      const itemsVal = expenseItemsInput.value.trim();
+      const descVal = expenseDescInput.value.trim();
+
+      let candidateItems = [];
+      if (itemsVal) {
+        candidateItems = itemsVal.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean);
+      } else if (descVal) {
+        candidateItems = [descVal];
+      }
+
+      if (candidateItems.length > 0) {
+        const predicted = predictCategoryFromItems(candidateItems);
+        if (predicted && predicted !== state.selectedCategory) {
+          const cats = getCategories();
+          if (cats.some(c => c.id === predicted)) {
+            state.selectedCategory = predicted;
+            categoryPicker.querySelectorAll('.category-pill').forEach(p => {
+              if (p.getAttribute('data-id') === predicted) {
+                p.classList.add('selected');
+              } else {
+                p.classList.remove('selected');
+              }
+            });
+            triggerHaptic(6);
+          }
+        }
+      }
+    };
+
+    expenseItemsInput.addEventListener('input', handleAutoCategorize);
+    expenseDescInput.addEventListener('input', handleAutoCategorize);
+  }
 
   // History Search/Filters
   historySearchInput.addEventListener('input', renderHistory);

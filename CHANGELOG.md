@@ -7,6 +7,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [1.6.0] - 2026-09-03
+
+### Added & Enhanced
+- **Itemized Purchase Breakdowns**:
+  - **Expandable Receipt Drawer**: Transactions with purchased items feature a warm copper badge (e.g. `🛒 5 items`) that expands to show each item as an interactive chip in both Recent Spending and History.
+  - **Deep Item Search in History**: The History search bar matches against both merchant names and purchased line items (e.g. searching "milk" or "drinks" surfaces matching transactions).
+  - **Purchased Items Input**: Added optional "Purchased Items" input fields to both the Log Expense screen and Edit Expense modal.
+  - **Smart Item Extraction**: Automatically extracts clean merchant names and individual items from notes/descriptions formatted as `Merchant (item1, item2...)` with 100% backward compatibility.
+- **Smart Item Categorization Engine**:
+  - **Item-Level Classification Taxonomy (`ITEM_RULES`)**: Built-in rules classifying line items into Groceries, Shopping, Fast Food, Gas & Auto, Bills, Gym & Health, and Entertainment.
+  - **Category-Badged Item Chips**: Individual item chips display active category color dots and category labels, with multi-category distribution summaries for mixed store trips.
+  - **Real-Time Category Auto-Detection**: As you type items into the Log Expense form, the matching category is automatically detected and selected.
+  - **Superstore Disambiguation & Companion Rules**: Synchronized item classification rules with `companion/rules.json`, `scripts/sync_excel.py`, and `companion/reconcile.py`.
+
+---
+
 ## [1.5.0] - 2026-08-28
 
 ### Added & Enhanced

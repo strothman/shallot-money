@@ -172,6 +172,15 @@
             </div>
           </div>
 
+          <!-- Purchased Items / Notes (Optional) -->
+          <div class="form-group">
+            <label for="expense-items">Purchased Items <span class="optional-tag">(optional)</span></label>
+            <div class="input-with-icon">
+              <i data-lucide="shopping-bag"></i>
+              <input type="text" id="expense-items" placeholder="e.g. Milk, Eggs, Bread (comma-separated)" />
+            </div>
+          </div>
+
           <!-- Category Selection (Grid of Quick Tap Pills) -->
           <div class="form-group">
             <label>Category</label>
@@ -225,7 +234,7 @@
           <div class="filter-bar">
             <div class="search-wrapper">
               <i data-lucide="search"></i>
-              <input type="text" id="history-search" placeholder="Search description..." />
+              <input type="text" id="history-search" placeholder="Search merchant or items..." />
             </div>
             <div class="filter-select-wrapper">
               <select id="history-filter-category">
@@ -455,6 +464,14 @@
             <div class="input-with-icon">
               <i data-lucide="tag"></i>
               <input type="text" id="edit-expense-desc" placeholder="e.g. Grocery, Taxi, Coffee" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-expense-items">Purchased Items <span class="optional-tag">(optional)</span></label>
+            <div class="input-with-icon">
+              <i data-lucide="shopping-bag"></i>
+              <input type="text" id="edit-expense-items" placeholder="e.g. Milk, Eggs, Bread (comma-separated)" />
             </div>
           </div>
 

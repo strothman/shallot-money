@@ -70,9 +70,10 @@ for r_idx, row in enumerate(sheet.iter_rows(values_only=True)):
             date_str = datetime.date.today().strftime('%Y-%m-%d')
 
     # Description mapping (combine Business and Notes if notes exists)
-    desc_str = str(business or "Unknown").strip()
-    if notes and str(notes).strip():
-        desc_str = f"{desc_str} ({str(notes).strip()})"
+    raw_biz = str(business or "Unknown").strip()
+    notes_str = str(notes).strip() if notes else ""
+    desc_str = f"{raw_biz} ({notes_str})" if notes_str else raw_biz
+    items_list = [it.strip() for it in notes_str.split(',') if it.strip()] if notes_str else []
 
     # Category Mapping
     cat_str = str(category).strip()
@@ -85,13 +86,16 @@ for r_idx, row in enumerate(sheet.iter_rows(values_only=True)):
         continue
 
     # Create expense object (Generate stable IDs from row number and values)
-    expenses.append({
+    exp_entry = {
         "id": f"imported_{r_idx}_{date_str}",
         "amount": amt_float,
         "description": desc_str,
         "category": mapped_category,
         "date": date_str
-    })
+    }
+    if items_list:
+        exp_entry["items"] = items_list
+    expenses.append(exp_entry)
 
 # Write to src/imported_expenses.json
 os.makedirs(os.path.dirname(output_path), exist_ok=True)

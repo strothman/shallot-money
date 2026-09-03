@@ -38,5 +38,47 @@
       "cvs", "walgreens", "rite aid", "pharmacy", "planet fitness", "pf dixie", "anytime fitness", "kort",
       "la fitness", "crunch", "gold's gym", "ymca", "doctor", "dental", "hospital", "urgent care", "physical therapy"
     ]
+  },
+  "item_rules": {
+    "groceries": [
+      "lettuce", "tomato", "potato", "potatoes", "onion", "onions", "garlic", "apple", "apples", "banana", "bananas",
+      "cherry", "cherries", "fruit", "fruits", "vegetable", "vegetables", "produce", "salad", "milk", "cheese", "cheeses",
+      "butter", "yogurt", "cream", "creamer", "egg", "eggs", "bread", "buns", "bagel", "bagels", "tortilla", "tortillas",
+      "chicken", "beef", "pork", "meat", "patty", "patties", "nugget", "nuggets", "nugs", "fries", "fish", "salmon",
+      "tuna", "turkey", "bacon", "sausage", "water", "cereal", "salsa", "chips", "sauce", "oil", "pasta", "rice",
+      "soup", "bean", "beans", "flour", "sugar", "spice", "spices", "pepper", "salt", "cookie", "cookies", "sweet bread",
+      "donette", "donettes", "can", "cans", "groceries", "grocery"
+    ],
+    "fastfood": [
+      "sandwich", "sandwiches", "pizza", "pizzas", "burger", "burgers", "taco", "tacos", "burrito", "burritos",
+      "subway", "mcdonald", "wendy", "kfc", "popeye", "starbucks", "dunkin", "panera", "chipotle", "smoothie", "smoothies",
+      "shake", "shakes", "ice cream", "donut", "donuts", "combo", "meal", "nuggets meal", "fry", "drink", "drinks",
+      "coffee", "latte", "frappe"
+    ],
+    "transport": [
+      "gas", "fuel", "unleaded", "diesel", "oil change", "car wash", "tire", "tires", "wiper", "wipers",
+      "parking", "toll", "tolls", "uber", "lyft", "auto"
+    ],
+    "bills": [
+      "prime", "amazon prime", "subscription", "sub", "membership", "cloud", "icloud", "netflix", "spotify",
+      "hulu", "disney", "utility", "electric", "power", "water bill", "internet", "wifi", "cable", "phone",
+      "insurance", "storage"
+    ],
+    "entertainment": [
+      "game", "games", "gaming", "steam", "arena", "sineus arena", "ticket", "tickets", "movie", "movies", "cinema",
+      "theatre", "theater", "nintendo", "playstation", "xbox", "roblox", "oculus", "concert", "museum"
+    ],
+    "gym": [
+      "fitness", "gym", "workout", "protein", "powder", "creatine", "vitamin", "vitamins", "supplement", "supplements",
+      "dumbbell", "bandage", "band-aid", "advil", "tylenol", "medicine", "pharmacy", "prescription", "first aid"
+    ],
+    "shopping": [
+      "sock", "socks", "shirt", "shirts", "pants", "jeans", "hoodie", "jacket", "shoes", "boots", "sunglasses",
+      "glasses", "towel", "towels", "soap", "shampoo", "conditioner", "deodorant", "toothpaste", "toothbrush",
+      "cleaner", "detergent", "bleach", "sponge", "paper towel", "toilet paper", "tissue", "trash bag", "trash bags",
+      "card", "cards", "gift", "gift card", "amazon card", "charger", "cable", "cord", "case", "pillow", "blanket",
+      "candle", "lamp", "bulb", "battery", "batteries", "tape", "tool", "tools", "blender", "pan", "pot", "knife",
+      "plate", "cup", "mug", "clothes", "clothing", "apparel"
+    ]
   }
 }

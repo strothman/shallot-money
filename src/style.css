@@ -745,8 +745,7 @@ body {
 .expense-item {
   position: relative;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--border-color);
 }
@@ -846,9 +845,201 @@ body {
   gap: 2px;
 }
 
+.item-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .item-desc {
   font-size: 0.9rem;
   font-weight: 600;
+}
+
+/* Receipt Item Pills & Badges */
+.receipt-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(212, 130, 68, 0.15);
+  color: var(--copper-glow, #d48244);
+  border: 1px solid rgba(212, 130, 68, 0.35);
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  line-height: 1.2;
+}
+
+.receipt-pill:hover {
+  background: rgba(212, 130, 68, 0.28);
+  border-color: rgba(212, 130, 68, 0.6);
+  transform: translateY(-1px);
+}
+
+.receipt-pill:active {
+  transform: scale(0.95);
+}
+
+.receipt-pill i {
+  width: 11px;
+  height: 11px;
+}
+
+.receipt-pill.open {
+  background: var(--copper-glow, #d48244);
+  color: #180d21;
+  border-color: var(--copper-glow, #d48244);
+}
+
+.receipt-toggle-chevron {
+  display: inline-flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.receipt-pill.open .receipt-toggle-chevron {
+  transform: rotate(180deg);
+}
+
+/* Expandable Receipt Drawer */
+.expense-items-drawer {
+  display: none;
+  margin-top: 10px;
+  margin-left: 44px;
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  animation: slideDownFade 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.expense-items-drawer.open {
+  display: block;
+}
+
+@keyframes slideDownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.receipt-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.receipt-drawer-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.receipt-drawer-title i {
+  width: 12px;
+  height: 12px;
+  color: var(--copper-glow, #d48244);
+}
+
+.receipt-drawer-cats {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.receipt-cat-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.64rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--cat-border, rgba(255, 255, 255, 0.15));
+  background: var(--cat-bg, rgba(255, 255, 255, 0.08));
+  color: var(--cat-color, var(--text-secondary));
+}
+
+.receipt-cat-tag .cat-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--cat-color, #10b981);
+}
+
+.receipt-item-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.receipt-item-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px;
+  font-size: 0.76rem;
+  font-weight: 500;
+  border-radius: 6px;
+  background: var(--item-cat-bg, rgba(255, 255, 255, 0.06));
+  border: 1px solid var(--item-cat-border, rgba(255, 255, 255, 0.12));
+  color: var(--text-primary);
+  word-break: break-word;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.receipt-item-chip:hover {
+  background: var(--item-cat-bg-hover, rgba(255, 255, 255, 0.12));
+  border-color: var(--item-cat-color, rgba(255, 255, 255, 0.3));
+  transform: translateY(-1px);
+}
+
+.item-chip-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.item-chip-label {
+  line-height: 1.2;
+}
+
+.item-chip-cat {
+  font-size: 0.62rem;
+  font-weight: 700;
+  opacity: 0.65;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding-left: 2px;
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+  line-height: 1;
+}
+
+.optional-tag {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: normal;
+  margin-left: 4px;
 }
 
 .item-meta {
