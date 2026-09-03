@@ -7,6 +7,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [1.7.0] - 2026-09-03
+
+### Added & Enhanced
+- **In-App Mobile Smart Receipt Pasting & Auto-Merge**:
+  - **100% Phone-Only Workflow**: Run full receipt reconciliation directly in mobile browsers without requiring a PC or Python.
+  - **1-Tap "Paste Receipt" Button**: Added to the Log Expense screen and Edit Expense modal.
+  - **Real-Time Client-Side Receipt Parsing**: Automatically extracts Store Name, Date, Total Amount, and Line Items from copied text (Walmart, Kroger, Sam's Club, Target, Amazon, emails).
+  - **Live Preview Card**: Shows detected store, amount, date, and category-badged item chips.
+  - **Auto-Fill Log Form**: 1-tap transfers receipt details directly into the Log form and auto-selects the category.
+  - **Smart Auto-Merge**: Automatically identifies existing matching transactions in spending history and merges the item breakdown directly into them, avoiding duplicate records.
+
+---
+
 ## [1.6.0] - 2026-09-03
 
 ### Added & Enhanced

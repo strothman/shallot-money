@@ -262,6 +262,125 @@ function renderReceiptDrawerHtml(details, drawerId) {
 }
 
 // ----------------------------------------------------
+// MOBILE SMART RECEIPT PARSER & AUTO-MERGE ENGINE
+// ----------------------------------------------------
+function parseReceiptText(content) {
+  if (!content || typeof content !== 'string') return null;
+  const lines = content.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  if (lines.length === 0) return null;
+
+  const lower = content.toLowerCase();
+  let store = 'Store';
+  if (lower.includes('walmart') || lower.includes('wal-mart')) store = 'Walmart';
+  else if (lower.includes('kroger')) store = 'Kroger';
+  else if (lower.includes("sam's") || lower.includes('sams club') || lower.includes('samsclub')) store = "Sam's Club";
+  else if (lower.includes('target')) store = 'Target';
+  else if (lower.includes('amazon') || lower.includes('amzn')) store = 'Amazon';
+  else if (lower.includes('trader joe')) store = "Trader Joe's";
+  else if (lower.includes('aldi')) store = 'Aldi';
+  else if (lower.includes('costco')) store = 'Costco';
+  else if (lower.includes('wawa')) store = 'Wawa';
+
+  // Total amount extraction
+  let totalAmt = 0.0;
+  for (const line of lines) {
+    const m = line.match(/(?:total|amount charged|grand total|final total|paid|balance due)[:\s]*\$?\s*([0-9]+\.[0-9]{2})/i);
+    if (m) {
+      totalAmt = parseFloat(m[1]);
+      break;
+    }
+  }
+  if (totalAmt === 0.0) {
+    for (const line of lines) {
+      if (/total/i.test(line)) {
+        const amtM = line.match(/\$?\s*([0-9]+\.[0-9]{2})/);
+        if (amtM) {
+          totalAmt = parseFloat(amtM[1]);
+          break;
+        }
+      }
+    }
+  }
+  if (totalAmt === 0.0) {
+    const allAmts = Array.from(content.matchAll(/\$([0-9]+\.[0-9]{2})/g)).map(m => parseFloat(m[1]));
+    if (allAmts.length > 0) {
+      totalAmt = Math.max(...allAmts);
+    }
+  }
+
+  // Date extraction
+  let dateStr = null;
+  const dateMatch = content.match(/(\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{1,2},?\s+\d{4}|\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|\d{4}-\d{2}-\d{2})/i);
+  if (dateMatch) {
+    const parsedD = new Date(dateMatch[1]);
+    if (!isNaN(parsedD.getTime())) {
+      dateStr = formatDateLocal(parsedD);
+    }
+  }
+  if (!dateStr) {
+    dateStr = formatDateLocal(new Date());
+  }
+
+  // Item extraction
+  const ignoreWords = new Set([
+    'total', 'subtotal', 'tax', 'order', 'delivered', 'delivery', 'pickup', 'shipping',
+    'visa', 'mastercard', 'amex', 'payment', 'items', 'qty', 'quantity', 'track', 'review',
+    'return', 'help', 'placed', 'arriving', 'savings', 'discount', 'change', 'cash', 'account',
+    'status', 'order#', 'order #', 'member', 'store', 'phone', 'receipt', 'customer',
+    'barcode', 'tender', 'auth', 'sold by', 'fulfilled by', 'gift card', 'coupons'
+  ]);
+
+  const items = [];
+  for (const rawLine of lines) {
+    let line = rawLine.trim();
+    if (line.length < 3 || line.length > 90) continue;
+    const firstWord = line.split(/\s+/)[0].toLowerCase().replace(/[:#]/g, '');
+    if (ignoreWords.has(firstWord)) continue;
+    if (/^\$?[0-9]+\.[0-9]{2}$/.test(line)) continue;
+    if (/^(date|time|card|auth|store|phone|order\s*#|trans\s*#|member|cashier)/i.test(line)) continue;
+
+    let clean = line.replace(/^[•\-\*\d+\.]\s*/, '').trim();
+    clean = clean.replace(/\s+\$\d+\.\d{2}.*$/, '').trim();
+    clean = clean.replace(/\s*(?:qty:?\s*\d+|\bx\d+)\s*$/i, '').trim();
+
+    if (clean.length >= 3 && !/terms of use|privacy policy|rights reserved|thank you for shopping/i.test(clean)) {
+      items.push(clean);
+    }
+  }
+
+  const predictedCat = predictCategoryFromItems(items) || (store === 'Walmart' || store === 'Kroger' || store === 'Aldi' ? 'groceries' : 'shopping');
+
+  return {
+    store,
+    amount: totalAmt,
+    date: dateStr,
+    items,
+    predictedCategory: predictedCat,
+    hasDetails: totalAmt > 0 || items.length > 0
+  };
+}
+
+function findMatchingExpense(parsedReceipt) {
+  if (!parsedReceipt || parsedReceipt.amount <= 0) return null;
+  const targetAmt = parsedReceipt.amount;
+  const targetTime = new Date(parsedReceipt.date + 'T12:00:00').getTime();
+
+  // Search state.expenses for matching amount within +/- 3 days
+  const candidates = state.expenses.filter(exp => {
+    const amtMatch = Math.abs(Math.abs(exp.amount) - targetAmt) < 0.01;
+    if (!amtMatch) return false;
+    const expTime = new Date(exp.date + 'T12:00:00').getTime();
+    const diffDays = Math.abs((expTime - targetTime) / (1000 * 60 * 60 * 24));
+    return diffDays <= 3;
+  });
+
+  if (candidates.length === 0) return null;
+  const storeLower = parsedReceipt.store.toLowerCase();
+  const storeMatch = candidates.find(c => c.description.toLowerCase().includes(storeLower));
+  return storeMatch || candidates[0];
+}
+
+// ----------------------------------------------------
 // APPLICATION STATE
 // ----------------------------------------------------
 let state = {
@@ -361,6 +480,33 @@ const toastUndoBtn = document.getElementById('toast-undo-btn');
 let lastDeletedExpense = null;
 let toastTimeout = null;
 
+function showToast(msg, duration = 3000) {
+  if (!undoToast || !toastMessage) return;
+  toastMessage.textContent = msg;
+  if (toastUndoBtn) toastUndoBtn.style.display = 'none';
+  undoToast.classList.add('active');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => {
+    undoToast.classList.remove('active');
+  }, duration);
+}
+
+// Smart Receipt Ingest Modal Elements
+const btnOpenReceiptPaste = document.getElementById('btn-open-receipt-paste');
+const receiptPasteModal = document.getElementById('receipt-paste-modal');
+const closeReceiptPaste = document.getElementById('close-receipt-paste');
+const receiptPasteInput = document.getElementById('receipt-paste-input');
+const receiptParsePreview = document.getElementById('receipt-parse-preview');
+const previewStoreBadge = document.getElementById('preview-store-badge');
+const previewDateBadge = document.getElementById('preview-date-badge');
+const previewAmtBadge = document.getElementById('preview-amt-badge');
+const previewItemsCount = document.getElementById('preview-items-count');
+const previewChipsContainer = document.getElementById('preview-chips-container');
+const previewMatchNotice = document.getElementById('preview-match-notice');
+const btnReceiptAutofill = document.getElementById('btn-receipt-autofill');
+const btnReceiptMerge = document.getElementById('btn-receipt-merge');
+const btnEditPasteReceipt = document.getElementById('btn-edit-paste-receipt');
+
 // ----------------------------------------------------
 // LOCALSTORAGE & SNAPSHOT FUNCTIONS
 // ----------------------------------------------------
@@ -446,11 +592,15 @@ function updateCurrencyUI() {
   }
 }
 
-function showUndoToast(deletedExpense) {
-  lastDeletedExpense = deletedExpense;
+function showUndoToast(msgOrExpense) {
   if (!undoToast) return;
-
-  toastMessage.textContent = `Deleted "${escapeHTML(deletedExpense.description)}" (${formatCurrency(deletedExpense.amount)})`;
+  if (typeof msgOrExpense === 'string') {
+    toastMessage.textContent = msgOrExpense;
+  } else if (msgOrExpense && msgOrExpense.description) {
+    lastDeletedExpense = msgOrExpense;
+    toastMessage.textContent = `Deleted "${escapeHTML(msgOrExpense.description)}" (${formatCurrency(msgOrExpense.amount)})`;
+  }
+  if (toastUndoBtn) toastUndoBtn.style.display = 'inline-block';
   undoToast.classList.add('active');
 
   if (toastTimeout) clearTimeout(toastTimeout);
@@ -2329,6 +2479,168 @@ function setupEventListeners() {
 
     expenseItemsInput.addEventListener('input', handleAutoCategorize);
     expenseDescInput.addEventListener('input', handleAutoCategorize);
+  }
+
+  // Smart Receipt Ingest Modal Listeners
+  if (btnOpenReceiptPaste && receiptPasteModal) {
+    let currentParsedReceipt = null;
+
+    const openReceiptModal = (targetMode = 'log') => {
+      receiptPasteModal.setAttribute('data-mode', targetMode);
+      receiptPasteInput.value = '';
+      receiptParsePreview.style.display = 'none';
+      btnReceiptAutofill.disabled = true;
+      btnReceiptMerge.disabled = true;
+      receiptPasteModal.classList.add('active');
+      triggerHaptic(8);
+      setTimeout(() => receiptPasteInput.focus(), 100);
+    };
+
+    const closeReceiptModal = () => {
+      receiptPasteModal.classList.remove('active');
+    };
+
+    btnOpenReceiptPaste.addEventListener('click', () => openReceiptModal('log'));
+    if (btnEditPasteReceipt) {
+      btnEditPasteReceipt.addEventListener('click', () => openReceiptModal('edit'));
+    }
+    if (closeReceiptPaste) {
+      closeReceiptPaste.addEventListener('click', closeReceiptModal);
+    }
+    receiptPasteModal.addEventListener('click', (e) => {
+      if (e.target === receiptPasteModal) closeReceiptModal();
+    });
+
+    receiptPasteInput.addEventListener('input', () => {
+      const text = receiptPasteInput.value.trim();
+      if (!text) {
+        receiptParsePreview.style.display = 'none';
+        btnReceiptAutofill.disabled = true;
+        btnReceiptMerge.disabled = true;
+        currentParsedReceipt = null;
+        return;
+      }
+
+      currentParsedReceipt = parseReceiptText(text);
+      if (!currentParsedReceipt || !currentParsedReceipt.hasDetails) {
+        receiptParsePreview.style.display = 'none';
+        btnReceiptAutofill.disabled = true;
+        btnReceiptMerge.disabled = true;
+        return;
+      }
+
+      // Populate preview
+      previewStoreBadge.textContent = currentParsedReceipt.store;
+      previewDateBadge.textContent = currentParsedReceipt.date;
+      previewAmtBadge.textContent = formatCurrency(currentParsedReceipt.amount);
+      previewItemsCount.textContent = `${currentParsedReceipt.items.length} item${currentParsedReceipt.items.length === 1 ? '' : 's'} detected`;
+
+      previewChipsContainer.innerHTML = currentParsedReceipt.items.map(it => {
+        const cId = categorizeItem(it) || currentParsedReceipt.predictedCategory;
+        const c = getCategory(cId);
+        return `
+          <span class="receipt-item-chip" style="--item-cat-color: ${c.color}; --item-cat-bg: ${c.bg}; --item-cat-border: ${c.color}35;">
+            <span class="item-chip-dot" style="background-color: ${c.color};"></span>
+            <span class="item-chip-label">${escapeHTML(it)}</span>
+          </span>
+        `;
+      }).join('');
+
+      // Check for match in history
+      const match = findMatchingExpense(currentParsedReceipt);
+      if (match) {
+        previewMatchNotice.style.display = 'flex';
+        previewMatchNotice.innerHTML = `
+          <i data-lucide="check-circle-2" style="width: 14px; height: 14px;"></i>
+          <span>Found matching purchase: ${escapeHTML(match.description)} (${formatCurrency(match.amount)} on ${formatDateDisplay(match.date)})</span>
+        `;
+        btnReceiptMerge.disabled = false;
+        btnReceiptMerge.innerHTML = `<i data-lucide="git-merge"></i> Merge into ${escapeHTML(match.description.slice(0, 14))}...`;
+      } else {
+        previewMatchNotice.style.display = 'none';
+        btnReceiptMerge.disabled = true;
+        btnReceiptMerge.innerHTML = `<i data-lucide="git-merge"></i> Find &amp; Merge Existing`;
+      }
+
+      receiptParsePreview.style.display = 'flex';
+      btnReceiptAutofill.disabled = false;
+      if (window.lucide) window.lucide.createIcons();
+    });
+
+    // Action 1: Auto-Fill Form
+    btnReceiptAutofill.addEventListener('click', () => {
+      if (!currentParsedReceipt) return;
+      triggerHaptic(12);
+
+      const mode = receiptPasteModal.getAttribute('data-mode') || 'log';
+      if (mode === 'edit') {
+        if (editExpenseItemsInput) {
+          editExpenseItemsInput.value = currentParsedReceipt.items.join(', ');
+        }
+        closeReceiptModal();
+        showToast('Receipt items added to expense!');
+        return;
+      }
+
+      // Fill Log Form
+      expenseAmountInput.value = currentParsedReceipt.amount > 0 ? currentParsedReceipt.amount.toFixed(2) : '';
+      expenseDescInput.value = currentParsedReceipt.store;
+      if (expenseItemsInput) {
+        expenseItemsInput.value = currentParsedReceipt.items.join(', ');
+      }
+      expenseDateInput.value = currentParsedReceipt.date;
+
+      // Set predicted category
+      if (currentParsedReceipt.predictedCategory) {
+        const cats = getCategories();
+        if (cats.some(c => c.id === currentParsedReceipt.predictedCategory)) {
+          state.selectedCategory = currentParsedReceipt.predictedCategory;
+          categoryPicker.querySelectorAll('.category-pill').forEach(p => {
+            if (p.getAttribute('data-id') === currentParsedReceipt.predictedCategory) {
+              p.classList.add('selected');
+            } else {
+              p.classList.remove('selected');
+            }
+          });
+        }
+      }
+
+      closeReceiptModal();
+      const logTab = Array.from(tabItems).find(t => t.getAttribute('data-view') === 'view-log');
+      if (logTab) logTab.click();
+      showToast(`Auto-filled ${currentParsedReceipt.store} receipt details!`);
+    });
+
+    // Action 2: Merge into Existing Transaction
+    btnReceiptMerge.addEventListener('click', () => {
+      if (!currentParsedReceipt) return;
+      const match = findMatchingExpense(currentParsedReceipt);
+      if (!match) return;
+      triggerHaptic(15);
+
+      createSnapshot(`Before merging receipt into ${match.description}`);
+
+      const idx = state.expenses.findIndex(e => e.id === match.id);
+      if (idx !== -1) {
+        state.expenses[idx] = {
+          ...state.expenses[idx],
+          items: currentParsedReceipt.items
+        };
+        if ((match.category === 'food' || match.category === 'groceries' || match.category === 'shopping') && currentParsedReceipt.predictedCategory) {
+          state.expenses[idx].category = currentParsedReceipt.predictedCategory;
+        }
+        saveState();
+        renderDashboard();
+        renderMonthlyBreakdown();
+        renderHistory();
+        closeReceiptModal();
+
+        showUndoToast(`Merged ${currentParsedReceipt.items.length} items into ${match.description}!`);
+
+        const histTab = Array.from(tabItems).find(t => t.getAttribute('data-view') === 'view-history');
+        if (histTab) histTab.click();
+      }
+    });
   }
 
   // History Search/Filters

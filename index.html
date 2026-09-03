@@ -149,7 +149,13 @@
       <!-- VIEW 2: LOG SPENDING -->
       <section id="view-log" class="app-view">
         <div class="log-form-container">
-          <h2 class="view-title">Log Expense</h2>
+          <div class="log-header-row">
+            <h2 class="view-title">Log Expense</h2>
+            <button type="button" id="btn-open-receipt-paste" class="receipt-paste-trigger-btn" title="Paste digital receipt or order summary">
+              <i data-lucide="receipt"></i>
+              <span>Paste Receipt</span>
+            </button>
+          </div>
 
           <!-- Segmented Toggle -->
           <div class="transaction-type-toggle" id="log-type-toggle">
@@ -468,7 +474,12 @@
           </div>
 
           <div class="form-group">
-            <label for="edit-expense-items">Purchased Items <span class="optional-tag">(optional)</span></label>
+            <div class="label-with-action">
+              <label for="edit-expense-items">Purchased Items <span class="optional-tag">(optional)</span></label>
+              <button type="button" id="btn-edit-paste-receipt" class="mini-receipt-btn" title="Paste receipt text into this expense">
+                <i data-lucide="receipt"></i> Paste Receipt
+              </button>
+            </div>
             <div class="input-with-icon">
               <i data-lucide="shopping-bag"></i>
               <input type="text" id="edit-expense-items" placeholder="e.g. Milk, Eggs, Bread (comma-separated)" />
@@ -576,6 +587,46 @@
           <button id="save-category-btn" class="primary-btn" style="width: 100%; margin-top: 18px;">
             <i data-lucide="check"></i> Save Category
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: SMART RECEIPT INGEST & AUTO-MERGE -->
+    <div id="receipt-paste-modal" class="modal-overlay">
+      <div class="modal-content receipt-modal-content">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <i data-lucide="receipt" class="modal-header-icon"></i>
+            <h3>Smart Receipt Ingest</h3>
+          </div>
+          <button id="close-receipt-paste" class="icon-btn" aria-label="Close Receipt Modal"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-hint">
+            Paste order text or email receipt from Walmart, Kroger, Sam's Club, Target, Amazon, etc.
+          </p>
+          <textarea id="receipt-paste-input" rows="6" placeholder="Paste order summary or digital receipt text here..."></textarea>
+
+          <!-- Live Extraction Preview -->
+          <div id="receipt-parse-preview" class="receipt-parse-preview" style="display: none;">
+            <div class="preview-header">
+              <span class="preview-badge" id="preview-store-badge">Walmart</span>
+              <span class="preview-date" id="preview-date-badge">2026-08-28</span>
+              <span class="preview-amt" id="preview-amt-badge">$0.00</span>
+            </div>
+            <div class="preview-items-row" id="preview-items-count">0 items detected</div>
+            <div class="preview-chips" id="preview-chips-container"></div>
+            <div id="preview-match-notice" class="preview-match-notice" style="display: none;"></div>
+          </div>
+
+          <div class="receipt-modal-actions">
+            <button type="button" id="btn-receipt-autofill" class="primary-btn" disabled>
+              <i data-lucide="edit-3"></i> Auto-Fill Log Form
+            </button>
+            <button type="button" id="btn-receipt-merge" class="secondary-btn" disabled>
+              <i data-lucide="git-merge"></i> Find &amp; Merge into History
+            </button>
+          </div>
         </div>
       </div>
     </div>
