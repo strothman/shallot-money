@@ -32,18 +32,33 @@ def load_rules():
         try:
             with open(RULES_FILE, "r", encoding="utf-8") as f:
                 data = json.load(f)
-                return data.get("merchant_rules", {})
+                return data.get("merchant_rules", {}), data.get("item_rules", {})
         except Exception as e:
             print(f"[!] Warning reading rules.json: {e}")
-    return {}
+    return {}, {}
 
-def auto_categorize(desc, rules):
+def auto_categorize(desc, merchant_rules):
     desc_lower = desc.lower()
-    for cat_id, keywords in rules.items():
+    for cat_id, keywords in merchant_rules.items():
         for kw in keywords:
             if kw.lower() in desc_lower:
                 return cat_id
-    return "groceries" if "kroger" in desc_lower or "walmart" in desc_lower else "shopping"
+    return "groceries" if any(s in desc_lower for s in ["kroger", "walmart", "sam", "grocery"]) else "shopping"
+
+def auto_categorize_items(items, item_rules):
+    if not items or not item_rules:
+        return None
+    counts = {}
+    for it in items:
+        it_lower = str(it).lower()
+        for cat_id, keywords in item_rules.items():
+            for kw in keywords:
+                if re.search(r'\b' + re.escape(kw), it_lower) or kw in it_lower:
+                    counts[cat_id] = counts.get(cat_id, 0) + 1
+                    break
+    if counts:
+        return max(counts, key=counts.get)
+    return None
 
 def parse_date(date_str):
     if not date_str:
@@ -78,104 +93,206 @@ def clean_merchant_name(raw):
     s = re.sub(r'\s+', ' ', s).strip()
     return s.title() if (s.isupper() and len(s) > 3) else s
 
+
+def parse_text_receipt(content, default_store="Store"):
+    """
+    Parses a plain text receipt or order summary (e.g. copied from web or email).
+    Extracts store name, date, total amount, and item descriptions.
+    """
+    lines = [l.strip() for l in content.splitlines() if l.strip()]
+    if not lines:
+        return None
+
+    # Detect store name if present
+    store = default_store
+    lower_content = content.lower()
+    if "walmart" in lower_content:
+        store = "Walmart"
+    elif "kroger" in lower_content:
+        store = "Kroger"
+    elif "sam's" in lower_content or "sams club" in lower_content or "samsclub" in lower_content:
+        store = "Sam's Club"
+    elif "target" in lower_content:
+        store = "Target"
+    elif "amazon" in lower_content:
+        store = "Amazon"
+
+    # Find total amount
+    total_amt = 0.0
+    for line in lines:
+        m = re.search(r'(?:total|amount charged|grand total|final total)[:\s]*\$?\s*([0-9]+\.[0-9]{2})', line, re.I)
+        if m:
+            total_amt = float(m.group(1))
+            break
+    if total_amt == 0.0:
+        for line in lines:
+            if re.search(r'total', line, re.I):
+                amt_m = re.search(r'\$?\s*([0-9]+\.[0-9]{2})', line)
+                if amt_m:
+                    total_amt = float(amt_m.group(1))
+                    break
+
+    # Find date
+    date_val = None
+    date_match = re.search(r'(\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{1,2},?\s+\d{4}|\d{1,2}[/-]\d{1,2}[/-]\d{2,4})', content, re.I)
+    if date_match:
+        date_val = parse_date(date_match.group(1))
+
+    # Extract items
+    ignore_words = {'total', 'subtotal', 'tax', 'order', 'delivered', 'delivery', 'pickup', 'shipping', 'visa', 'mastercard', 'payment', 'items', 'qty', 'quantity', 'track', 'review', 'return', 'help', 'placed', 'arriving', 'savings', 'discount', 'change', 'cash', 'account', 'status'}
+    items = []
+    for line in lines:
+        if len(line) < 3 or len(line) > 100:
+            continue
+        first_word = line.split()[0].lower().rstrip(':')
+        if first_word in ignore_words:
+            continue
+        if re.search(r'^\$?[0-9]+\.[0-9]{2}$', line):
+            continue
+        if re.search(r'^(date|time|card|auth|store|phone|order\s*#|trans\s*#|member)', line, re.I):
+            continue
+        clean_item = re.sub(r'^[•\-\*\d+\.]\s*', '', line).strip()
+        clean_item = re.sub(r'\s+\$\d+\.\d{2}.*$', '', clean_item).strip()
+        if len(clean_item) >= 3 and not any(w in clean_item.lower() for w in ['terms of use', 'privacy policy', 'all rights reserved', 'customer service']):
+            items.append(clean_item)
+
+    if total_amt > 0:
+        return {
+            "store": store,
+            "date": date_val or datetime.date.today(),
+            "amount": round(total_amt, 2),
+            "items": items,
+            "raw": f"{store} ({', '.join(items) if items else 'Receipt Items'})"
+        }
+    return None
+
+
 # ---------------------------------------------------------------------------
-# STORE RECEIPT PARSERS (KROGER & WALMART)
+# STORE RECEIPT PARSERS (WALMART, KROGER, SAM'S CLUB, AMAZON, TARGET)
 # ---------------------------------------------------------------------------
 def load_store_receipts(inputs_dir):
     receipts = []
     
-    # 1. Kroger receipt JSON or CSV
-    for fpath in glob.glob(os.path.join(inputs_dir, "*kroger*.*")):
-        try:
-            if fpath.endswith(".json"):
-                with open(fpath, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                    orders = data if isinstance(data, list) else data.get("orders", [data])
-                    for order in orders:
-                        d = parse_date(order.get("date") or order.get("orderDate"))
-                        amt = clean_amount(order.get("total") or order.get("amount"))
-                        items = order.get("items", [])
-                        item_names = [it.get("name", "") for it in items if isinstance(it, dict)] if items else []
-                        if d and amt > 0:
-                            receipts.append({
-                                "store": "Kroger",
-                                "date": d,
-                                "amount": round(amt, 2),
-                                "items": item_names,
-                                "raw": f"Kroger ({', '.join(item_names) if item_names else 'Groceries'})"
-                            })
-            elif fpath.endswith(".csv"):
-                with open(fpath, "r", encoding="utf-8", errors="ignore") as f:
-                    reader = csv.DictReader(f)
-                    for row in reader:
-                        # Find date and total
-                        d = None
-                        amt = 0.0
-                        items = []
-                        for k, v in row.items():
-                            k_low = k.lower()
-                            if "date" in k_low and not d:
-                                d = parse_date(v)
-                            elif ("total" in k_low or "amount" in k_low) and amt == 0:
-                                amt = clean_amount(v)
-                            elif "item" in k_low or "desc" in k_low:
-                                items.append(str(v).strip())
-                        if d and amt > 0:
-                            receipts.append({
-                                "store": "Kroger",
-                                "date": d,
-                                "amount": round(amt, 2),
-                                "items": items,
-                                "raw": f"Kroger ({', '.join(items) if items else 'Groceries'})"
-                            })
-        except Exception as e:
-            print(f"[!] Warning reading Kroger receipt {fpath}: {e}")
+    # Store match patterns
+    store_patterns = [
+        ("Kroger", ["*kroger*.*"]),
+        ("Walmart", ["*walmart*.*"]),
+        ("Sam's Club", ["*sams*.*", "*samsclub*.*", "*sam.*", "*sam_*.*"]),
+        ("Amazon", ["*amazon*.*", "*amzn*.*"]),
+        ("Target", ["*target*.*"]),
+        ("Store Receipt", ["*receipt*.*", "*order*.*", "*invoice*.*"])
+    ]
 
-    # 2. Walmart receipt JSON or CSV
-    for fpath in glob.glob(os.path.join(inputs_dir, "*walmart*.*")):
-        try:
-            if fpath.endswith(".json"):
-                with open(fpath, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                    orders = data if isinstance(data, list) else data.get("orders", [data])
-                    for order in orders:
-                        d = parse_date(order.get("date") or order.get("orderDate"))
-                        amt = clean_amount(order.get("total") or order.get("amount"))
-                        items = order.get("items", [])
-                        item_names = [it.get("name", "") for it in items if isinstance(it, dict)] if items else []
-                        if d and amt > 0:
-                            receipts.append({
-                                "store": "Walmart",
-                                "date": d,
-                                "amount": round(amt, 2),
-                                "items": item_names,
-                                "raw": f"Walmart ({', '.join(item_names) if item_names else 'Groceries & Goods'})"
-                            })
-            elif fpath.endswith(".csv"):
-                with open(fpath, "r", encoding="utf-8", errors="ignore") as f:
-                    reader = csv.DictReader(f)
-                    for row in reader:
-                        d = None
-                        amt = 0.0
-                        items = []
-                        for k, v in row.items():
-                            k_low = k.lower()
-                            if "date" in k_low and not d:
-                                d = parse_date(v)
-                            elif ("total" in k_low or "amount" in k_low) and amt == 0:
-                                amt = clean_amount(v)
-                            elif "item" in k_low or "desc" in k_low:
-                                items.append(str(v).strip())
-                        if d and amt > 0:
-                            receipts.append({
-                                "store": "Walmart",
-                                "date": d,
-                                "amount": round(amt, 2),
-                                "items": items,
-                                "raw": f"Walmart ({', '.join(items) if items else 'Goods'})"
-                            })
-        except Exception as e:
-            print(f"[!] Warning reading Walmart receipt {fpath}: {e}")
+    seen_files = set()
+
+    for default_store, patterns in store_patterns:
+        for pat in patterns:
+            for fpath in glob.glob(os.path.join(inputs_dir, pat)):
+                if fpath in seen_files:
+                    continue
+                seen_files.add(fpath)
+                try:
+                    # 1. JSON Formats
+                    if fpath.endswith(".json"):
+                        with open(fpath, "r", encoding="utf-8") as f:
+                            data = json.load(f)
+                            orders = data if isinstance(data, list) else data.get("orders", data.get("receipts", [data]))
+                            for order in orders:
+                                if not isinstance(order, dict):
+                                    continue
+                                d = parse_date(order.get("date") or order.get("orderDate") or order.get("purchaseDate"))
+                                amt = clean_amount(order.get("total") or order.get("amount") or order.get("orderTotal") or order.get("grandTotal"))
+                                items_raw = order.get("items") or order.get("lines") or order.get("orderItems") or []
+                                item_names = []
+                                for it in items_raw:
+                                    if isinstance(it, dict):
+                                        name = it.get("name") or it.get("title") or it.get("description") or ""
+                                        if name:
+                                            item_names.append(name.strip())
+                                    elif isinstance(it, str):
+                                        item_names.append(it.strip())
+
+                                store_name = order.get("store") or order.get("merchant") or default_store
+                                if d and amt > 0:
+                                    receipts.append({
+                                        "store": store_name,
+                                        "date": d,
+                                        "amount": round(amt, 2),
+                                        "items": item_names,
+                                        "raw": f"{store_name} ({', '.join(item_names) if item_names else 'Store Purchase'})"
+                                    })
+
+                    # 2. CSV Formats (Single-row or Multi-row Item Reports)
+                    elif fpath.endswith(".csv"):
+                        with open(fpath, "r", encoding="utf-8", errors="ignore") as f:
+                            reader = csv.DictReader(f)
+                            # Check if CSV has order IDs to group line items
+                            rows_by_order = {}
+                            has_order_grouping = False
+
+                            for row in reader:
+                                d = None
+                                amt = 0.0
+                                item_name = None
+                                order_id = None
+
+                                for k, v in row.items():
+                                    if not k or not v:
+                                        continue
+                                    k_low = k.lower().strip()
+                                    v_str = str(v).strip()
+
+                                    if ("order id" in k_low or "order #" in k_low or "order_id" in k_low) and not order_id:
+                                        order_id = v_str
+                                        has_order_grouping = True
+                                    elif ("date" in k_low) and not d:
+                                        d = parse_date(v_str)
+                                    elif ("total" in k_low or "amount" in k_low or "price" in k_low) and amt == 0:
+                                        amt = clean_amount(v_str)
+                                    elif ("item" in k_low or "title" in k_low or "product" in k_low or "desc" in k_low) and not item_name:
+                                        item_name = v_str
+
+                                if order_id and d:
+                                    if order_id not in rows_by_order:
+                                        rows_by_order[order_id] = {
+                                            "date": d,
+                                            "total": amt,
+                                            "items": []
+                                        }
+                                    if amt > rows_by_order[order_id]["total"]:
+                                        rows_by_order[order_id]["total"] = amt
+                                    if item_name:
+                                        rows_by_order[order_id]["items"].append(item_name)
+                                elif d and amt > 0:
+                                    receipts.append({
+                                        "store": default_store,
+                                        "date": d,
+                                        "amount": round(amt, 2),
+                                        "items": [item_name] if item_name else [],
+                                        "raw": f"{default_store} ({item_name if item_name else 'Store Purchase'})"
+                                    })
+
+                            if has_order_grouping:
+                                for oid, odata in rows_by_order.items():
+                                    if odata["total"] > 0:
+                                        receipts.append({
+                                            "store": default_store,
+                                            "date": odata["date"],
+                                            "amount": round(odata["total"], 2),
+                                            "items": odata["items"],
+                                            "raw": f"{default_store} ({', '.join(odata['items']) if odata['items'] else 'Store Order'})"
+                                        })
+
+                    # 3. Text Copy-Paste Receipts
+                    elif fpath.endswith(".txt"):
+                        with open(fpath, "r", encoding="utf-8", errors="ignore") as f:
+                            content = f.read()
+                            rec = parse_text_receipt(content, default_store=default_store)
+                            if rec:
+                                receipts.append(rec)
+
+                except Exception as e:
+                    print(f"[!] Warning reading receipt file {fpath}: {e}")
 
     return receipts
 
@@ -362,23 +479,24 @@ def run_reconciliation():
     print("=" * 65)
     print(f"[*] Scanning inputs folder: {INPUTS_DIR}")
     
-    rules = load_rules()
+    merchant_rules, item_rules = load_rules()
     receipts = load_store_receipts(INPUTS_DIR)
-    print(f"[+] Loaded {len(receipts)} store receipts from Kroger / Walmart")
+    print(f"[+] Loaded {len(receipts)} store receipts (Walmart, Kroger, Sam's Club, Amazon, Target, etc.)")
 
+    STORE_KEYWORDS = ["kroger", "walmart", "sam", "sams", "samsclub", "amazon", "amzn", "target", "receipt", "order", "invoice"]
     all_txs = []
     for fpath in glob.glob(os.path.join(INPUTS_DIR, "*.*")):
         fname = os.path.basename(fpath).lower()
-        if any(store in fname for store in ["kroger", "walmart"]) and ("receipt" in fname or "order" in fname):
+        if any(store in fname for store in STORE_KEYWORDS):
             continue # Already loaded in store receipts
         txs = parse_bank_file(fpath)
         if txs:
             print(f"[+] Parsed {len(txs)} transactions from {os.path.basename(fpath)}")
             all_txs.extend(txs)
 
-    if not all_txs:
-        print("\n[!] No bank statement files found in inputs/.")
-        print(f"👉 Please drop your TD Bank, Capital One, or EBT statement files into:\n   {INPUTS_DIR}")
+    if not all_txs and not receipts:
+        print("\n[!] No bank statement files or store receipts found in inputs/.")
+        print(f"👉 Please drop your TD Bank, Capital One, EBT, or Store receipt files into:\n   {INPUTS_DIR}")
         return
 
     # Deduplicate & Match against receipts
@@ -405,11 +523,12 @@ def run_reconciliation():
         if matched_receipt:
             final_desc = matched_receipt["raw"]
             items_list = matched_receipt.get("items", [])
-            category = "groceries" if matched_receipt["store"] == "Kroger" else auto_categorize(final_desc, rules)
+            item_cat = auto_categorize_items(items_list, item_rules)
+            category = item_cat or auto_categorize(final_desc, merchant_rules)
         elif tx.get("force_category"):
             category = tx["force_category"]
         else:
-            category = auto_categorize(tx_desc, rules)
+            category = auto_categorize(tx_desc, merchant_rules)
 
         reconciled_expenses.append({
             "date": tx_date.strftime("%Y-%m-%d"),
@@ -419,6 +538,22 @@ def run_reconciliation():
             "items": "; ".join(items_list) if items_list else "",
             "source_key": tx.get("source_key")
         })
+
+    # Include any receipts that didn't match a bank statement charge (e.g. paid cash or statement pending)
+    unmatched_receipts = [rec for idx, rec in enumerate(receipts) if idx not in used_receipts]
+    if unmatched_receipts:
+        print(f"[*] Found {len(unmatched_receipts)} receipts without direct bank statement matches. Including them as verified purchases...")
+        for rec in unmatched_receipts:
+            item_cat = auto_categorize_items(rec.get("items", []), item_rules)
+            category = item_cat or auto_categorize(rec["raw"], merchant_rules)
+            reconciled_expenses.append({
+                "date": rec["date"].strftime("%Y-%m-%d"),
+                "amount": rec["amount"],
+                "description": rec["raw"],
+                "category": category,
+                "items": "; ".join(rec.get("items", [])) if rec.get("items") else "",
+                "source_key": f"unmatched_rec_{rec['store']}_{rec['date']}_{rec['amount']}"
+            })
 
     # Deduplicate only across overlapping files, while preserving legitimate same-statement charges (e.g. dual Planet Fitness memberships)
     unique_expenses = []
