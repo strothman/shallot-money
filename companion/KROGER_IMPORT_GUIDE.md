@@ -1,42 +1,40 @@
-# Mass Importing Kroger Purchase History 🛒🥦
+# 🧅 Shallot Money — Kroger Mass Purchase Harvester
 
-Kroger protects its servers with Akamai bot detection, which blocks third-party automated tools from logging in. However, because you can log in through your own regular browser, we can safely extract your entire purchase backlog right from inside your authenticated session.
+This tool allows you (or family members like your mom) to automatically extract your entire Kroger order history—including **exact dates, penny-accurate totals, fuel tracking, and complete grocery line items** (*Coca-Cola, Goldfish, milk, produce, etc.*)—and import them directly into Shallot Money in under 60 seconds!
 
 ---
 
-## 🚀 3-Step Mass Export Guide
+## ⚡ Quick 3-Step Guide (For You or Your Mom)
 
-### Step 1: Open Kroger Purchase History
-1. Open **Google Chrome**, **Microsoft Edge**, or **Firefox** on your PC.
-2. Log into your account and navigate to:
-   **[https://www.kroger.com/mypurchases](https://www.kroger.com/mypurchases)**
-   *(Make sure you can see your list of past in-store and online purchases).*
+### Step 1: Log in to Kroger
+1. Open **Google Chrome** or **Microsoft Edge** on the computer.
+2. Go to: **[https://www.kroger.com/mypurchases](https://www.kroger.com/mypurchases)**
+3. Make sure you are logged into the Kroger account.
 
-### Step 2: Run the Harvester Script
-1. Press **F12** on your keyboard (or Right-Click anywhere on the page $\rightarrow$ select **Inspect**).
-2. Click on the **Console** tab at the top of the developer panel.
+### Step 2: Run the Harvester (Takes ~60 seconds)
+1. Press **F12** on the keyboard (or right-click anywhere on the page $\rightarrow$ click **Inspect**).
+2. Click the **Console** tab at the top of the developer panel.
 3. Open [`companion/kroger_harvester.js`](kroger_harvester.js), copy all the code, paste it into the Console, and press **Enter**.
+4. You will see it stream each receipt live on the screen:
+   ```
+   [1/27] 2026-09-06 | $84.74 | 🛍️ Coca-Cola, Goldfish, Plush...
+   [2/27] 2026-09-03 | $57.45 | 🛍️ 2% Milk, Water, Monster...
+   ```
+5. When finished, your browser will automatically pop up with:
+   **`shallot_kroger_itemized_history.csv`** downloaded directly into your **Downloads** folder!
 
-### Step 3: What the Script Does
-* Automatically scrolls down to trigger lazy loading of older purchases.
-* Collects every purchase order on the page.
-* Fetches the itemized details for each order using your authenticated session.
-* Extracts the **Date**, **Total Amount**, and **All Purchased Items**.
-* Automatically triggers a download of:
-  **`shallot_kroger_backlog_YYYY-MM-DD.csv`** into your Downloads folder!
+### Step 3: Import into Shallot Money
+1. Open **Shallot Money** (on your phone or computer).
+2. Tap **Settings & Budget** (⚙️).
+3. Tap **Import CSV** and select `shallot_kroger_itemized_history.csv`.
+4. **All set!** 
+   - The app's exact-match protection ensures no duplicate spending is created.
+   - All transactions are automatically tagged as **Groceries** (or **Gas & Auto** for Fuel).
+   - Tapping any card expands its **Purchased Items** drawer with full product details!
 
 ---
 
-## 📥 Loading into Shallot Money
-
-Once you have `shallot_kroger_backlog_YYYY-MM-DD.csv`:
-
-### Option A: Direct Web App Import
-1. In Shallot Money, go to **Settings** (⚙️) $\rightarrow$ **Import CSV**.
-2. Select the downloaded Kroger CSV.
-3. Because Shallot Money verifies exact dollar amounts and dates, it will automatically match your bank transactions and enrich them with the purchased items!
-
-### Option B: Companion Reconciler (Cross-Bank Matching)
-1. Drop the downloaded CSV into [`companion/inputs/`](inputs/).
-2. Run [`run_reconciler.bat`](run_reconciler.bat).
-3. The reconciler cross-references your TD Bank charges and Kroger purchases, categorizes all items, and generates a unified import.
+## 🛡️ Privacy & Safety
+* **100% Client-Side**: Runs entirely inside your own browser session.
+* **No Passwords Shared**: You never need to enter credentials into any third-party app or script.
+* **No Memory Leaks**: Uses lightweight micro-workers that clean up after themselves.

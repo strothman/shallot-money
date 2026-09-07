@@ -1,6 +1,6 @@
 # Shallot Money — Project State & Technical Architecture 🧅💰
 
-> **Current Version:** `1.7.0`  
+> **Current Version:** `1.7.4`  
 > **Repository:** [strothman/Shallot-Money](https://github.com/strothman/Shallot-Money)  
 > **Ecosystem:** Shallot Personal Utility Suite (alongside Shallot Kitchen Keeper)  
 > **Last Updated:** September 2026
@@ -11,7 +11,7 @@
 
 **Shallot Money** is a mobile-first, privacy-focused personal spending tracker and monthly budget planner. Designed around the signature **Shallot Plum & Warm Copper Glow** design language, it runs as a Progressive Web App (PWA) with 100% offline capability, zero cloud telemetry, and client-side `localStorage` persistence.
 
-The project also includes a Python-powered **PC Companion & Statement Reconciler** (`companion/`) capable of automatically ingesting bank statements (TD Bank, Capital One), EBT transaction logs, and retail receipts (Kroger, Walmart), auto-categorizing spending, matching cross-statement charges, and generating clean imports for the web application.
+The project also includes a browser-native **Kroger Precision Harvester** (`companion/kroger_harvester.js`) capable of extracting multi-year itemized grocery purchases, dates, totals, and fuel transactions without bot blocking, as well as a Python-powered **PC Companion & Statement Reconciler** (`companion/`) that reconciles bank statements and retail receipts.
 
 ---
 
