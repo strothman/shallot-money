@@ -62,3 +62,8 @@ node_modules/
 .pnp.js
 .vite/
 .next/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class

@@ -4,42 +4,62 @@
     "amount": 31.64,
     "description": "Walmart (lettuce, tomato, milk, cherry can, chicken fingers x2)",
     "category": "food",
-    "date": "2026-06-14"
+    "date": "2026-06-14",
+    "items": [
+      "lettuce",
+      "tomato",
+      "milk",
+      "cherry can",
+      "chicken fingers x2"
+    ]
   },
   {
     "id": "imported_2_2026-06-14",
     "amount": 8.87,
     "description": "Wawa (3 Drinks [too expensive])",
     "category": "food",
-    "date": "2026-06-14"
+    "date": "2026-06-14",
+    "items": [
+      "3 Drinks [too expensive]"
+    ]
   },
   {
     "id": "imported_3_2026-06-14",
     "amount": 29.34,
     "description": "Jimmy Johns (4 Sandwiches, got one for free.)",
     "category": "food",
-    "date": "2026-06-14"
+    "date": "2026-06-14",
+    "items": [
+      "4 Sandwiches",
+      "got one for free."
+    ]
   },
   {
-    "id": "imported_4_2026-06-16",
-    "amount": 18.02,
-    "description": "Walmart (Distilled Water x6, chicken patties, buns)",
-    "category": "food",
-    "date": "2026-06-16"
-  },
-  {
-    "id": "imported_5_2026-06-17",
+    "id": "imported_4_2026-06-17",
     "amount": 12.17,
     "description": "RaceTrac (Pizza)",
     "category": "food",
-    "date": "2026-06-17"
+    "date": "2026-06-17",
+    "items": [
+      "Pizza"
+    ]
   },
   {
-    "id": "imported_6_2026-06-17",
+    "id": "imported_5_2026-06-17",
     "amount": 11.1,
     "description": "RaceTrac (Ice Cream for them.)",
     "category": "food",
-    "date": "2026-06-17"
+    "date": "2026-06-17",
+    "items": [
+      "Ice Cream for them."
+    ]
+  },
+  {
+    "id": "imported_6_2026-06-18",
+    "amount": 15.9,
+    "description": "Planet Fitness",
+    "category": "gym",
+    "date": "2026-06-18"
   },
   {
     "id": "imported_7_2026-06-18",
@@ -49,199 +69,364 @@
     "date": "2026-06-18"
   },
   {
-    "id": "imported_8_2026-06-18",
-    "amount": 15.9,
-    "description": "Planet Fitness",
-    "category": "gym",
-    "date": "2026-06-18"
-  },
-  {
-    "id": "imported_9_2026-06-19",
+    "id": "imported_8_2026-06-19",
     "amount": 7.37,
     "description": "Amazon (Apparently paid for Prime)",
     "category": "bills",
-    "date": "2026-06-19"
+    "date": "2026-06-19",
+    "items": [
+      "Apparently paid for Prime"
+    ]
   },
   {
-    "id": "imported_10_2026-06-19",
+    "id": "imported_9_2026-06-19",
     "amount": 6.26,
     "description": "Circle K (2 Drinks, bag of Donettes)",
     "category": "food",
-    "date": "2026-06-19"
+    "date": "2026-06-19",
+    "items": [
+      "2 Drinks",
+      "bag of Donettes"
+    ]
   },
   {
-    "id": "imported_11_2026-06-19",
+    "id": "imported_10_2026-06-19",
     "amount": 3.49,
     "description": "Kroger (Buns)",
     "category": "food",
-    "date": "2026-06-19"
+    "date": "2026-06-19",
+    "items": [
+      "Buns"
+    ]
   },
   {
-    "id": "imported_12_2026-06-19",
+    "id": "imported_11_2026-06-19",
     "amount": 44.14,
     "description": "Circle K (Gas)",
     "category": "transport",
-    "date": "2026-06-19"
+    "date": "2026-06-19",
+    "items": [
+      "Gas"
+    ]
   },
   {
-    "id": "imported_13_2026-06-20",
-    "amount": 51.4,
-    "description": "Walmart (Buns, Nugs, Patties, Pizzas, Father’s Day Chips)",
-    "category": "food",
-    "date": "2026-06-20"
-  },
-  {
-    "id": "imported_14_2026-06-20",
-    "amount": 11.98,
-    "description": "Kroger (Sweet Bread)",
-    "category": "food",
-    "date": "2026-06-20"
-  },
-  {
-    "id": "imported_15_2026-06-21",
-    "amount": 66.26,
-    "description": "Kroger (Chicken Fries, Cheeses, $30 in Amazon Cards)",
-    "category": "food",
-    "date": "2026-06-21"
-  },
-  {
-    "id": "imported_16_2026-06-22",
+    "id": "imported_12_2026-06-22",
     "amount": 12.3,
     "description": "Sam’s (Pizza at Sams)",
     "category": "food",
-    "date": "2026-06-22"
+    "date": "2026-06-22",
+    "items": [
+      "Pizza at Sams"
+    ]
   },
   {
-    "id": "imported_17_2026-06-22",
-    "amount": 191.35,
-    "description": "Sam’s (General Groceries)",
-    "category": "food",
-    "date": "2026-06-22"
-  },
-  {
-    "id": "imported_18_2026-06-22",
+    "id": "imported_13_2026-06-22",
     "amount": 8.47,
     "description": "Oculus (Logan?)",
     "category": "entertainment",
-    "date": "2026-06-22"
+    "date": "2026-06-22",
+    "items": [
+      "Logan?"
+    ]
   },
   {
-    "id": "imported_19_2026-06-22",
+    "id": "imported_14_2026-06-22",
     "amount": 22.74,
     "description": "Amazon (Jim’s Father’s day Amazon card, I think.)",
-    "category": "shopping",
-    "date": "2026-06-22"
+    "category": "food",
+    "date": "2026-06-22",
+    "items": [
+      "Jim’s Father’s day Amazon card",
+      "I think."
+    ]
   },
   {
-    "id": "imported_20_2026-06-22",
+    "id": "imported_15_2026-06-22",
     "amount": 19.11,
     "description": "Amazon (Sunglasses)",
-    "category": "shopping",
-    "date": "2026-06-22"
+    "category": "food",
+    "date": "2026-06-22",
+    "items": [
+      "Sunglasses"
+    ]
   },
   {
-    "id": "imported_21_2026-06-23",
+    "id": "imported_16_2026-06-23",
     "amount": 12.86,
     "description": "Walmart (Salsa and Creamer)",
     "category": "food",
-    "date": "2026-06-23"
+    "date": "2026-06-23",
+    "items": [
+      "Salsa and Creamer"
+    ]
   },
   {
-    "id": "imported_22_2026-06-24",
+    "id": "imported_17_2026-06-24",
     "amount": 10.48,
     "description": "Steam (Sineus Arena)",
     "category": "entertainment",
-    "date": "2026-06-24"
+    "date": "2026-06-24",
+    "items": [
+      "Sineus Arena"
+    ]
   },
   {
-    "id": "imported_23_2026-06-24",
+    "id": "imported_18_2026-06-24",
     "amount": 0.99,
-    "description": "Apple (Cloud)",
-    "category": "gym",
+    "description": "Apple",
+    "category": "bills",
     "date": "2026-06-24"
   },
   {
-    "id": "imported_24_2026-06-25",
+    "id": "imported_19_2026-06-25",
     "amount": 29.57,
     "description": "Papalino’s (Pizza)",
     "category": "food",
-    "date": "2026-06-25"
+    "date": "2026-06-25",
+    "items": [
+      "Pizza"
+    ]
   },
   {
-    "id": "imported_25_2026-06-25",
+    "id": "imported_20_2026-06-25",
     "amount": 94.53,
     "description": "Walmart (Groceries and x1 Monster at 2.88)",
     "category": "food",
-    "date": "2026-06-25"
+    "date": "2026-06-25",
+    "items": [
+      "Groceries and x1 Monster at 2.88"
+    ]
   },
   {
-    "id": "imported_26_2026-06-25",
+    "id": "imported_21_2026-06-25",
     "amount": 45.0,
     "description": "Amazon (A baby monitor : I)",
-    "category": "shopping",
-    "date": "2026-06-25"
+    "category": "food",
+    "date": "2026-06-25",
+    "items": [
+      "A baby monitor : I"
+    ]
   },
   {
-    "id": "imported_27_2026-06-28",
+    "id": "imported_22_2026-06-28",
     "amount": 7.93,
     "description": "Circle K (4 Drinks, two of them are meals.)",
     "category": "food",
-    "date": "2026-06-28"
+    "date": "2026-06-28",
+    "items": [
+      "4 Drinks",
+      "two of them are meals."
+    ]
   },
   {
-    "id": "imported_28_2026-06-29",
+    "id": "imported_23_2026-06-29",
     "amount": 18.1,
     "description": "McDonalds (Order A)",
     "category": "food",
-    "date": "2026-06-29"
+    "date": "2026-06-29",
+    "items": [
+      "Order A"
+    ]
   },
   {
-    "id": "imported_29_2026-06-29",
+    "id": "imported_24_2026-06-29",
     "amount": 9.31,
     "description": "McDonalds (Order B)",
     "category": "food",
-    "date": "2026-06-29"
+    "date": "2026-06-29",
+    "items": [
+      "Order B"
+    ]
   },
   {
-    "id": "imported_30_2026-06-29",
+    "id": "imported_25_2026-06-29",
     "amount": 6.01,
     "description": "McDonalds (Ice Cream for 3)",
     "category": "food",
-    "date": "2026-06-29"
+    "date": "2026-06-29",
+    "items": [
+      "Ice Cream for 3"
+    ]
   },
   {
-    "id": "imported_31_2026-06-29",
+    "id": "imported_26_2026-06-29",
     "amount": 10.6,
     "description": "Five Below (Fuggler Mini)",
     "category": "entertainment",
-    "date": "2026-06-29"
+    "date": "2026-06-29",
+    "items": [
+      "Fuggler Mini"
+    ]
   },
   {
-    "id": "imported_32_2026-06-30",
+    "id": "imported_27_2026-06-30",
     "amount": 39.95,
     "description": "Kroger (Candy for movies, and food items.)",
     "category": "food",
-    "date": "2026-06-30"
+    "date": "2026-06-30",
+    "items": [
+      "Candy for movies",
+      "and food items."
+    ]
   },
   {
-    "id": "imported_33_2026-06-30",
+    "id": "imported_28_2026-06-30",
     "amount": 33.15,
     "description": "Cinemark (Toy Story 5 for 5)",
     "category": "entertainment",
-    "date": "2026-06-30"
+    "date": "2026-06-30",
+    "items": [
+      "Toy Story 5 for 5"
+    ]
   },
   {
-    "id": "imported_34_2026-06-30",
+    "id": "imported_29_2026-06-30",
     "amount": 32.1,
     "description": "Wendy’s (Wendy’s for 5)",
     "category": "food",
-    "date": "2026-06-30"
+    "date": "2026-06-30",
+    "items": [
+      "Wendy’s for 5"
+    ]
   },
   {
-    "id": "imported_36_2026-06-30",
-    "amount": 66.66,
-    "description": "Satan (Planet Fitness)",
+    "id": "imported_30_2026-06-30",
+    "amount": 3.35,
+    "description": "Circle K, drinks",
+    "category": "food",
+    "date": "2026-06-30",
+    "items": [
+      "drinks"
+    ]
+  },
+  {
+    "id": "imported_31_2026-07-01",
+    "amount": 425.0,
+    "description": "July Rent and 100 Hold",
+    "category": "bills",
+    "date": "2026-07-01"
+  },
+  {
+    "id": "imported_32_2026-07-01",
+    "amount": 30.91,
+    "description": "Using up EBT at Walmart",
+    "category": "food",
+    "date": "2026-07-01"
+  },
+  {
+    "id": "imported_33_2026-07-01",
+    "amount": 18.98,
+    "description": "Kids Squish blocks, Walmart",
+    "category": "entertainment",
+    "date": "2026-07-01"
+  },
+  {
+    "id": "imported_34_2026-07-01",
+    "amount": 95.21,
+    "description": "Walmart, Groceries",
+    "category": "food",
+    "date": "2026-07-01",
+    "items": [
+      "Groceries"
+    ]
+  },
+  {
+    "id": "imported_35_2026-07-02",
+    "amount": 12.85,
+    "description": "Circle K for three.",
+    "category": "food",
+    "date": "2026-07-02"
+  },
+  {
+    "id": "imported_36_2026-07-02",
+    "amount": 51.94,
+    "description": "Planet Fitness",
     "category": "gym",
-    "date": "2026-06-30"
+    "date": "2026-07-02"
+  },
+  {
+    "id": "imported_37_2026-07-03",
+    "amount": 65.51,
+    "description": "Kroger, Soda Run",
+    "category": "food",
+    "date": "2026-07-03",
+    "items": [
+      "Soda Run"
+    ]
+  },
+  {
+    "id": "imported_38_2026-07-03",
+    "amount": 22.72,
+    "description": "Walmart, buns, lettuce, ham, Monster x1",
+    "category": "food",
+    "date": "2026-07-03",
+    "items": [
+      "buns",
+      "lettuce",
+      "ham",
+      "Monster x1"
+    ]
+  },
+  {
+    "id": "imported_39_2026-07-03",
+    "amount": 7.98,
+    "description": "Blizzard. Diablo 4 Season Pass",
+    "category": "entertainment",
+    "date": "2026-07-03"
+  },
+  {
+    "id": "imported_40_2026-07-04",
+    "amount": 38.35,
+    "description": "Jimmy John’s for 4",
+    "category": "fastfood",
+    "date": "2026-07-04"
+  },
+  {
+    "id": "imported_41_2026-07-04",
+    "amount": 2.1,
+    "description": "Circle K, drinks for 2",
+    "category": "fastfood",
+    "date": "2026-07-04",
+    "items": [
+      "drinks for 2"
+    ]
+  },
+  {
+    "id": "imported_42_2026-07-05",
+    "amount": 3.59,
+    "description": "Jimmy John’s DOB",
+    "category": "fastfood",
+    "date": "2026-07-05"
+  },
+  {
+    "id": "imported_43_2026-07-05",
+    "amount": 23.9,
+    "description": "Kroger, clearance crap and pop-its",
+    "category": "food",
+    "date": "2026-07-05",
+    "items": [
+      "clearance crap and pop-its"
+    ]
+  },
+  {
+    "id": "imported_44_2026-07-05",
+    "amount": 6.86,
+    "description": "Kroger Rx. OME, Logan’s fever blister med.",
+    "category": "gym",
+    "date": "2026-07-05"
+  },
+  {
+    "id": "imported_45_2026-07-06",
+    "amount": 10.6,
+    "description": "Sam’s Pizza Etc.",
+    "category": "food",
+    "date": "2026-07-06"
+  },
+  {
+    "id": "imported_46_2026-07-06",
+    "amount": 90.89,
+    "description": "Sam’s Food Shopping",
+    "category": "food",
+    "date": "2026-07-06"
   }
 ]
