@@ -3042,9 +3042,22 @@ function setupEventListeners() {
   const forceUpdateBtn = document.getElementById('force-update-btn');
   if (forceUpdateBtn) {
     forceUpdateBtn.addEventListener('click', async () => {
+      triggerHaptic(20);
       forceUpdateBtn.innerHTML = `<i data-lucide="refresh-cw" class="spin-icon"></i> Checking & Updating...`;
       if (window.lucide) window.lucide.createIcons();
       saveState();
+
+      // Unregister service workers to clear PWA cache
+      if ('serviceWorker' in navigator) {
+        try {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          for (const reg of registrations) {
+            await reg.unregister();
+          }
+        } catch (e) {
+          console.warn('SW unregister error:', e);
+        }
+      }
 
       // Clear any CacheStorage caches if present
       if ('caches' in window) {
@@ -3088,6 +3101,7 @@ function setupEventListeners() {
     }
   });
 }
+
 
 let isInitialized = false;
 function init() {
