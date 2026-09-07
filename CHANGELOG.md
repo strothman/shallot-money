@@ -7,6 +7,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [1.7.5] - 2026-09-07
+
+### Added & Enhanced
+- **Full Retail Harvester Suite (Kroger, Walmart, Sam's Club, Target)**:
+  - Added dedicated browser-console companion harvesters for **Walmart** (`walmart_harvester.js`), **Sam's Club** (`samsclub_harvester.js`), and **Target** (`target_harvester.js`), complementing the master **Kroger** harvester (`kroger_harvester.js`).
+  - All harvesters include auto-scroll lazy loading to pull past order cards, penny-accurate totals, exact dates, and product line items.
+  - Generates ready-to-import CSVs formatted with semicolon-delimited items and defaults to `groceries` (or `gas` for fuel).
+- **Unified Retail Import Guide**:
+  - Published [`companion/RETAIL_HARVESTERS_GUIDE.md`](file:///c:/Users/strot/Antigravity%20IDE/Shallot-Money/companion/RETAIL_HARVESTERS_GUIDE.md) offering clear 3-step instructions for personal use and family members with no software installation required.
+- **Food Category Adoption into Groceries**:
+  - Automatically migrates and cleanses legacy `food` categories into `groceries` on app load and CSV import, preventing duplicate tags.
+- **Robust Semicolon Item Delimiter**:
+  - CSV importer and parser split on semicolons `;` first so product names with internal commas (e.g. *"Fish Oil, 1200mg"*) stay intact as single items.
+
+---
+
 ## [1.7.1] - 2026-09-07
 
 ### Added & Enhanced
