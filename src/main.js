@@ -45,11 +45,15 @@ function getCategories() {
 
 function getCategory(id) {
   const cats = getCategories();
-  // Support legacy food mapping
-  if (id === 'food') {
+  // Support legacy food mapping (any variant of food or food_xxxx)
+  if (!id || id === 'food' || String(id).startsWith('food')) {
     return cats.find(c => c.id === 'groceries') || cats[0];
   }
-  return cats.find(c => c.id === id) || {
+  const found = cats.find(c => c.id === id);
+  if (found && found.label.toLowerCase() === 'food') {
+    return cats.find(c => c.id === 'groceries') || cats[0];
+  }
+  return found || {
     id,
     label: id.charAt(0).toUpperCase() + id.slice(1),
     iconName: 'tag',
@@ -653,20 +657,24 @@ function loadState() {
 
       // Automatically adopt all 'food' expenses and categories into 'groceries'
       let migrated = false;
+      const foodCatIds = new Set(['food']);
+      if (Array.isArray(state.categories)) {
+        state.categories = state.categories.filter(c => {
+          if (c.id === 'food' || c.id.startsWith('food') || (c.label && c.label.toLowerCase() === 'food')) {
+            foodCatIds.add(c.id);
+            migrated = true;
+            return false;
+          }
+          return true;
+        });
+      }
       if (Array.isArray(state.expenses)) {
         state.expenses.forEach(exp => {
-          if (exp.category === 'food') {
+          if (foodCatIds.has(exp.category) || exp.category === 'food' || (exp.category && exp.category.startsWith('food'))) {
             exp.category = 'groceries';
             migrated = true;
           }
         });
-      }
-      if (Array.isArray(state.categories)) {
-        const foodIdx = state.categories.findIndex(c => c.id === 'food');
-        if (foodIdx !== -1) {
-          state.categories.splice(foodIdx, 1);
-          migrated = true;
-        }
       }
       if (migrated) {
         saveState();
