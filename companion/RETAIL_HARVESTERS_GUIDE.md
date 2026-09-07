@@ -10,10 +10,10 @@ Each script runs **100% locally in your browser** (Chrome or Edge) without shari
 
 | Store | Order History URL | Harvester Script | Default Category |
 | :--- | :--- | :--- | :--- |
-| **Kroger** | [kroger.com/mypurchases](https://www.kroger.com/mypurchases) | [`kroger_harvester.js`](kroger_harvester.js) | `groceries` (or `gas` for fuel) |
-| **Walmart** | [walmart.com/orders](https://www.walmart.com/orders) | [`walmart_harvester.js`](walmart_harvester.js) | `groceries` |
-| **Sam's Club** | [samsclub.com/account/orders](https://www.samsclub.com/account/orders) | [`samsclub_harvester.js`](samsclub_harvester.js) | `groceries` |
-| **Target** | [target.com/orders](https://www.target.com/orders) | [`target_harvester.js`](target_harvester.js) | `groceries` |
+| **Kroger** | [kroger.com/mypurchases](https://www.kroger.com/mypurchases) | [`kroger_harvester.js`](kroger_harvester.js) | `groceries` (or `gas` for fuel, `shopping` for pure runs) |
+| **Walmart** | [walmart.com/orders](https://www.walmart.com/orders) | [`walmart_harvester.js`](walmart_harvester.js) | `groceries` (or `shopping` for pure runs) |
+| **Sam's Club** | [samsclub.com/account/orders](https://www.samsclub.com/account/orders) | [`samsclub_harvester.js`](samsclub_harvester.js) | `groceries` (or `shopping` for pure runs) |
+| **Target** | [target.com/orders](https://www.target.com/orders) | [`target_harvester.js`](target_harvester.js) | `groceries` (or `shopping` for pure runs) |
 
 ---
 
@@ -32,7 +32,7 @@ Each script runs **100% locally in your browser** (Chrome or Edge) without shari
    - For Sam's Club: Copy all text from [`samsclub_harvester.js`](samsclub_harvester.js)
    - For Target: Copy all text from [`target_harvester.js`](target_harvester.js)
 4. Paste it into the Console and press **Enter**.
-5. Watch it stream the receipts and auto-scroll. When finished, your browser will immediately download the CSV (e.g. `shallot_target_itemized_12_orders.csv`).
+5. Watch it stream the receipts and auto-scroll. When finished, your browser will immediately download the CSV (e.g. `shallot_kroger_itemized_history.csv`).
 
 ### Step 3: Import into Shallot Money
 1. Open **Shallot Money** (on your phone, tablet, or PC).
@@ -42,6 +42,22 @@ Each script runs **100% locally in your browser** (Chrome or Edge) without shari
    - **Zero Duplicates**: Shallot Money automatically matches by date, merchant, and dollar amount. If you already have bank transactions, it simply attaches the itemized receipt without creating duplicates!
    - **No Legacy "Food" Categories**: Everything automatically routes into **Groceries** (or Gas & Auto for fuel).
    - **Item Breakdown**: Tap on any transaction card to expand the purchased items drawer!
+
+---
+
+## ✂️ Handling "Mixed Baskets" (Groceries + Stuffed Animals, Toys, Clothes)
+
+When you buy groceries plus a non-grocery item (like a stuffed animal for your son, a shirt, or a video game), Shallot Money protects your bank reconciliation while giving you 1-tap splitting:
+
+1. **Initial Bank Integrity**: The purchase imports as a single swipe matching your bank statement (e.g., `$84.74` at Kroger).
+2. **Expand the Card**: Tap the receipt pill (`🛒 3 items`) to open the drawer.
+3. **Smart Badges**: Each item chip shows its smart category (🥦 for food, 🛍️ for toys/shopping, 💊 for pharmacy).
+4. **1-Tap "Split"**: Tap the **✂️ Split** button on the non-grocery item chip (e.g., *Disney Stitch Plush*).
+5. **Confirm**: A balance comparison modal appears:
+   - Remaining in **Groceries**: `$69.75`
+   - New in **Shopping**: `$14.99`
+   - Total still matches: `$84.74` *(zero discrepancy with your bank statement!)*
+6. **Pure Shopping Trips**: If you went to Target, Kroger, or Walmart and *only* bought toys, clothes, or electronics, the harvester automatically categorizes the whole transaction as **Shopping** right out of the box.
 
 ---
 

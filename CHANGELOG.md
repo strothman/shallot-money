@@ -10,6 +10,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [1.7.5] - 2026-09-07
 
 ### Added & Enhanced
+- **In-App 1-Tap Receipt Item Splitting (Mixed Superstore Baskets)**:
+  - Solves the mixed-basket dilemma (e.g., buying milk and bread, but also a $15 stuffed animal, toy, or apparel item).
+  - Inside the expandable **Purchased Items** drawer, each item chip now features a sleek **✂️ Split** button.
+  - Tapping **Split** opens the **Split Receipt Item** modal with live balance calculation (e.g., Remaining in Groceries: `$69.75`, New in Shopping: `$14.99`).
+  - Automatically deducts the item price from the original parent transaction, removes the split item, and creates a new linked child expense under the chosen category—keeping your budget 100% accurate while preserving exact bank statement swipe reconciliation ($84.74).
+- **Smart Category Detection Across All Retail Harvesters (Kroger, Walmart, Sam's Club, Target)**:
+  - If an entire order contains only non-grocery merchandise (toys, plush, clothes, electronics, home goods), the harvester automatically categorizes it as **Shopping** directly.
+  - Harvesters now extract individual product prices where available on receipt detail pages and cards, auto-filling the in-app split modal with exact prices.
 - **Full Retail Harvester Suite (Kroger, Walmart, Sam's Club, Target)**:
   - Added dedicated browser-console companion harvesters for **Walmart** (`walmart_harvester.js`), **Sam's Club** (`samsclub_harvester.js`), and **Target** (`target_harvester.js`), complementing the master **Kroger** harvester (`kroger_harvester.js`).
   - All harvesters include auto-scroll lazy loading to pull past order cards, penny-accurate totals, exact dates, and product line items.

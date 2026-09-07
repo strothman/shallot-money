@@ -140,7 +140,8 @@ const ITEM_RULES = {
     'cleaner', 'detergent', 'bleach', 'sponge', 'paper towel', 'toilet paper', 'tissue', 'trash bag', 'trash bags',
     'card', 'cards', 'gift', 'gift card', 'amazon card', 'charger', 'cable', 'cord', 'case', 'pillow', 'blanket',
     'candle', 'lamp', 'bulb', 'battery', 'batteries', 'tape', 'tool', 'tools', 'blender', 'pan', 'pot', 'knife',
-    'plate', 'cup', 'mug', 'clothes', 'clothing', 'apparel', 'hardware'
+    'plate', 'cup', 'mug', 'clothes', 'clothing', 'apparel', 'hardware',
+    'toy', 'toys', 'plush', 'stuffed animal', 'squishmallow', 'doll', 'dolls', 'action figure', 'lego', 'puzzle', 'puzzles', 'board game'
   ]
 };
 
@@ -242,7 +243,7 @@ function parseExpenseDetails(exp) {
   };
 }
 
-function renderReceiptDrawerHtml(details, drawerId) {
+function renderReceiptDrawerHtml(details, drawerId, exp = null) {
   if (!details.hasItems) return '';
 
   const distKeys = Object.keys(details.catDistribution);
@@ -268,19 +269,141 @@ function renderReceiptDrawerHtml(details, drawerId) {
         ${distHtml}
       </div>
       <div class="receipt-item-chips">
-        ${details.categorizedItems.map(ci => {
+        ${details.categorizedItems.map((ci, idx) => {
           const c = getCategory(ci.categoryId);
+          const priceMatch = ci.name.match(/(?:\$|\()([0-9,]+\.[0-9]{2})\)?/);
+          const priceVal = priceMatch ? priceMatch[1].replace(/,/g, '') : '';
+          const canSplit = exp && exp.amount > 0 && details.items.length > 1;
+          const splitBtnHtml = canSplit ? `
+            <button type="button" class="item-split-btn" 
+              data-exp-id="${exp.id}" 
+              data-item-idx="${idx}" 
+              data-item-name="${escapeHTML(ci.name)}" 
+              data-item-cat="${ci.categoryId}" 
+              data-item-price="${priceVal}" 
+              title="Split this item into a separate category">
+              <i data-lucide="scissors"></i>
+              <span>Split</span>
+            </button>
+          ` : '';
+
           return `
             <span class="receipt-item-chip" style="--item-cat-color: ${c.color}; --item-cat-bg: ${c.bg}; --item-cat-border: ${c.color}35; --item-cat-bg-hover: ${c.bg}">
               <span class="item-chip-dot" style="background-color: ${c.color};"></span>
               <span class="item-chip-label">${escapeHTML(ci.name)}</span>
               <span class="item-chip-cat" style="color: ${c.color};">${escapeHTML(c.label)}</span>
+              ${splitBtnHtml}
             </span>
           `;
         }).join('')}
       </div>
     </div>
   `;
+}
+
+// ----------------------------------------------------
+// IN-APP RECEIPT ITEM SPLIT ENGINE
+// ----------------------------------------------------
+function generateId(prefix = 'exp') {
+  return prefix + '_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+}
+
+function renderAll() {
+  renderDashboard();
+  renderMonthlyBreakdown();
+  renderHistory();
+}
+
+let activeSplitContext = null;
+
+function updateSplitPreview() {
+  if (!activeSplitContext) return;
+  const parentExp = state.expenses.find(e => e.id === activeSplitContext.expId);
+  if (!parentExp) return;
+
+  const catSelect = document.getElementById('split-item-category-select');
+  const amountInput = document.getElementById('split-item-amount-input');
+  const nameInput = document.getElementById('split-item-name-input');
+  const confirmBtn = document.getElementById('btn-confirm-split');
+
+  const splitAmt = parseFloat(amountInput ? amountInput.value : 0) || 0;
+  const parentCat = getCategory(parentExp.category);
+  const selectedCat = getCategory(catSelect ? catSelect.value : 'shopping');
+
+  const remaining = Math.max(0, parentExp.amount - splitAmt);
+
+  const parentCatLabel = document.getElementById('split-parent-cat-label');
+  const parentRemainVal = document.getElementById('split-parent-remaining-val');
+  const childCatLabel = document.getElementById('split-child-cat-label');
+  const childNewVal = document.getElementById('split-child-new-val');
+
+  if (parentCatLabel) parentCatLabel.textContent = parentCat.label;
+  if (parentRemainVal) parentRemainVal.textContent = formatCurrency(remaining);
+  if (childCatLabel) childCatLabel.textContent = selectedCat ? selectedCat.label : 'Split Category';
+  if (childNewVal) childNewVal.textContent = formatCurrency(splitAmt);
+
+  if (confirmBtn) {
+    const isValid = splitAmt > 0 && splitAmt < parentExp.amount && nameInput && nameInput.value.trim().length > 0;
+    confirmBtn.disabled = !isValid;
+  }
+}
+
+function openSplitItemModal(expId, itemIdx, itemName, itemCat, itemPrice) {
+  const parentExp = state.expenses.find(e => e.id === expId);
+  if (!parentExp) return;
+
+  activeSplitContext = {
+    expId: expId,
+    itemIdx: parseInt(itemIdx, 10),
+    itemName: itemName,
+    detectedCat: itemCat,
+    originalAmount: parentExp.amount
+  };
+
+  const modal = document.getElementById('split-item-modal');
+  const merchantEl = document.getElementById('split-context-merchant');
+  const totalEl = document.getElementById('split-context-total');
+  const nameInput = document.getElementById('split-item-name-input');
+  const catSelect = document.getElementById('split-item-category-select');
+  const amountInput = document.getElementById('split-item-amount-input');
+
+  if (merchantEl) merchantEl.textContent = parentExp.description || 'Receipt';
+  if (totalEl) totalEl.textContent = formatCurrency(parentExp.amount);
+  if (nameInput) nameInput.value = itemName;
+
+  // Populate categories excluding food
+  if (catSelect) {
+    catSelect.innerHTML = state.categories
+      .filter(c => c.id !== 'food')
+      .map(c => `<option value="${c.id}">${escapeHTML(c.label)}</option>`)
+      .join('');
+
+    // Default to detected category if available and not equal to parent category, else 'shopping'
+    let preferredCat = (itemCat && itemCat !== parentExp.category && state.categories.some(c => c.id === itemCat))
+      ? itemCat
+      : (state.categories.some(c => c.id === 'shopping') ? 'shopping' : state.categories[0]?.id || 'groceries');
+
+    catSelect.value = preferredCat;
+  }
+
+  // Pre-fill amount if available
+  const parsedPrice = parseFloat(itemPrice);
+  if (amountInput) {
+    amountInput.value = (!isNaN(parsedPrice) && parsedPrice > 0 && parsedPrice < parentExp.amount)
+      ? parsedPrice.toFixed(2)
+      : '';
+  }
+
+  updateSplitPreview();
+
+  if (modal) {
+    modal.classList.add('active');
+    triggerHaptic(8);
+    if (window.lucide) window.lucide.createIcons();
+    setTimeout(() => {
+      if (amountInput && !amountInput.value) amountInput.focus();
+    }, 150);
+  }
 }
 
 // ----------------------------------------------------
@@ -1064,7 +1187,7 @@ function renderDashboard() {
         </button>
       ` : '';
 
-      const drawerHtml = renderReceiptDrawerHtml(details, `drawer-recent-${exp.id}`);
+      const drawerHtml = renderReceiptDrawerHtml(details, `drawer-recent-${exp.id}`, exp);
 
       return `
         <div class="expense-item" data-id="${exp.id}">
@@ -1107,6 +1230,20 @@ function renderDashboard() {
           const isOpen = drawer.classList.toggle('open');
           pill.classList.toggle('open', isOpen);
         }
+      });
+    });
+
+    // Attach click listeners for recent receipt item split buttons
+    recentSpendingList.querySelectorAll('.item-split-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        triggerHaptic(8);
+        const expId = btn.getAttribute('data-exp-id');
+        const itemIdx = btn.getAttribute('data-item-idx');
+        const itemName = btn.getAttribute('data-item-name');
+        const itemCat = btn.getAttribute('data-item-cat');
+        const itemPrice = btn.getAttribute('data-item-price');
+        openSplitItemModal(expId, itemIdx, itemName, itemCat, itemPrice);
       });
     });
   }
@@ -1391,7 +1528,7 @@ function renderHistory() {
           </button>
         ` : '';
 
-        const drawerHtml = renderReceiptDrawerHtml(details, `drawer-hist-${exp.id}`);
+        const drawerHtml = renderReceiptDrawerHtml(details, `drawer-hist-${exp.id}`, exp);
 
         return `
           <div class="expense-item" data-id="${exp.id}">
@@ -1476,6 +1613,20 @@ function renderHistory() {
         const isOpen = drawer.classList.toggle('open');
         pill.classList.toggle('open', isOpen);
       }
+    });
+  });
+
+  // Attach click listeners for history receipt item split buttons
+  historyFeedList.querySelectorAll('.item-split-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      triggerHaptic(8);
+      const expId = btn.getAttribute('data-exp-id');
+      const itemIdx = btn.getAttribute('data-item-idx');
+      const itemName = btn.getAttribute('data-item-name');
+      const itemCat = btn.getAttribute('data-item-cat');
+      const itemPrice = btn.getAttribute('data-item-price');
+      openSplitItemModal(expId, itemIdx, itemName, itemCat, itemPrice);
     });
   });
 
@@ -2761,6 +2912,91 @@ function setupEventListeners() {
         const histTab = Array.from(tabItems).find(t => t.getAttribute('data-view') === 'view-history');
         if (histTab) histTab.click();
       }
+    });
+  }
+
+  // Split Receipt Item Modal Listeners
+  const splitItemModal = document.getElementById('split-item-modal');
+  const closeSplitItem = document.getElementById('close-split-item');
+  const btnCancelSplit = document.getElementById('btn-cancel-split');
+  const btnConfirmSplit = document.getElementById('btn-confirm-split');
+  const splitItemNameInput = document.getElementById('split-item-name-input');
+  const splitItemCatSelect = document.getElementById('split-item-category-select');
+  const splitItemAmountInput = document.getElementById('split-item-amount-input');
+
+  const closeSplitModal = () => {
+    if (splitItemModal) splitItemModal.classList.remove('active');
+    activeSplitContext = null;
+  };
+
+  if (closeSplitItem) closeSplitItem.addEventListener('click', closeSplitModal);
+  if (btnCancelSplit) btnCancelSplit.addEventListener('click', closeSplitModal);
+  if (splitItemModal) {
+    splitItemModal.addEventListener('click', (e) => {
+      if (e.target === splitItemModal) closeSplitModal();
+    });
+  }
+
+  if (splitItemAmountInput) splitItemAmountInput.addEventListener('input', updateSplitPreview);
+  if (splitItemCatSelect) splitItemCatSelect.addEventListener('change', updateSplitPreview);
+  if (splitItemNameInput) splitItemNameInput.addEventListener('input', updateSplitPreview);
+
+  if (btnConfirmSplit) {
+    btnConfirmSplit.addEventListener('click', () => {
+      if (!activeSplitContext) return;
+      const parentExp = state.expenses.find(e => e.id === activeSplitContext.expId);
+      if (!parentExp) return;
+
+      const splitAmt = Number(parseFloat(splitItemAmountInput.value).toFixed(2));
+      const splitName = splitItemNameInput.value.trim() || activeSplitContext.itemName;
+      const targetCatId = splitItemCatSelect.value || 'shopping';
+
+      if (isNaN(splitAmt) || splitAmt <= 0 || splitAmt >= parentExp.amount) {
+        alert("Please enter a valid item cost greater than $0.00 and less than the total purchase amount.");
+        return;
+      }
+
+      triggerHaptic(12);
+
+      // 1. Deduct amount from parent
+      parentExp.amount = Number((parentExp.amount - splitAmt).toFixed(2));
+
+      // 2. Remove split item from parent's items list
+      let parentItems = [];
+      if (Array.isArray(parentExp.items)) {
+        parentItems = [...parentExp.items];
+      } else if (typeof parentExp.items === 'string') {
+        parentItems = parentExp.items.includes(';')
+          ? parentExp.items.split(';').map(s => s.trim()).filter(Boolean)
+          : parentExp.items.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean);
+      }
+
+      if (activeSplitContext.itemIdx >= 0 && activeSplitContext.itemIdx < parentItems.length) {
+        parentItems.splice(activeSplitContext.itemIdx, 1);
+      } else {
+        const foundIdx = parentItems.findIndex(it => it.toLowerCase().includes(activeSplitContext.itemName.toLowerCase()));
+        if (foundIdx !== -1) parentItems.splice(foundIdx, 1);
+      }
+      parentExp.items = parentItems;
+
+      // 3. Create the new child expense
+      const splitExp = {
+        id: generateId(),
+        amount: splitAmt,
+        description: `${parentExp.description || 'Expense'} (${splitName})`,
+        category: targetCatId,
+        date: parentExp.date,
+        items: [splitName],
+        notes: `Split from ${parentExp.description || 'receipt'} on ${parentExp.date}`
+      };
+
+      state.expenses.unshift(splitExp);
+      saveState();
+      closeSplitModal();
+      renderAll();
+
+      const targetCat = getCategory(targetCatId);
+      showUndoToast(`Split ${formatCurrency(splitAmt)} to ${targetCat.label}!`);
     });
   }
 

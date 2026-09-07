@@ -70,7 +70,7 @@
       amt = Math.max(...values);
     }
 
-    // Extract Product Titles
+    // Extract Product Titles and Prices
     const itemElements = Array.from(card.querySelectorAll([
       'a[href*="/p/"]',
       '[data-test="order-item-name"]',
@@ -80,8 +80,18 @@
     ].join(', ')));
 
     const itemTitles = itemElements
-      .map(el => (el.textContent || el.getAttribute('aria-label') || '').trim())
-      .filter(t => t.length > 2 && !/^\$\d/.test(t) && !/view order|details|reorder|track/i.test(t));
+      .map(el => {
+        const title = (el.textContent || el.getAttribute('aria-label') || '').trim();
+        if (title.length <= 2 || /^\$\d/.test(title) || /view order|details|reorder|track/i.test(title)) return null;
+        const container = el.closest('[data-test="order-item"], div[class*="OrderItem"], li, tr') || el.parentElement;
+        let priceStr = '';
+        if (container) {
+          const priceMatch = container.innerText.match(/\$([0-9,]+\.[0-9]{2})/);
+          if (priceMatch) priceStr = ` ($${priceMatch[1]})`;
+        }
+        return `${title}${priceStr}`;
+      })
+      .filter(Boolean);
 
     // Also check image alt tags if text links were empty
     if (itemTitles.length === 0) {
@@ -97,13 +107,24 @@
     const items = [...new Set(itemTitles)];
     const uniqueKey = `${dateStr}_${amt.toFixed(2)}`;
 
+    let cat = 'groceries';
+    if (items.length > 0) {
+      const isPureShopping = items.every(it => {
+        const lower = it.toLowerCase();
+        return /plush|toy|toys|stuffed|squishmallow|doll|lego|puzzle|shirt|pants|jeans|hoodie|shoes|socks|underwear|apparel|charger|battery|batteries|headphones|blender|towel|pillow|blanket|candle|knife|hardware/i.test(lower);
+      });
+      if (isPureShopping) {
+        cat = 'shopping';
+      }
+    }
+
     if (dateStr && amt > 0 && !seenKeys.has(uniqueKey)) {
       seenKeys.add(uniqueKey);
       orders.push({
         date: dateStr,
         amount: amt,
         description: 'Target',
-        category: 'groceries',
+        category: cat,
         items: items
       });
       console.log(`  ✅ ${dateStr} | $${amt.toFixed(2)} | ${items.slice(0, 3).join(', ')}${items.length > 3 ? ` (+${items.length - 3} more)` : ''}`);

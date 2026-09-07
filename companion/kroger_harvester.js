@@ -83,11 +83,26 @@
       await sleep(2200); // Wait for React product links to hydrate
 
       const doc = ifr.contentDocument || ifr.contentWindow?.document;
-      const links = doc ? Array.from(doc.querySelectorAll('a[href*="/p/"]'))
-        .map(el => el.textContent.trim())
-        .filter(t => t.length > 2) : [];
+      let items = [];
+      if (doc) {
+        const linkEls = Array.from(doc.querySelectorAll('a[href*="/p/"]'));
+        const seenTitles = new Set();
+        items = linkEls.map(el => {
+          const title = el.textContent.trim();
+          if (seenTitles.has(title) || title.length <= 2) return null;
+          seenTitles.add(title);
 
-      const items = [...new Set(links)];
+          // Attempt to extract item price from surrounding container
+          const container = el.closest('div[class*="Item"], div[class*="Product"], tr, li') || el.parentElement?.parentElement;
+          let priceStr = '';
+          if (container) {
+            const priceMatch = container.innerText.match(/\$([0-9,]+\.[0-9]{2})/);
+            if (priceMatch) priceStr = ` ($${priceMatch[1]})`;
+          }
+          return `${title}${priceStr}`;
+        }).filter(Boolean);
+      }
+
       results[ord.key] = items;
 
       const preview = items.slice(0, 3).join(', ') + (items.length > 3 ? ` (+${items.length - 3} more)` : '');
@@ -111,7 +126,18 @@
 
     const items = o.isFuel ? ['Kroger Fuel'] : (results[o.key] || []);
     const desc = o.isFuel ? 'Kroger Fuel' : 'Kroger';
-    const cat = o.isFuel ? 'transport' : 'groceries';
+    let cat = o.isFuel ? 'transport' : 'groceries';
+
+    // Smart check: If order consists 100% of non-grocery shopping items, auto-tag as shopping
+    if (!o.isFuel && items.length > 0) {
+      const isPureShopping = items.every(it => {
+        const lower = it.toLowerCase();
+        return /plush|toy|toys|stuffed|squishmallow|doll|lego|puzzle|shirt|pants|jeans|hoodie|shoes|socks|underwear|apparel|charger|battery|batteries|headphones|blender|towel|pillow|blanket|candle|knife|hardware/i.test(lower);
+      });
+      if (isPureShopping) {
+        cat = 'shopping';
+      }
+    }
 
     csvRows.push([
       o.date,
