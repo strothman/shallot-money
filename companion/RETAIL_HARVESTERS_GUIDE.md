@@ -61,6 +61,24 @@ When you buy groceries plus a non-grocery item (like a stuffed animal for your s
 
 ---
 
+## 🥦 Split-Tender EBT / SNAP Tracking
+
+If you pay for part of an order with **EBT (SNAP)** and the rest with **Credit Card, Debit, or Cash**:
+
+1. **Automatic Tender Detection**:
+   - The harvester reads the payment breakdown on the receipt (e.g. `SNAP / EBT $50.00` and `VISA $34.74`).
+2. **Penny-Accurate Split Rows**:
+   - It exports **two separate rows** in the CSV:
+     - `Kroger (Card)` $\rightarrow$ `$34.74`
+     - `Kroger (EBT)`  $\rightarrow$ `$50.00`
+3. **Flawless Bank Matching**:
+   - When you reconcile your checking account or credit card statement, the `$34.74` row matches your bank swipe to the exact penny!
+4. **Visual EBT Badges in Shallot Money**:
+   - Transactions tagged with `(EBT)` display a green sprout badge (`🌱 EBT`) on the dashboard and history, so you can easily track benefit spending.
+   - Since EBT is factored into your monthly pool at the top, both rows count normally toward your overall spending.
+
+---
+
 ## 💡 Tips for Family (e.g. Running on Mom's Computer)
 * You don't need to install Python, Node.js, or any software.
 * All you need is the browser she normally uses to shop on Kroger, Walmart, Sam's Club, or Target.

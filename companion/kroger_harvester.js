@@ -105,8 +105,21 @@
 
       results[ord.key] = items;
 
+      // Extract EBT & Card payment tenders if present
+      let tenders = { ebt: 0, card: 0 };
+      if (doc) {
+        const fullText = doc.body?.innerText || '';
+        const ebtMatch = fullText.match(/(?:snap|ebt|food\s*stamp)[^\$\n\r]*\$([0-9,]+\.[0-9]{2})/i);
+        if (ebtMatch) tenders.ebt = parseFloat(ebtMatch[1].replace(/,/g, ''));
+
+        const cardMatch = fullText.match(/(?:visa|mastercard|discover|amex|debit|credit|cash|apple\s*pay)[^\$\n\r]*\$([0-9,]+\.[0-9]{2})/i);
+        if (cardMatch) tenders.card = parseFloat(cardMatch[1].replace(/,/g, ''));
+      }
+      results[ord.key + '_tenders'] = tenders;
+
+      const tenderStr = (tenders.ebt > 0 && tenders.card > 0) ? ` [Split: EBT $${tenders.ebt.toFixed(2)} + Card $${tenders.card.toFixed(2)}]` : (tenders.ebt > 0 ? ` [EBT $${tenders.ebt.toFixed(2)}]` : '');
       const preview = items.slice(0, 3).join(', ') + (items.length > 3 ? ` (+${items.length - 3} more)` : '');
-      console.log(`[${i + 1}/${groceriesToExtract.length}] ${ord.date} | ${ord.total} | 🛍️ ${preview || '(Summary only)'}`);
+      console.log(`[${i + 1}/${groceriesToExtract.length}] ${ord.date} | ${ord.total} | 🛍️ ${preview || '(Summary only)'}${tenderStr}`);
 
     } catch (err) {
       console.warn("Could not extract items for", ord.key, err);
@@ -139,13 +152,42 @@
       }
     }
 
-    csvRows.push([
-      o.date,
-      amt.toFixed(2),
-      desc,
-      cat,
-      items.join('; ')
-    ]);
+    const tenders = results[o.key + '_tenders'] || { ebt: 0, card: 0 };
+
+    if (!o.isFuel && tenders.ebt > 0 && tenders.card > 0) {
+      // Split tender: export Card swipe (matches bank statement!) and EBT swipe separately
+      csvRows.push([
+        o.date,
+        tenders.card.toFixed(2),
+        `${desc} (Card)`,
+        cat,
+        items.join('; ')
+      ]);
+      csvRows.push([
+        o.date,
+        tenders.ebt.toFixed(2),
+        `${desc} (EBT)`,
+        cat,
+        items.join('; ')
+      ]);
+      console.log(`  💳 Split Tender Exported: ${desc} (Card) $${tenders.card.toFixed(2)} + ${desc} (EBT) $${tenders.ebt.toFixed(2)}`);
+    } else if (!o.isFuel && tenders.ebt > 0) {
+      csvRows.push([
+        o.date,
+        amt.toFixed(2),
+        `${desc} (EBT)`,
+        cat,
+        items.join('; ')
+      ]);
+    } else {
+      csvRows.push([
+        o.date,
+        amt.toFixed(2),
+        desc,
+        cat,
+        items.join('; ')
+      ]);
+    }
   }
 
   const csvContent = csvRows.map(row => row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");

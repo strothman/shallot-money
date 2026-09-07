@@ -101,15 +101,50 @@
       }
     }
 
+    // Detect EBT vs Card tender
+    let tenders = { ebt: 0, card: 0 };
+    const ebtMatch = text.match(/(?:snap|ebt|food\s*stamp)[^\$\n\r]*\$([0-9,]+\.[0-9]{2})/i);
+    if (ebtMatch) tenders.ebt = parseFloat(ebtMatch[1].replace(/,/g, ''));
+
+    const cardMatch = text.match(/(?:visa|mastercard|discover|amex|debit|credit|cash|walmart\s*pay)[^\$\n\r]*\$([0-9,]+\.[0-9]{2})/i);
+    if (cardMatch) tenders.card = parseFloat(cardMatch[1].replace(/,/g, ''));
+
     if (dateStr && amt > 0 && !seenKeys.has(uniqueKey)) {
       seenKeys.add(uniqueKey);
-      orders.push({
-        date: dateStr,
-        amount: amt,
-        description: 'Walmart',
-        category: cat,
-        items: items
-      });
+
+      if (tenders.ebt > 0 && tenders.card > 0) {
+        orders.push({
+          date: dateStr,
+          amount: tenders.card,
+          description: 'Walmart (Card)',
+          category: cat,
+          items: items
+        });
+        orders.push({
+          date: dateStr,
+          amount: tenders.ebt,
+          description: 'Walmart (EBT)',
+          category: cat,
+          items: items
+        });
+        console.log(`  💳 Split Tender: Walmart (Card) $${tenders.card.toFixed(2)} + Walmart (EBT) $${tenders.ebt.toFixed(2)}`);
+      } else if (tenders.ebt > 0) {
+        orders.push({
+          date: dateStr,
+          amount: amt,
+          description: 'Walmart (EBT)',
+          category: cat,
+          items: items
+        });
+      } else {
+        orders.push({
+          date: dateStr,
+          amount: amt,
+          description: 'Walmart',
+          category: cat,
+          items: items
+        });
+      }
       console.log(`  ✅ ${dateStr} | $${amt.toFixed(2)} | ${items.slice(0, 3).join(', ')}${items.length > 3 ? ` (+${items.length - 3} more)` : ''}`);
     }
   }

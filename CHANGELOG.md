@@ -7,6 +7,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [1.7.6] - 2026-09-07
+
+### Added & Enhanced
+- **Split-Tender EBT / SNAP Auto-Detection Across Retail Harvesters**:
+  - Automatically identifies split-tender orders where payment was divided between **EBT (SNAP)** and a **Credit Card, Debit Card, or Cash** across Kroger, Walmart, Sam's Club, and Target.
+  - Automatically exports two clean rows in the CSV:
+    - `Store (Card)` with the exact card charge that matches your bank statement to the penny.
+    - `Store (EBT)` with the exact SNAP benefit allowance spent.
+- **Visual EBT Badges in Shallot Money**:
+  - Expenses tagged with `(EBT)` or `SNAP` display a distinct emerald sprout badge (`🌱 EBT`) on the dashboard and transaction history feeds, making benefit usage instantly recognizable at a glance.
+  - Both card and EBT portions seamlessly flow into your monthly pool at the top.
+
+---
+
 ## [1.7.5] - 2026-09-07
 
 ### Added & Enhanced

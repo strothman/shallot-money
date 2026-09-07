@@ -233,9 +233,12 @@ function parseExpenseDetails(exp) {
     catDistribution[ci.categoryId] = (catDistribution[ci.categoryId] || 0) + 1;
   });
 
+  const isEbt = /[\(\s_–-]ebt[\)\s_–-]?|snap/i.test(cleanDesc) || /ebt|snap/i.test(exp.notes || '');
+
   return {
     merchant: cleanDesc || 'Expense',
     rawDescription: exp.description || '',
+    isEbt: isEbt,
     items: items,
     categorizedItems: categorizedItems,
     catDistribution: catDistribution,
@@ -1187,6 +1190,13 @@ function renderDashboard() {
         </button>
       ` : '';
 
+      const ebtBadgeHtml = details.isEbt ? `
+        <span class="ebt-badge" title="Paid via EBT / SNAP">
+          <i data-lucide="sprout"></i>
+          <span>EBT</span>
+        </span>
+      ` : '';
+
       const drawerHtml = renderReceiptDrawerHtml(details, `drawer-recent-${exp.id}`, exp);
 
       return `
@@ -1199,6 +1209,7 @@ function renderDashboard() {
               <div class="item-details">
                 <div class="item-title-row">
                   <span class="item-desc">${escapeHTML(details.merchant)}</span>
+                  ${ebtBadgeHtml}
                   ${receiptPillHtml}
                 </div>
                 ${hasItems ? `
@@ -1528,6 +1539,13 @@ function renderHistory() {
           </button>
         ` : '';
 
+        const ebtBadgeHtml = details.isEbt ? `
+          <span class="ebt-badge" title="Paid via EBT / SNAP">
+            <i data-lucide="sprout"></i>
+            <span>EBT</span>
+          </span>
+        ` : '';
+
         const drawerHtml = renderReceiptDrawerHtml(details, `drawer-hist-${exp.id}`, exp);
 
         return `
@@ -1540,6 +1558,7 @@ function renderHistory() {
                 <div class="item-details">
                   <div class="item-title-row">
                     <span class="item-desc">${escapeHTML(details.merchant)}</span>
+                    ${ebtBadgeHtml}
                     ${receiptPillHtml}
                   </div>
                   ${hasItems ? `
