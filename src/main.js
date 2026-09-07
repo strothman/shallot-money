@@ -180,7 +180,7 @@ function parseExpenseDetails(exp) {
     items = exp.items.split(/[,;\n]+/).map(it => it.trim()).filter(Boolean);
   }
 
-  // If no explicit items, check description for patterns like "Merchant (item1, item2, ...)"
+  // If no explicit items, check description for patterns like "Merchant (item1, item2, ...)", "Merchant: item1, item2", or "Merchant - item1, item2"
   if (items.length === 0 && cleanDesc) {
     const parenMatch = cleanDesc.match(/^(.*?)\s*\((.+)\)\s*$/);
     if (parenMatch) {
@@ -191,6 +191,17 @@ function parseExpenseDetails(exp) {
       if (candidateMerchant && splitItems.length > 0) {
         cleanDesc = candidateMerchant;
         items = splitItems;
+      }
+    } else {
+      const delimMatch = cleanDesc.match(/^([^:\-–—]{2,30})\s*[:\-–—]\s*(.+)$/);
+      if (delimMatch) {
+        const candidateMerchant = delimMatch[1].trim();
+        const rawItems = delimMatch[2].trim();
+        const splitItems = rawItems.split(/[,;]+/).map(s => s.trim()).filter(Boolean);
+        if (candidateMerchant && splitItems.length > 0) {
+          cleanDesc = candidateMerchant;
+          items = splitItems;
+        }
       }
     }
   }
@@ -1031,6 +1042,12 @@ function renderDashboard() {
                   <span class="item-desc">${escapeHTML(details.merchant)}</span>
                   ${receiptPillHtml}
                 </div>
+                ${hasItems ? `
+                  <div class="item-purchased-summary" title="${escapeHTML(details.items.join(', '))}">
+                    <i data-lucide="shopping-bag"></i>
+                    <span>${escapeHTML(details.items.join(', '))}</span>
+                  </div>
+                ` : ''}
                 <span class="item-meta">${formatDateDisplay(exp.date)} &bull; ${escapeHTML(cat.label)}</span>
               </div>
             </div>
@@ -1352,6 +1369,12 @@ function renderHistory() {
                     <span class="item-desc">${escapeHTML(details.merchant)}</span>
                     ${receiptPillHtml}
                   </div>
+                  ${hasItems ? `
+                    <div class="item-purchased-summary" title="${escapeHTML(details.items.join(', '))}">
+                      <i data-lucide="shopping-bag"></i>
+                      <span>${escapeHTML(details.items.join(', '))}</span>
+                    </div>
+                  ` : ''}
                   <span class="item-meta">${escapeHTML(cat.label)}</span>
                 </div>
               </div>
@@ -2097,9 +2120,24 @@ function importFromCSV(fileContent) {
     catMap[c.id] = c.id;
   });
 
+  // Prepare unmatched pool of existing expenses for smart duplicate detection with dollar amount verification
+  const unmatchedExpenses = state.expenses.map((exp, idx) => {
+    const details = parseExpenseDetails(exp);
+    return {
+      index: idx,
+      id: exp.id,
+      date: exp.date,
+      amount: Math.abs(exp.amount),
+      merchantClean: (details.merchant || exp.description || '').toLowerCase().replace(/[^a-z0-9]/g, ''),
+      rawDescClean: (exp.description || '').toLowerCase().replace(/[^a-z0-9]/g, ''),
+      claimed: false
+    };
+  });
+
   const existingIds = new Set(state.expenses.map(e => e.id));
   let addedCount = 0;
   let skippedCount = 0;
+  let enrichedCount = 0;
 
   for (let i = startRow; i < lines.length; i++) {
     const fields = parseCSVLine(lines[i]);
@@ -2109,6 +2147,61 @@ function importFromCSV(fileContent) {
     const rawCatName = catIdx !== -1 ? (fields[catIdx] || '').trim() : '';
     const rawItems = itemsIdx !== -1 && fields.length > itemsIdx ? (fields[itemsIdx] || '').trim() : '';
     const catLower = rawCatName.toLowerCase();
+
+    // Validate
+    if (!dateStr || isNaN(amount) || amount === 0) {
+      skippedCount++;
+      continue;
+    }
+
+    // Normalize date format (handle M/D/YYYY or YYYY-MM-DD)
+    let normalizedDate = dateStr;
+    const slashMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (slashMatch) {
+      normalizedDate = `${slashMatch[3]}-${slashMatch[1].padStart(2, '0')}-${slashMatch[2].padStart(2, '0')}`;
+    }
+
+    const incomingAbsAmt = Math.abs(amount);
+    const incomingDescClean = description.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const parsedItems = rawItems ? rawItems.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean) : [];
+
+    // Verify existing transaction: match date, merchant/description, AND verify exact dollar amount
+    const matchedExisting = unmatchedExpenses.find(exp => {
+      if (exp.claimed) return false;
+
+      // 1. Must match date
+      if (exp.date !== normalizedDate) return false;
+
+      // 2. MUST VERIFY EXACT DOLLAR AMOUNT (within 1 cent)
+      const amtMatches = Math.abs(exp.amount - incomingAbsAmt) < 0.009;
+      if (!amtMatches) return false;
+
+      // 3. Must match description or merchant
+      const descMatches = (
+        exp.merchantClean === incomingDescClean ||
+        exp.rawDescClean === incomingDescClean ||
+        (incomingDescClean.length >= 3 && exp.merchantClean.includes(incomingDescClean)) ||
+        (exp.merchantClean.length >= 3 && incomingDescClean.includes(exp.merchantClean)) ||
+        (incomingDescClean.length >= 3 && exp.rawDescClean.includes(incomingDescClean))
+      );
+
+      return descMatches;
+    });
+
+    if (matchedExisting) {
+      // Dollar amount and transaction verified as already in app -> skip to preserve user edits!
+      matchedExisting.claimed = true;
+
+      // If existing transaction had no items, but this verified row has items, auto-enrich it!
+      const existingExp = state.expenses[matchedExisting.index];
+      if (existingExp && parsedItems.length > 0 && (!existingExp.items || existingExp.items.length === 0)) {
+        existingExp.items = parsedItems;
+        enrichedCount++;
+      }
+
+      skippedCount++;
+      continue;
+    }
 
     let categoryId = catMap[catLower];
     if (!categoryId && rawCatName) {
@@ -2129,26 +2222,11 @@ function importFromCSV(fileContent) {
       categoryId = cats[0]?.id || 'groceries';
     }
 
-    // Validate
-    if (!dateStr || isNaN(amount) || amount === 0) {
-      skippedCount++;
-      continue;
-    }
-
-    // Normalize date format (handle M/D/YYYY or YYYY-MM-DD)
-    let normalizedDate = dateStr;
-    const slashMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-    if (slashMatch) {
-      normalizedDate = `${slashMatch[3]}-${slashMatch[1].padStart(2, '0')}-${slashMatch[2].padStart(2, '0')}`;
-    }
-
-    const id = `csv_${i}_${normalizedDate}_${amount}`;
+    // Ensure unique ID
+    let id = `csv_${i}_${normalizedDate}_${amount}`;
     if (existingIds.has(id)) {
-      skippedCount++;
-      continue;
+      id = `${id}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
     }
-
-    const parsedItems = rawItems ? rawItems.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean) : [];
 
     const newExpense = {
       id,
@@ -2173,7 +2251,8 @@ function importFromCSV(fileContent) {
   renderHistory();
 
   let msg = `Import complete! Added ${addedCount} expense(s).`;
-  if (skippedCount > 0) msg += ` Skipped ${skippedCount} row(s) (duplicates or invalid).`;
+  if (enrichedCount > 0) msg += ` Enriched ${enrichedCount} existing expense(s) with purchased items.`;
+  if (skippedCount > 0) msg += ` Skipped ${skippedCount} duplicate row(s) (verified existing transactions by amount & date).`;
   alert(msg);
 }
 
@@ -2186,6 +2265,8 @@ function deduplicateExpenses() {
   // Known legitimate twin charges / dual memberships
   const dualChargeKeywords = ['planet fitness', 'membership', 'gym', 'subscription'];
 
+  const keyMap = new Map();
+
   state.expenses.forEach(exp => {
     const descLower = (exp.description || '').toLowerCase().trim();
     const isDualExempt = dualChargeKeywords.some(kw => descLower.includes(kw));
@@ -2196,12 +2277,17 @@ function deduplicateExpenses() {
       return;
     }
 
-    // Unique key matching normalized date, absolute amount (2 decimals), and lowercase description
-    const key = `${exp.date}_${Math.abs(exp.amount).toFixed(2)}_${descLower}`;
-    if (seen.has(key)) {
+    // Unique key matching normalized date and absolute amount (2 decimals)
+    const key = `${exp.date}_${Math.abs(exp.amount).toFixed(2)}`;
+    if (keyMap.has(key)) {
       duplicatesCount++;
+      const existing = keyMap.get(key);
+      // If the duplicate has items, preserve them onto the existing one!
+      if (exp.items && exp.items.length > 0 && (!existing.items || existing.items.length === 0)) {
+        existing.items = exp.items;
+      }
     } else {
-      seen.add(key);
+      keyMap.set(key, exp);
       uniqueList.push(exp);
     }
   });

@@ -857,6 +857,34 @@ body {
   font-weight: 600;
 }
 
+.item-purchased-summary {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.76rem;
+  color: var(--copper-glow, #d48244);
+  font-weight: 500;
+  line-height: 1.3;
+  margin: 1px 0;
+  max-width: min(280px, calc(100vw - 160px));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-purchased-summary span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-purchased-summary i {
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
 /* Receipt Item Pills & Badges */
 .receipt-pill {
   display: inline-flex;

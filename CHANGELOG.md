@@ -7,6 +7,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [1.7.1] - 2026-09-07
+
+### Added & Enhanced
+- **Smart CSV Import Deduplication & Dollar Amount Verification**:
+  - The CSV importer now checks existing transactions and **strictly verifies the exact dollar amount** (along with date and merchant) before skipping any incoming row.
+  - Guarantees that manual edits (e.g. re-categorizing Target from "shopping" to "groceries") are preserved without being reverted or duplicated across overlapping statement imports.
+  - If a transaction on the same date at the same merchant has a different dollar amount, it is recognized as a separate purchase and safely imported rather than skipped.
+  - Immune to row number shifts across monthly export files.
+
+---
+
 ## [1.7.0] - 2026-09-03
 
 ### Added & Enhanced
