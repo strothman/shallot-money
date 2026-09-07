@@ -102,7 +102,9 @@ const ITEM_RULES = {
     'chicken', 'beef', 'pork', 'meat', 'patty', 'patties', 'nugget', 'nuggets', 'nugs', 'fries', 'fish', 'salmon',
     'tuna', 'turkey', 'bacon', 'sausage', 'water', 'cereal', 'salsa', 'chips', 'sauce', 'oil', 'pasta', 'rice',
     'soup', 'bean', 'beans', 'flour', 'sugar', 'spice', 'spices', 'pepper', 'salt', 'cookie', 'cookies', 'sweet bread',
-    'donette', 'donettes', 'can', 'cans', 'groceries', 'grocery', 'lime', 'lemon', 'orange', 'berry', 'berries'
+    'donette', 'donettes', 'can', 'cans', 'groceries', 'grocery', 'lime', 'lemon', 'orange', 'berry', 'berries',
+    'cucumber', 'dill', 'snack', 'candy', 'cracker', 'crackers', 'seasoning', 'pop-it', 'lunchmeat', 'bologna',
+    'whiskey', 'bourbon', 'tea', 'rolls', 'pudding', 'sparkling', 'prebiotic', 'soda', 'coca-cola', 'dew', 'fanta', 'dr pepper'
   ],
   fastfood: [
     'sandwich', 'sandwiches', 'pizza', 'pizzas', 'burger', 'burgers', 'taco', 'tacos', 'burrito', 'burritos',
@@ -210,19 +212,13 @@ function parseExpenseDetails(exp) {
 
   // Smart classify each item
   const hasGroceries = state.categories.some(c => c.id === 'groceries');
-  const hasFood = state.categories.some(c => c.id === 'food');
-  const fallbackCat = (exp.category === 'food' && hasGroceries && !hasFood) ? 'groceries' : (exp.category || 'groceries');
-
   const categorizedItems = items.map(item => {
     let detectedCatId = categorizeItem(item);
-    // Align grocery category ID with whatever category the user has configured
-    if (detectedCatId === 'groceries') {
-      if (!hasGroceries && hasFood) detectedCatId = 'food';
-      else if (fallbackCat === 'food') detectedCatId = 'food';
-    }
+    let finalCat = detectedCatId || exp.category || 'groceries';
+    if (finalCat === 'food') finalCat = 'groceries';
     return {
       name: item,
-      categoryId: detectedCatId || fallbackCat
+      categoryId: finalCat
     };
   });
 
@@ -653,6 +649,27 @@ function loadState() {
       if (!state.currency) state.currency = '$';
       if (!state.categories || !Array.isArray(state.categories) || state.categories.length === 0) {
         state.categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+      }
+
+      // Automatically adopt all 'food' expenses and categories into 'groceries'
+      let migrated = false;
+      if (Array.isArray(state.expenses)) {
+        state.expenses.forEach(exp => {
+          if (exp.category === 'food') {
+            exp.category = 'groceries';
+            migrated = true;
+          }
+        });
+      }
+      if (Array.isArray(state.categories)) {
+        const foodIdx = state.categories.findIndex(c => c.id === 'food');
+        if (foodIdx !== -1) {
+          state.categories.splice(foodIdx, 1);
+          migrated = true;
+        }
+      }
+      if (migrated) {
+        saveState();
       }
     } catch (e) {
       console.error('Error loading state from localStorage:', e);
@@ -2213,7 +2230,7 @@ function importFromCSV(fileContent) {
       continue;
     }
 
-    let categoryId = catMap[catLower];
+    let categoryId = (catLower === 'food' || catLower === 'groceries') ? 'groceries' : catMap[catLower];
     if (!categoryId && rawCatName) {
       const slug = rawCatName.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 16) + '_' + Date.now().toString().slice(-4);
       const randomColor = AVAILABLE_COLORS[cats.length % AVAILABLE_COLORS.length];
