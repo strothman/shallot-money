@@ -177,7 +177,9 @@ function parseExpenseDetails(exp) {
   if (Array.isArray(exp.items) && exp.items.length > 0) {
     items = exp.items.map(it => String(it).trim()).filter(Boolean);
   } else if (typeof exp.items === 'string' && exp.items.trim()) {
-    items = exp.items.split(/[,;\n]+/).map(it => it.trim()).filter(Boolean);
+    items = exp.items.includes(';')
+      ? exp.items.split(';').map(it => it.trim()).filter(Boolean)
+      : exp.items.split(/[,;\n]+/).map(it => it.trim()).filter(Boolean);
   }
 
   // If no explicit items, check description for patterns like "Merchant (item1, item2, ...)", "Merchant: item1, item2", or "Merchant - item1, item2"
@@ -207,11 +209,20 @@ function parseExpenseDetails(exp) {
   }
 
   // Smart classify each item
+  const hasGroceries = state.categories.some(c => c.id === 'groceries');
+  const hasFood = state.categories.some(c => c.id === 'food');
+  const fallbackCat = (exp.category === 'food' && hasGroceries && !hasFood) ? 'groceries' : (exp.category || 'groceries');
+
   const categorizedItems = items.map(item => {
-    const detectedCatId = categorizeItem(item);
+    let detectedCatId = categorizeItem(item);
+    // Align grocery category ID with whatever category the user has configured
+    if (detectedCatId === 'groceries') {
+      if (!hasGroceries && hasFood) detectedCatId = 'food';
+      else if (fallbackCat === 'food') detectedCatId = 'food';
+    }
     return {
       name: item,
-      categoryId: detectedCatId || exp.category || 'groceries'
+      categoryId: detectedCatId || fallbackCat
     };
   });
 
@@ -2162,8 +2173,7 @@ function importFromCSV(fileContent) {
     }
 
     const incomingAbsAmt = Math.abs(amount);
-    const incomingDescClean = description.toLowerCase().replace(/[^a-z0-9]/g, '');
-    const parsedItems = rawItems ? rawItems.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean) : [];
+    const parsedItems = rawItems ? (rawItems.includes(';') ? rawItems.split(';').map(s => s.trim()).filter(Boolean) : rawItems.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean)) : [];
 
     // Verify existing transaction: match date, merchant/description, AND verify exact dollar amount
     const matchedExisting = unmatchedExpenses.find(exp => {
