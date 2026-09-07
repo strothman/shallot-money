@@ -62,72 +62,179 @@
   const groceriesToExtract = orders.filter(o => !o.isFuel && o.key);
   console.log(`\n🛍️ Step 2: Extracting grocery line items for ${groceriesToExtract.length} receipts...`);
 
-  // Step 2: Micro-worker iframe to extract exact product links without triggering rate limits
-  const results = {};
-  const ifr = document.createElement('iframe');
-  ifr.style.cssText = 'width: 10px; height: 10px; position: fixed; bottom: 0; right: 0; opacity: 0; pointer-events: none;';
-  document.body.appendChild(ifr);
+  // Step 2: Extract grocery line items & tender info
+  // Uses session cache to resume if ever interrupted, tries direct API first, and disposes iframes to prevent memory leaks
+  const cacheKey = 'shallot_kroger_results_cache';
+  let results = {};
+  try {
+    results = JSON.parse(sessionStorage.getItem(cacheKey) || '{}');
+  } catch (e) {
+    results = {};
+  }
+
+  const detailHeaders = {
+    "accept": "application/json, text/plain, */*",
+    "content-type": "application/json",
+    "x-call-origin": "{\"page\":\"/mypurchases/detail\",\"component\":\"purchase detail\"}",
+    "x-kroger-channel": "WEB"
+  };
+
+  // Helper: Try direct API for an order
+  async function tryDirectApi(ord) {
+    const parts = (ord.key || '').split('~');
+    if (parts.length < 5) return null;
+    try {
+      const res = await fetch("https://www.kroger.com/atlas/v1/purchase-history/v2/details", {
+        method: "POST",
+        credentials: "include",
+        headers: detailHeaders,
+        body: JSON.stringify([{
+          divisionNumber: parts[0],
+          storeNumber: parts[1],
+          transactionDate: parts[2],
+          terminalNumber: parts[3],
+          transactionId: parts[4]
+        }])
+      });
+      if (!res.ok) return null;
+      const json = await res.json();
+      const det = json.data?.purchaseHistoryDetails?.[0];
+      if (!det) return null;
+
+      const items = (det.items || []).map(it => {
+        const desc = it.purchasedData?.displayInfo?.description?.trim();
+        if (!desc) return null;
+        let priceStr = '';
+        const priceVal = it.costSummary?.total || it.price?.regular || it.price?.sale;
+        if (priceVal) {
+          const num = parseFloat(String(priceVal).replace(/[^0-9.]/g, ''));
+          if (!isNaN(num) && num > 0) priceStr = ` ($${num.toFixed(2)})`;
+        }
+        return `${desc}${priceStr}`;
+      }).filter(Boolean);
+
+      const tenders = { ebt: 0, card: 0 };
+      const tenderList = det.tenderInformation || det.tenders || [];
+      for (const t of tenderList) {
+        const tType = (t.tenderType || t.type || '').toLowerCase();
+        const tAmt = parseFloat(String(t.amount || '0').replace(/[^0-9.]/g, '')) || 0;
+        if (/ebt|snap|food\s*stamp/i.test(tType)) tenders.ebt += tAmt;
+        else if (/visa|mastercard|discover|amex|credit|debit|card/i.test(tType)) tenders.card += tAmt;
+      }
+
+      return { items, tenders };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Probe direct API on the first order
+  let useDirectApi = false;
+  if (groceriesToExtract.length > 0) {
+    const probe = await tryDirectApi(groceriesToExtract[0]);
+    if (probe && probe.items && probe.items.length > 0) {
+      useDirectApi = true;
+      console.log("⚡ Kroger Fast Direct API active! Extracting with zero browser memory overhead...");
+    }
+  }
 
   for (let i = 0; i < groceriesToExtract.length; i++) {
     const ord = groceriesToExtract[i];
-    const url = `https://www.kroger.com/mypurchases/detail/${ord.key}`;
 
-    try {
-      await new Promise(res => {
-        let done = false;
-        ifr.onload = () => { done = true; res(); };
-        ifr.src = url;
-        setTimeout(() => { if (!done) res(); }, 6000);
-      });
-
-      await sleep(2200); // Wait for React product links to hydrate
-
-      const doc = ifr.contentDocument || ifr.contentWindow?.document;
-      let items = [];
-      if (doc) {
-        const linkEls = Array.from(doc.querySelectorAll('a[href*="/p/"]'));
-        const seenTitles = new Set();
-        items = linkEls.map(el => {
-          const title = el.textContent.trim();
-          if (seenTitles.has(title) || title.length <= 2) return null;
-          seenTitles.add(title);
-
-          // Attempt to extract item price from surrounding container
-          const container = el.closest('div[class*="Item"], div[class*="Product"], tr, li') || el.parentElement?.parentElement;
-          let priceStr = '';
-          if (container) {
-            const priceMatch = container.innerText.match(/\$([0-9,]+\.[0-9]{2})/);
-            if (priceMatch) priceStr = ` ($${priceMatch[1]})`;
-          }
-          return `${title}${priceStr}`;
-        }).filter(Boolean);
-      }
-
-      results[ord.key] = items;
-
-      // Extract EBT & Card payment tenders if present
-      let tenders = { ebt: 0, card: 0 };
-      if (doc) {
-        const fullText = doc.body?.innerText || '';
-        const ebtMatch = fullText.match(/(?:snap|ebt|food\s*stamp)[^\$\n\r]*\$([0-9,]+\.[0-9]{2})/i);
-        if (ebtMatch) tenders.ebt = parseFloat(ebtMatch[1].replace(/,/g, ''));
-
-        const cardMatch = fullText.match(/(?:visa|mastercard|discover|amex|debit|credit|cash|apple\s*pay)[^\$\n\r]*\$([0-9,]+\.[0-9]{2})/i);
-        if (cardMatch) tenders.card = parseFloat(cardMatch[1].replace(/,/g, ''));
-      }
-      results[ord.key + '_tenders'] = tenders;
-
-      const tenderStr = (tenders.ebt > 0 && tenders.card > 0) ? ` [Split: EBT $${tenders.ebt.toFixed(2)} + Card $${tenders.card.toFixed(2)}]` : (tenders.ebt > 0 ? ` [EBT $${tenders.ebt.toFixed(2)}]` : '');
-      const preview = items.slice(0, 3).join(', ') + (items.length > 3 ? ` (+${items.length - 3} more)` : '');
-      console.log(`[${i + 1}/${groceriesToExtract.length}] ${ord.date} | ${ord.total} | 🛍️ ${preview || '(Summary only)'}${tenderStr}`);
-
-    } catch (err) {
-      console.warn("Could not extract items for", ord.key, err);
+    // Check if already extracted in cache
+    if (results[ord.key] && results[ord.key + '_tenders']) {
+      const cachedItems = results[ord.key];
+      const cachedTenders = results[ord.key + '_tenders'];
+      const preview = cachedItems.slice(0, 3).join(', ') + (cachedItems.length > 3 ? ` (+${cachedItems.length - 3} more)` : '');
+      console.log(`[${i + 1}/${groceriesToExtract.length}] ${ord.date} | ${ord.total} | ⚡ (Cached) ${preview || '(Summary only)'}`);
+      continue;
     }
-    await sleep(200);
-  }
 
-  ifr.remove();
+    let items = [];
+    let tenders = { ebt: 0, card: 0 };
+
+    if (useDirectApi) {
+      const apiData = await tryDirectApi(ord);
+      if (apiData) {
+        items = apiData.items;
+        tenders = apiData.tenders;
+      }
+      await sleep(150);
+    }
+
+    // Fallback to sandboxed, memory-disposed micro-iframe if direct API returned nothing
+    if (items.length === 0) {
+      const url = `https://www.kroger.com/mypurchases/detail/${ord.key}`;
+      let ifr = document.createElement('iframe');
+      ifr.style.cssText = 'width: 10px; height: 10px; position: fixed; bottom: 0; right: 0; opacity: 0; pointer-events: none;';
+      document.body.appendChild(ifr);
+
+      try {
+        await new Promise(res => {
+          let done = false;
+          ifr.onload = () => { done = true; res(); };
+          ifr.src = url;
+          setTimeout(() => { if (!done) res(); }, 5500);
+        });
+
+        await sleep(2000); // Allow product cards to hydrate
+
+        const doc = ifr.contentDocument || ifr.contentWindow?.document;
+        if (doc) {
+          const linkEls = Array.from(doc.querySelectorAll('a[href*="/p/"]'));
+          const seenTitles = new Set();
+          items = linkEls.map(el => {
+            const title = el.textContent.trim();
+            if (seenTitles.has(title) || title.length <= 2) return null;
+            seenTitles.add(title);
+
+            const container = el.closest('div[class*="Item"], div[class*="Product"], tr, li') || el.parentElement?.parentElement;
+            let priceStr = '';
+            if (container) {
+              const priceMatch = container.innerText.match(/\$([0-9,]+\.[0-9]{2})/);
+              if (priceMatch) priceStr = ` ($${priceMatch[1]})`;
+            }
+            return `${title}${priceStr}`;
+          }).filter(Boolean);
+
+          const fullText = doc.body?.innerText || '';
+          const ebtMatch = fullText.match(/(?:snap|ebt|food\s*stamp)[^\$\n\r]*\$([0-9,]+\.[0-9]{2})/i);
+          if (ebtMatch) tenders.ebt = parseFloat(ebtMatch[1].replace(/,/g, ''));
+
+          const cardMatch = fullText.match(/(?:visa|mastercard|discover|amex|debit|credit|cash|apple\s*pay)[^\$\n\r]*\$([0-9,]+\.[0-9]{2})/i);
+          if (cardMatch) tenders.card = parseFloat(cardMatch[1].replace(/,/g, ''));
+        }
+      } catch (err) {
+        console.warn("Could not extract items for", ord.key, err);
+      } finally {
+        // Crucial: Clean up iframe completely to free browser memory
+        try {
+          ifr.src = 'about:blank';
+          ifr.remove();
+          ifr = null;
+        } catch (e) {}
+      }
+
+      // Memory breather every 5 orders to let Chromium GC reclaim memory
+      if (i % 5 === 0) {
+        await sleep(400);
+      } else {
+        await sleep(150);
+      }
+    }
+
+    results[ord.key] = items;
+    results[ord.key + '_tenders'] = tenders;
+
+    // Save progress to session storage
+    try {
+      sessionStorage.setItem(cacheKey, JSON.stringify(results));
+    } catch (e) {}
+
+    const tenderStr = (tenders.ebt > 0 && tenders.card > 0) ? ` [Split: EBT $${tenders.ebt.toFixed(2)} + Card $${tenders.card.toFixed(2)}]` : (tenders.ebt > 0 ? ` [EBT $${tenders.ebt.toFixed(2)}]` : '');
+    const preview = items.slice(0, 3).join(', ') + (items.length > 3 ? ` (+${items.length - 3} more)` : '');
+    console.log(`[${i + 1}/${groceriesToExtract.length}] ${ord.date} | ${ord.total} | 🛍️ ${preview || '(Summary only)'}${tenderStr}`);
+  }
 
   // Step 3: Build Shallot Money CSV
   console.log("\n💾 Step 3: Generating Shallot Money CSV...");
