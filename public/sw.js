@@ -1,4 +1,4 @@
-const CACHE_NAME = 'shallot-money-v1.7.6';
+const CACHE_NAME = 'shallot-money-v1.7.7';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

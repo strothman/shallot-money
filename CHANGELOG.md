@@ -7,6 +7,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [1.7.7] - 2026-09-07
+
+### Added & Enhanced
+- **Smart Reharvesting & Split-Tender Upgrade Engine**:
+  - Safely reharvest and re-import store receipts without fear of creating duplicate entries.
+  - Automatically identifies previous single-swipe transactions (e.g. `$72.37` total) that have now been split into separate tender rows (`Store (Card)` and `Store (EBT)`) in a reharvested CSV.
+  - Seamlessly replaces the legacy single-swipe row with the clean dual-tender split rows so card charges match bank statements to the penny.
+  - Automatically enriches existing transactions with newly extracted line-item prices (e.g. `Item ($X.XX)`) and upgrades categories (e.g. to `shopping` if purely non-grocery).
+  - Displays a detailed import summary: `Upgraded X order(s) to clean EBT/Card split tenders`, `Enriched Y existing expense(s)`, and `Skipped Z duplicate row(s)`.
+
+---
+
 ## [1.7.6] - 2026-09-07
 
 ### Added & Enhanced

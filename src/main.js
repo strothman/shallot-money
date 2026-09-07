@@ -2303,7 +2303,6 @@ function importFromCSV(fileContent) {
   if (headerIndex !== -1) {
     startRow = headerIndex + 1;
   } else {
-    // Headerless check
     const firstRow = parseCSVLine(lines[0]);
     if (firstRow.length >= 2 && !isNaN(parseFloat(firstRow[1]))) {
       dateIdx = 0;
@@ -2313,12 +2312,13 @@ function importFromCSV(fileContent) {
       itemsIdx = firstRow.length > 4 ? 4 : -1;
       startRow = 0;
     } else {
-      alert('Could not find "Date" and "Amount" columns. Please verify the CSV text contains dates and amounts.');
+      alert('Could not find "Date" and "Amount" columns. Please verify the CSV contains dates and amounts.');
       return;
     }
   }
 
-  // Build category label-to-id map
+  createSnapshot('Pre-CSV import backup');
+
   const cats = getCategories();
   const catMap = {};
   cats.forEach(c => {
@@ -2326,95 +2326,170 @@ function importFromCSV(fileContent) {
     catMap[c.id] = c.id;
   });
 
-  // Prepare unmatched pool of existing expenses for smart duplicate detection with dollar amount verification
-  const unmatchedExpenses = state.expenses.map((exp, idx) => {
-    const details = parseExpenseDetails(exp);
-    return {
-      index: idx,
-      id: exp.id,
-      date: exp.date,
-      amount: Math.abs(exp.amount),
-      merchantClean: (details.merchant || exp.description || '').toLowerCase().replace(/[^a-z0-9]/g, ''),
-      rawDescClean: (exp.description || '').toLowerCase().replace(/[^a-z0-9]/g, ''),
-      claimed: false
-    };
-  });
-
-  const existingIds = new Set(state.expenses.map(e => e.id));
-  let addedCount = 0;
-  let skippedCount = 0;
-  let enrichedCount = 0;
-
+  // Step 1: Parse and validate all incoming rows
+  const incomingRows = [];
   for (let i = startRow; i < lines.length; i++) {
     const fields = parseCSVLine(lines[i]);
     const dateStr = fields[dateIdx];
     const amount = parseFloat(fields[amountIdx]);
-    const description = descIdx !== -1 ? fields[descIdx] : 'Imported expense';
+    const description = descIdx !== -1 ? (fields[descIdx] || 'Imported expense').trim() : 'Imported expense';
     const rawCatName = catIdx !== -1 ? (fields[catIdx] || '').trim() : '';
     const rawItems = itemsIdx !== -1 && fields.length > itemsIdx ? (fields[itemsIdx] || '').trim() : '';
-    const catLower = rawCatName.toLowerCase();
 
-    // Validate
-    if (!dateStr || isNaN(amount) || amount === 0) {
-      skippedCount++;
-      continue;
-    }
+    if (!dateStr || isNaN(amount) || amount === 0) continue;
 
-    // Normalize date format (handle M/D/YYYY or YYYY-MM-DD)
     let normalizedDate = dateStr;
     const slashMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
     if (slashMatch) {
       normalizedDate = `${slashMatch[3]}-${slashMatch[1].padStart(2, '0')}-${slashMatch[2].padStart(2, '0')}`;
     }
 
-    const incomingAbsAmt = Math.abs(amount);
     const parsedItems = rawItems ? (rawItems.includes(';') ? rawItems.split(';').map(s => s.trim()).filter(Boolean) : rawItems.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean)) : [];
 
-    // Verify existing transaction: match date, merchant/description, AND verify exact dollar amount
+    // Base merchant stripping (Card), (EBT), etc.
+    const baseMerchant = description.toLowerCase()
+      .replace(/\s*\((?:card|ebt|snap|groceries|shopping)\)/gi, '')
+      .replace(/[^a-z0-9]/g, '');
+
+    incomingRows.push({
+      lineIdx: i,
+      date: normalizedDate,
+      amount: Math.abs(amount),
+      isRefund: amount < 0,
+      description: description,
+      baseMerchant: baseMerchant,
+      rawCatName: rawCatName,
+      parsedItems: parsedItems
+    });
+  }
+
+  // Step 2: Detect Split Tender Replacements
+  // Group incoming rows by (date, baseMerchant)
+  const incomingGroups = {};
+  incomingRows.forEach(row => {
+    const key = `${row.date}_${row.baseMerchant}`;
+    if (!incomingGroups[key]) incomingGroups[key] = [];
+    incomingGroups[key].push(row);
+  });
+
+  let replacedSplitCount = 0;
+  const replacedExistingIds = new Set();
+
+  Object.entries(incomingGroups).forEach(([key, groupRows]) => {
+    // Check if this group contains a tender split (e.g. Card + EBT)
+    const hasTenderSplit = groupRows.length >= 2 && groupRows.some(r => /ebt|snap/i.test(r.description)) && groupRows.some(r => /card|visa|credit|debit/i.test(r.description));
+    if (!hasTenderSplit) return;
+
+    const groupTotal = groupRows.reduce((sum, r) => sum + r.amount, 0);
+    const date = groupRows[0].date;
+    const baseMerchant = groupRows[0].baseMerchant;
+
+    // Look for single existing transaction matching this date and baseMerchant with total amount
+    const singleExisting = state.expenses.find(exp => {
+      if (exp.date !== date) return false;
+      const expBase = (exp.description || '').toLowerCase()
+        .replace(/\s*\((?:card|ebt|snap|groceries|shopping)\)/gi, '')
+        .replace(/[^a-z0-9]/g, '');
+      if (expBase !== baseMerchant && !expBase.includes(baseMerchant) && !baseMerchant.includes(expBase)) return false;
+      return Math.abs(Math.abs(exp.amount) - groupTotal) < 0.02;
+    });
+
+    if (singleExisting) {
+      replacedExistingIds.add(singleExisting.id);
+      replacedSplitCount++;
+    }
+  });
+
+  // Remove replaced single swipe transactions
+  if (replacedExistingIds.size > 0) {
+    state.expenses = state.expenses.filter(exp => !replacedExistingIds.has(exp.id));
+  }
+
+  // Step 3: Match remaining existing expenses
+  const unmatchedExpenses = state.expenses.map((exp, idx) => {
+    const details = parseExpenseDetails(exp);
+    const base = (details.merchant || exp.description || '').toLowerCase()
+      .replace(/\s*\((?:card|ebt|snap|groceries|shopping)\)/gi, '')
+      .replace(/[^a-z0-9]/g, '');
+    return {
+      index: idx,
+      id: exp.id,
+      date: exp.date,
+      amount: Math.abs(exp.amount),
+      base: base,
+      claimed: false
+    };
+  });
+
+  let addedCount = 0;
+  let skippedCount = 0;
+  let enrichedCount = 0;
+  const existingIds = new Set(state.expenses.map(e => e.id));
+
+  for (const row of incomingRows) {
+    const incomingAbsAmt = row.amount;
+    const incomingBase = row.baseMerchant;
+
+    // Check exact match (date, amount, base merchant)
     const matchedExisting = unmatchedExpenses.find(exp => {
       if (exp.claimed) return false;
+      if (exp.date !== row.date) return false;
+      if (Math.abs(exp.amount - incomingAbsAmt) >= 0.009) return false;
 
-      // 1. Must match date
-      if (exp.date !== normalizedDate) return false;
-
-      // 2. MUST VERIFY EXACT DOLLAR AMOUNT (within 1 cent)
-      const amtMatches = Math.abs(exp.amount - incomingAbsAmt) < 0.009;
-      if (!amtMatches) return false;
-
-      // 3. Must match description or merchant
-      const descMatches = (
-        exp.merchantClean === incomingDescClean ||
-        exp.rawDescClean === incomingDescClean ||
-        (incomingDescClean.length >= 3 && exp.merchantClean.includes(incomingDescClean)) ||
-        (exp.merchantClean.length >= 3 && incomingDescClean.includes(exp.merchantClean)) ||
-        (incomingDescClean.length >= 3 && exp.rawDescClean.includes(incomingDescClean))
+      return (
+        exp.base === incomingBase ||
+        (incomingBase.length >= 3 && exp.base.includes(incomingBase)) ||
+        (exp.base.length >= 3 && incomingBase.includes(exp.base))
       );
-
-      return descMatches;
     });
 
     if (matchedExisting) {
-      // Dollar amount and transaction verified as already in app -> skip to preserve user edits!
       matchedExisting.claimed = true;
-
-      // If existing transaction had no items, but this verified row has items, auto-enrich it!
       const existingExp = state.expenses[matchedExisting.index];
-      if (existingExp && parsedItems.length > 0 && (!existingExp.items || existingExp.items.length === 0)) {
-        existingExp.items = parsedItems;
-        enrichedCount++;
+
+      if (existingExp) {
+        let updated = false;
+
+        // Auto-enrich items (e.g. if incoming has items with prices or more items)
+        if (row.parsedItems.length > 0) {
+          const currentItems = Array.isArray(existingExp.items) ? existingExp.items : [];
+          const incomingHasPrices = row.parsedItems.some(it => it.includes('$'));
+          const currentHasPrices = currentItems.some(it => it.includes('$'));
+
+          if (currentItems.length === 0 || (incomingHasPrices && !currentHasPrices)) {
+            existingExp.items = row.parsedItems;
+            updated = true;
+          }
+        }
+
+        // Update category if pure shopping was detected
+        if (row.rawCatName.toLowerCase() === 'shopping' && existingExp.category === 'groceries') {
+          existingExp.category = 'shopping';
+          updated = true;
+        }
+
+        // Update description if incoming has EBT/Card tender tag
+        if (/ebt|card/i.test(row.description) && !/ebt|card/i.test(existingExp.description || '')) {
+          existingExp.description = row.description;
+          updated = true;
+        }
+
+        if (updated) enrichedCount++;
       }
 
       skippedCount++;
       continue;
     }
 
+    // New transaction to add
+    const catLower = row.rawCatName.toLowerCase();
     let categoryId = (catLower === 'food' || catLower === 'groceries') ? 'groceries' : catMap[catLower];
-    if (!categoryId && rawCatName) {
-      const slug = rawCatName.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 16) + '_' + Date.now().toString().slice(-4);
+    if (!categoryId && row.rawCatName) {
+      const slug = row.rawCatName.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 16) + '_' + Date.now().toString().slice(-4);
       const randomColor = AVAILABLE_COLORS[cats.length % AVAILABLE_COLORS.length];
       const newCat = {
         id: slug,
-        label: rawCatName,
+        label: row.rawCatName,
         iconName: 'tag',
         color: randomColor,
         bg: hexToRgba(randomColor, 0.15)
@@ -2427,21 +2502,21 @@ function importFromCSV(fileContent) {
       categoryId = cats[0]?.id || 'groceries';
     }
 
-    // Ensure unique ID
-    let id = `csv_${i}_${normalizedDate}_${amount}`;
+    let id = `csv_${row.lineIdx}_${row.date}_${row.amount}`;
     if (existingIds.has(id)) {
       id = `${id}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
     }
 
+    const finalAmount = row.isRefund ? -row.amount : row.amount;
     const newExpense = {
       id,
-      amount,
-      description,
+      amount: finalAmount,
+      description: row.description,
       category: categoryId,
-      date: normalizedDate,
+      date: row.date
     };
-    if (parsedItems.length > 0) {
-      newExpense.items = parsedItems;
+    if (row.parsedItems.length > 0) {
+      newExpense.items = row.parsedItems;
     }
 
     state.expenses.push(newExpense);
@@ -2456,8 +2531,9 @@ function importFromCSV(fileContent) {
   renderHistory();
 
   let msg = `Import complete! Added ${addedCount} expense(s).`;
-  if (enrichedCount > 0) msg += ` Enriched ${enrichedCount} existing expense(s) with purchased items.`;
-  if (skippedCount > 0) msg += ` Skipped ${skippedCount} duplicate row(s) (verified existing transactions by amount & date).`;
+  if (replacedSplitCount > 0) msg += ` Upgraded ${replacedSplitCount} order(s) to clean EBT/Card split tenders.`;
+  if (enrichedCount > 0) msg += ` Enriched ${enrichedCount} existing expense(s) with item prices & categories.`;
+  if (skippedCount > 0) msg += ` Skipped ${skippedCount} duplicate row(s).`;
   alert(msg);
 }
 
