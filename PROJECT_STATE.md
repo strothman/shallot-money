@@ -1,6 +1,6 @@
 # Shallot Money — Project State & Technical Architecture 🧅💰
 
-> **Current Version:** `1.7.7`  
+> **Current Version:** `1.7.8`  
 > **Repository:** [strothman/Shallot-Money](https://github.com/strothman/Shallot-Money)  
 > **Ecosystem:** Shallot Personal Utility Suite (alongside Shallot Kitchen Keeper)  
 > **Last Updated:** September 2026
