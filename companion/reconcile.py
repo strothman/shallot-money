@@ -450,6 +450,26 @@ def parse_bank_file(fpath):
                         })
                     continue
 
+                # Check for Venmo bill payments ($425, $325, $300) -> categorize as "Bills"
+                is_venmo_pmt = "venmo" in raw_lower and ("payment" in raw_lower or "pmt" in raw_lower)
+                if is_venmo_pmt:
+                    amt = 0.0
+                    if out_idx != -1 and len(r) > out_idx and clean_amount(r[out_idx]) > 0:
+                        amt = clean_amount(r[out_idx])
+                    elif amt_idx != -1 and len(r) > amt_idx:
+                        amt = clean_amount(r[amt_idx])
+                    if any(abs(amt - target) < 0.02 for target in [425.0, 325.0, 300.0]):
+                        transactions.append({
+                            "source": "TD Bank" if "td" in fname or "transaction" in fname else "Bank",
+                            "date": d,
+                            "amount": round(amt, 2),
+                            "description": "VENMO PAYMENT",
+                            "force_category": "bills",
+                            "raw_desc": raw_desc,
+                            "source_key": f"td_venmo_bill_{fname}_{d}_{amt:.2f}_{r_idx}"
+                        })
+                        continue
+
                 # Filter out internal transfers & card bill payments (since card purchases are tracked separately)
                 if any(kw in raw_lower for kw in [
                     "online xfer", "transfer to", "transfer from", "xfer",

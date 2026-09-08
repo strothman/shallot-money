@@ -15,7 +15,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
   - **Live App Auto-Migration**: On load, automatically scans existing expenses in `state.expenses` and updates any legacy unclassified or grocery-assigned Capital One payments to Bills.
   - **CSV & Bank Import Engine**: Direct bank imports (like TD Bank) without category headers now automatically map `"CAPITAL ONE MOBILE PMT"` to Bills rather than defaulting to Groceries or creating ad-hoc slugs.
   - **Smart Form Classification**: Typing or pasting Capital One mobile payments into the manual expense logger or receipt text modal immediately auto-selects the "Bills" category pill.
-  - **Companion Reconciler & Rules**: Updated `companion/reconcile.py` and `companion/rules.json` so TD Bank statements retain Capital One bill payments categorized as `Bills` rather than filtering them out as internal transfers.
+- **Automatic "Bills" Categorization for Specific Venmo Bill Payments**:
+  - Automatically categorizes all `"VENMO PAYMENT"` transactions with amounts of **$425.00**, **$325.00**, and **$300.00** (e.g. rent / recurring housing payments) as **Bills** (`bills`).
+  - Other Venmo transactions with different amounts remain untouched to preserve personal and incidental categorization.
+  - Applied across live app auto-migration on load, direct CSV import, form typing, and the Python TD Bank reconciler.
 
 ---
 

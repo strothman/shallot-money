@@ -95,6 +95,20 @@ function triggerHaptic(duration = 10) {
   }
 }
 
+function isVenmoBillPayment(description, amount) {
+  if (!description) return false;
+  const descUpper = String(description).toUpperCase();
+  if (!descUpper.includes('VENMO')) return false;
+  if (!descUpper.includes('PAYMENT') && !descUpper.includes('PMT')) return false;
+  const cleanAmtStr = String(amount !== undefined && amount !== null ? amount : '').replace(/[^0-9.]/g, '');
+  const numAmt = Math.abs(parseFloat(cleanAmtStr) || 0);
+  return (
+    Math.abs(numAmt - 425) < 0.02 ||
+    Math.abs(numAmt - 325) < 0.02 ||
+    Math.abs(numAmt - 300) < 0.02
+  );
+}
+
 // ----------------------------------------------------
 // SMART ITEM CATEGORIZATION ENGINE
 // ----------------------------------------------------
@@ -803,6 +817,12 @@ function loadState() {
           }
           const desc = (exp.description || '').toUpperCase();
           if (desc.includes('CAPITAL ONE MOBILE PMT') || desc.includes('CAPITAL ONE MOBILE PYMT') || /capital\s*one.*(?:mobile\s*p(?:y)?mt|pmt|payment)/i.test(desc)) {
+            if (exp.category !== 'bills') {
+              exp.category = 'bills';
+              migrated = true;
+            }
+          }
+          if (isVenmoBillPayment(exp.description, exp.amount)) {
             if (exp.category !== 'bills') {
               exp.category = 'bills';
               migrated = true;
@@ -2486,9 +2506,9 @@ function importFromCSV(fileContent) {
           updated = true;
         }
 
-        // Auto-update Capital One mobile payments to bills
+        // Auto-update Capital One and Venmo bill payments to bills
         const descUpper = (existingExp.description || '').toUpperCase();
-        if (descUpper.includes('CAPITAL ONE MOBILE PMT') || descUpper.includes('CAPITAL ONE MOBILE PYMT') || /capital\s*one.*(?:mobile\s*p(?:y)?mt|payment|pmt)/i.test(descUpper)) {
+        if (descUpper.includes('CAPITAL ONE MOBILE PMT') || descUpper.includes('CAPITAL ONE MOBILE PYMT') || /capital\s*one.*(?:mobile\s*p(?:y)?mt|payment|pmt)/i.test(descUpper) || isVenmoBillPayment(existingExp.description, existingExp.amount)) {
           if (existingExp.category !== 'bills') {
             existingExp.category = 'bills';
             updated = true;
@@ -2507,9 +2527,10 @@ function importFromCSV(fileContent) {
     const isCapOnePmt = rowDescUpper.includes('CAPITAL ONE MOBILE PMT') ||
                         rowDescUpper.includes('CAPITAL ONE MOBILE PYMT') ||
                         /capital\s*one.*(?:mobile\s*p(?:y)?mt|payment|pmt)/i.test(rowDescUpper);
+    const isVenmoBill = isVenmoBillPayment(row.description, row.amount);
 
     let categoryId = null;
-    if (isCapOnePmt) {
+    if (isCapOnePmt || isVenmoBill) {
       categoryId = 'bills';
       if (!cats.some(c => c.id === 'bills')) {
         const defaultBills = DEFAULT_CATEGORIES.find(c => c.id === 'bills');
@@ -2863,7 +2884,13 @@ function setupEventListeners() {
       }
 
       if (candidateItems.length > 0) {
-        const predicted = predictCategoryFromItems(candidateItems);
+        let predicted = null;
+        if (expenseAmountInput && isVenmoBillPayment(descVal, expenseAmountInput.value)) {
+          predicted = 'bills';
+        } else {
+          predicted = predictCategoryFromItems(candidateItems);
+        }
+
         if (predicted && predicted !== state.selectedCategory) {
           const cats = getCategories();
           if (cats.some(c => c.id === predicted)) {
@@ -2883,6 +2910,9 @@ function setupEventListeners() {
 
     expenseItemsInput.addEventListener('input', handleAutoCategorize);
     expenseDescInput.addEventListener('input', handleAutoCategorize);
+    if (expenseAmountInput) {
+      expenseAmountInput.addEventListener('input', handleAutoCategorize);
+    }
   }
 
   // Smart Receipt Ingest Modal Listeners
