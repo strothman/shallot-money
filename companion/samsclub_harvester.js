@@ -101,21 +101,35 @@
 
       await sleep(1500); // Allow cards to hydrate
 
-      const doc = scanIfr.contentDocument || scanIfr.contentWindow?.document;
-      const yearReceipts = extractReceiptsFromDoc(doc);
+      let pageNum = 1;
+      while (pageNum <= 10) {
+        const doc = scanIfr.contentDocument || scanIfr.contentWindow?.document;
+        if (!doc) break;
 
-      let newlyAdded = 0;
-      for (const r of yearReceipts) {
-        if (!allReceiptsMap.has(r.tc)) {
-          allReceiptsMap.set(r.tc, r.url);
-          newlyAdded++;
+        const pageReceipts = extractReceiptsFromDoc(doc);
+        let newlyAdded = 0;
+        for (const r of pageReceipts) {
+          if (!allReceiptsMap.has(r.tc)) {
+            allReceiptsMap.set(r.tc, r.url);
+            newlyAdded++;
+          }
         }
+
+        console.log(`  📅 ${yf.label} (Page ${pageNum}): Found ${pageReceipts.length} orders (${newlyAdded} new). Total collected: ${allReceiptsMap.size}`);
+
+        // Check for Next Page button
+        const nextBtn = Array.from(doc.querySelectorAll('button, a'))
+          .find(b => /next page/i.test(b.getAttribute('aria-label') || '') || b.getAttribute('aria-label') === 'Next');
+
+        const isEnd = !nextBtn || nextBtn.disabled || nextBtn.getAttribute('aria-disabled') === 'true' || newlyAdded === 0;
+        if (isEnd) break;
+
+        nextBtn.click();
+        pageNum++;
+        await sleep(2000);
       }
 
-      console.log(`  📅 ${yf.label}: Found ${yearReceipts.length} orders (${newlyAdded} new). Total collected: ${allReceiptsMap.size}`);
-
-      // If a historical year has 0 orders, we've likely reached the beginning of account history
-      if (yearReceipts.length === 0 && yf.param !== "year-0") {
+      if (pageNum === 1 && yf.param !== "year-0") {
         console.log(`  ⏹️ Reached earliest account history at ${yf.label}.`);
         break;
       }
