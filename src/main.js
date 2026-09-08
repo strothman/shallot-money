@@ -123,7 +123,8 @@ const ITEM_RULES = {
   bills: [
     'prime', 'amazon prime', 'subscription', 'sub', 'membership', 'cloud', 'icloud', 'netflix', 'spotify',
     'hulu', 'disney', 'utility', 'electric', 'power', 'water bill', 'internet', 'wifi', 'cable', 'phone',
-    'insurance', 'storage', 'domain', 'hosting'
+    'insurance', 'storage', 'domain', 'hosting',
+    'capital one mobile pmt', 'capital one mobile pymt', 'capital one payment', 'capital one pmt', 'capital one'
   ],
   entertainment: [
     'game', 'games', 'gaming', 'steam', 'arena', 'sineus arena', 'ticket', 'tickets', 'movie', 'movies', 'cinema',
@@ -800,9 +801,20 @@ function loadState() {
             exp.category = 'groceries';
             migrated = true;
           }
+          const desc = (exp.description || '').toUpperCase();
+          if (desc.includes('CAPITAL ONE MOBILE PMT') || desc.includes('CAPITAL ONE MOBILE PYMT') || /capital\s*one.*(?:mobile\s*p(?:y)?mt|pmt|payment)/i.test(desc)) {
+            if (exp.category !== 'bills') {
+              exp.category = 'bills';
+              migrated = true;
+            }
+          }
         });
       }
       if (migrated) {
+        if (!state.categories.some(c => c.id === 'bills')) {
+          const defaultBills = DEFAULT_CATEGORIES.find(c => c.id === 'bills');
+          if (defaultBills) state.categories.push(JSON.parse(JSON.stringify(defaultBills)));
+        }
         saveState();
       }
     } catch (e) {
@@ -2474,6 +2486,15 @@ function importFromCSV(fileContent) {
           updated = true;
         }
 
+        // Auto-update Capital One mobile payments to bills
+        const descUpper = (existingExp.description || '').toUpperCase();
+        if (descUpper.includes('CAPITAL ONE MOBILE PMT') || descUpper.includes('CAPITAL ONE MOBILE PYMT') || /capital\s*one.*(?:mobile\s*p(?:y)?mt|payment|pmt)/i.test(descUpper)) {
+          if (existingExp.category !== 'bills') {
+            existingExp.category = 'bills';
+            updated = true;
+          }
+        }
+
         if (updated) enrichedCount++;
       }
 
@@ -2482,24 +2503,40 @@ function importFromCSV(fileContent) {
     }
 
     // New transaction to add
-    const catLower = row.rawCatName.toLowerCase();
-    let categoryId = (catLower === 'food' || catLower === 'groceries') ? 'groceries' : catMap[catLower];
-    if (!categoryId && row.rawCatName) {
-      const slug = row.rawCatName.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 16) + '_' + Date.now().toString().slice(-4);
-      const randomColor = AVAILABLE_COLORS[cats.length % AVAILABLE_COLORS.length];
-      const newCat = {
-        id: slug,
-        label: row.rawCatName,
-        iconName: 'tag',
-        color: randomColor,
-        bg: hexToRgba(randomColor, 0.15)
-      };
-      cats.push(newCat);
-      catMap[catLower] = slug;
-      catMap[slug] = slug;
-      categoryId = slug;
-    } else if (!categoryId) {
-      categoryId = cats[0]?.id || 'groceries';
+    const rowDescUpper = (row.description || '').toUpperCase();
+    const isCapOnePmt = rowDescUpper.includes('CAPITAL ONE MOBILE PMT') ||
+                        rowDescUpper.includes('CAPITAL ONE MOBILE PYMT') ||
+                        /capital\s*one.*(?:mobile\s*p(?:y)?mt|payment|pmt)/i.test(rowDescUpper);
+
+    let categoryId = null;
+    if (isCapOnePmt) {
+      categoryId = 'bills';
+      if (!cats.some(c => c.id === 'bills')) {
+        const defaultBills = DEFAULT_CATEGORIES.find(c => c.id === 'bills');
+        if (defaultBills) cats.push(JSON.parse(JSON.stringify(defaultBills)));
+      }
+    } else {
+      const catLower = row.rawCatName.toLowerCase();
+      categoryId = (catLower === 'food' || catLower === 'groceries') ? 'groceries' : catMap[catLower];
+      if (!categoryId && row.rawCatName) {
+        const slug = row.rawCatName.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 16) + '_' + Date.now().toString().slice(-4);
+        const randomColor = AVAILABLE_COLORS[cats.length % AVAILABLE_COLORS.length];
+        const newCat = {
+          id: slug,
+          label: row.rawCatName,
+          iconName: 'tag',
+          color: randomColor,
+          bg: hexToRgba(randomColor, 0.15)
+        };
+        cats.push(newCat);
+        catMap[catLower] = slug;
+        catMap[slug] = slug;
+        categoryId = slug;
+      } else if (!categoryId) {
+        const candidateItems = row.parsedItems.length > 0 ? row.parsedItems : [row.description];
+        const predicted = predictCategoryFromItems(candidateItems);
+        categoryId = predicted || (cats[0]?.id || 'groceries');
+      }
     }
 
     let id = `csv_${row.lineIdx}_${row.date}_${row.amount}`;

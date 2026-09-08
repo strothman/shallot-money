@@ -430,11 +430,30 @@ def parse_bank_file(fpath):
                 d = parse_date(r[date_idx])
                 raw_desc = r[desc_idx].strip() if desc_idx != -1 and len(r) > desc_idx else "Debit Purchase"
                 
-                # Filter out internal transfers & card bill payments (since card purchases are tracked separately)
+                # Check for Capital One credit card payments -> categorize as "Bills"
                 raw_lower = raw_desc.lower()
+                if "capital one mobile pmt" in raw_lower or "capital one mobile pymt" in raw_lower or "capital one pmt" in raw_lower:
+                    amt = 0.0
+                    if out_idx != -1 and len(r) > out_idx and clean_amount(r[out_idx]) > 0:
+                        amt = clean_amount(r[out_idx])
+                    elif amt_idx != -1 and len(r) > amt_idx:
+                        amt = clean_amount(r[amt_idx])
+                    if amt > 0:
+                        transactions.append({
+                            "source": "TD Bank" if "td" in fname or "transaction" in fname else "Bank",
+                            "date": d,
+                            "amount": round(amt, 2),
+                            "description": "CAPITAL ONE MOBILE PMT",
+                            "force_category": "bills",
+                            "raw_desc": raw_desc,
+                            "source_key": f"td_capone_{fname}_{d}_{amt:.2f}_{r_idx}"
+                        })
+                    continue
+
+                # Filter out internal transfers & card bill payments (since card purchases are tracked separately)
                 if any(kw in raw_lower for kw in [
                     "online xfer", "transfer to", "transfer from", "xfer",
-                    "capital one mobile pmt", "card srvc bill pay", "mobile payment",
+                    "card srvc bill pay", "mobile payment",
                     "atm balance", "overdraft"
                 ]):
                     continue

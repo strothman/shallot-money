@@ -7,6 +7,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [1.7.8] - 2026-09-07
+
+### Added & Enhanced
+- **Automatic "Bills" Categorization for Capital One Mobile Payments**:
+  - Automatically identifies all transactions matching `"CAPITAL ONE MOBILE PMT"`, `"CAPITAL ONE MOBILE PYMT"`, or Capital One bill payments and assigns them directly to **Bills** (`bills`).
+  - **Live App Auto-Migration**: On load, automatically scans existing expenses in `state.expenses` and updates any legacy unclassified or grocery-assigned Capital One payments to Bills.
+  - **CSV & Bank Import Engine**: Direct bank imports (like TD Bank) without category headers now automatically map `"CAPITAL ONE MOBILE PMT"` to Bills rather than defaulting to Groceries or creating ad-hoc slugs.
+  - **Smart Form Classification**: Typing or pasting Capital One mobile payments into the manual expense logger or receipt text modal immediately auto-selects the "Bills" category pill.
+  - **Companion Reconciler & Rules**: Updated `companion/reconcile.py` and `companion/rules.json` so TD Bank statements retain Capital One bill payments categorized as `Bills` rather than filtering them out as internal transfers.
+
+---
+
 ## [1.7.7] - 2026-09-07
 
 ### Added & Enhanced

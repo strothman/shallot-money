@@ -23,7 +23,8 @@
       "verizon", "at&t", "t-mobile", "sprint", "xfinity", "comcast", "spectrum", "charter",
       "netflix", "spotify", "hulu", "disney", "apple.com/bill", "prime video", "hbo", "max", "google one", "chatgpt", "openai",
       "amzn digital", "youtube sub", "google youtube", "interest charge", "annual fee", "late fee",
-      "geico", "state farm", "progressive", "allstate", "insurance", "loan", "mortgage"
+      "geico", "state farm", "progressive", "allstate", "insurance", "loan", "mortgage",
+      "capital one mobile pmt", "capital one mobile pymt", "capital one payment", "capital one pmt", "capital one"
     ],
     "shopping": [
       "amazon", "amzn", "target", "best buy", "ebay", "walmart.com", "dollar tree",
@@ -62,7 +63,7 @@
     "bills": [
       "prime", "amazon prime", "subscription", "sub", "membership", "cloud", "icloud", "netflix", "spotify",
       "hulu", "disney", "utility", "electric", "power", "water bill", "internet", "wifi", "cable", "phone",
-      "insurance", "storage"
+      "insurance", "storage", "capital one mobile pmt", "capital one mobile pymt", "capital one payment", "capital one pmt", "capital one"
     ],
     "entertainment": [
       "game", "games", "gaming", "steam", "arena", "sineus arena", "ticket", "tickets", "movie", "movies", "cinema",
