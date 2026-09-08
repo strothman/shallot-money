@@ -15,6 +15,37 @@
   const orders = [];
   const seenKeys = new Set();
 
+  // 💳 Shared Membership Filter: Only export YOUR personal purchases
+  // Automatically includes all EBT purchases and checks for your Credit & Debit card digits.
+  let savedCards = {};
+  try {
+    savedCards = JSON.parse(localStorage.getItem('shallot_sams_my_cards') || '{}');
+  } catch (e) {}
+
+  let creditLast4 = savedCards.creditLast4 || '';
+  let debitLast4 = savedCards.debitLast4 || '';
+
+  if (!creditLast4 && !debitLast4) {
+    const input = prompt(
+      "💳 Shared Sam's Club Account Filter:\n\n" +
+      "Enter the last 4 digits of your Credit and/or Debit card separated by comma (e.g. 1234, 5678):\n" +
+      "(EBT purchases will be automatically included! Leave blank to export all orders)."
+    );
+    if (input) {
+      const parts = input.split(/[,;\s]+/).map(p => p.trim().slice(-4)).filter(p => p.length === 4);
+      if (parts[0]) creditLast4 = parts[0];
+      if (parts[1]) debitLast4 = parts[1];
+      localStorage.setItem('shallot_sams_my_cards', JSON.stringify({ creditLast4, debitLast4 }));
+    }
+  }
+
+  const myCardSet = new Set([creditLast4, debitLast4].filter(Boolean));
+  if (myCardSet.size > 0) {
+    console.log(`🔒 Shared Account Filtering Active: Matching cards [${Array.from(myCardSet).join(', ')}] + any EBT/SNAP orders.`);
+  } else {
+    console.log("ℹ️ No card filter specified: Exporting all orders on account.");
+  }
+
   // Auto-scroll down to trigger lazy loading of older orders
   console.log("📜 Scrolling to load Sam's Club order cards...");
   for (let i = 0; i < 4; i++) {
@@ -26,18 +57,20 @@
     'div[class*="order-card"]',
     'div[class*="OrderCard"]',
     'div[data-automation-id="order-card"]',
-    'div[class*="sc-order-card"]'
+    'div[class*="sc-order-card"]',
+    'div[class*="purchase-card"]',
+    'div[class*="history-card"]'
   ];
 
   let cards = Array.from(document.querySelectorAll(selectors.join(', ')));
   if (cards.length === 0) {
     const totals = Array.from(document.querySelectorAll('*')).filter(el => {
-      return el.children.length === 0 && /\$[0-9,]+\.[0-9]{2}/.test(el.textContent) && /order/i.test(el.parentElement?.textContent || '');
+      return el.children.length === 0 && /\$[0-9,]+\.[0-9]{2}/.test(el.textContent) && /order|purchase|total/i.test(el.parentElement?.textContent || '');
     });
     cards = totals.map(t => t.closest('div[class*="card"], div[class*="container"], li, section') || t.parentElement).filter(Boolean);
   }
 
-  console.log(`Found ${cards.length} order cards...`);
+  console.log(`Found ${cards.length} total order cards on page...`);
 
   for (const card of cards) {
     const text = card.innerText || '';
@@ -108,6 +141,20 @@
 
     const cardMatch = text.match(/(?:visa|mastercard|discover|amex|debit|credit|cash)[^\$\n\r]*\$([0-9,]+\.[0-9]{2})/i);
     if (cardMatch) tenders.card = parseFloat(cardMatch[1].replace(/,/g, ''));
+
+    // Check payment card digits (e.g. •••• 1234, ending in 1234)
+    const cardDigitsMatch = text.match(/(?:ending in|••••|\*{4}|\.{4}|visa|mastercard|discover|amex|debit|credit)[^\d\n\r]*(\d{4})/i);
+    const cardDigits = cardDigitsMatch ? cardDigitsMatch[1] : '';
+    const isEBT = tenders.ebt > 0 || /(?:snap|ebt|food\s*stamp)/i.test(text);
+
+    // If shared membership filter is active, skip purchases made on other cards
+    if (myCardSet.size > 0) {
+      const isMyCard = (cardDigits && myCardSet.has(cardDigits)) || isEBT;
+      if (!isMyCard && cardDigits) {
+        console.log(`  ⏭️ Skipped order from another cardholder ($${amt.toFixed(2)} on card ending in •••• ${cardDigits})`);
+        continue;
+      }
+    }
 
     if (dateStr && amt > 0 && !seenKeys.has(uniqueKey)) {
       seenKeys.add(uniqueKey);
