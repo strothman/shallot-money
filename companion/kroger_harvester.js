@@ -58,9 +58,17 @@
     }
   }
 
-  // Filter down to grocery orders that need itemization
-  const groceriesToExtract = orders.filter(o => !o.isFuel && o.key);
-  console.log(`\n🛍️ Step 2: Extracting grocery line items for ${groceriesToExtract.length} receipts...`);
+  // Step 2: Itemize grocery receipts
+  // Capped at 25 most recent orders to prevent Chrome tab Out of Memory (OOM) crashes.
+  // Older historical receipts are still fully included in the CSV with their verified totals & dates!
+  const MAX_ITEMIZE = 25;
+  const allGroceries = orders.filter(o => !o.isFuel && o.key);
+  const groceriesToExtract = allGroceries.slice(0, MAX_ITEMIZE);
+
+  console.log(`\n🛍️ Step 2: Extracting grocery line items for the ${groceriesToExtract.length} most recent receipts (preventing browser OOM)...`);
+  if (allGroceries.length > MAX_ITEMIZE) {
+    console.log(`  ℹ️ Note: ${allGroceries.length - MAX_ITEMIZE} older historical orders will be safely included as summary purchases in the CSV.`);
+  }
 
   // Step 2: Extract grocery line items & tender info
   // Uses session cache to resume if ever interrupted, tries direct API first, and disposes iframes to prevent memory leaks
